@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Club de Lectura</title>
+    <link rel="stylesheet" href="style.css">
+    <script defer src="app.js"></script>
+    <!-- Firebase -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+      import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "TU_API_KEY",
+        authDomain: "TU_PROYECTO.firebaseapp.com",
+        projectId: "TU_PROYECTO",
+        storageBucket: "TU_PROYECTO.appspot.com",
+        messagingSenderId: "TU_MESSAGING_ID",
+        appId: "TU_APP_ID"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      async function cargarLibroDelMes() {
+        const docRef = doc(db, "libroDelMes", "actual");
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          document.getElementById("portada").src = `assets/portadas/${docSnap.data().imagen}`;
+          document.getElementById("titulo").textContent = docSnap.data().titulo;
+        } else {
+          console.log("No hay libro del mes");
+        }
+      }
+
+      window.onload = cargarLibroDelMes;
+    </script>
+</head>
+<body>
+    <h1>Club de Lectura</h1>
+    <h2 id="titulo"></h2>
+    <img id="portada" src="" alt="Portada del libro" width="300">
+</body>
+</html>
