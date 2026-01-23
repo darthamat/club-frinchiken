@@ -27,7 +27,7 @@ s<!DOCTYPE html>
           
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-          document.getElementById("portadaUrl").src = `assets/portadas/${docSnap.data().imagen}`;
+          document.getElementById("portada").src = data.portadaUrl;
           document.getElementById("titulo").textContent = docSnap.data().titulo;
         } else {
           console.log("No hay libro del mes");
