@@ -1,19 +1,27 @@
-// Configuración Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyDcEUoGcKs6vwoNUF0ok1W-d8F2vVjCqP0",
-  authDomain: "club-frinchiken.firebaseapp.com",
-  projectId: "club-frinchiken",
-  storageBucket: "club-frinchiken.firebasestorage.app",
-  messagingSenderId: "993321884320",
-  appId: "1:993321884320:web:d4da17ddcc78f0482787c5"
-};
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
 
     // firebase-config.ts or your main application file (continuation)
 
     // ... (Firebase initialization code from above)
+
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyDcEUoGcKs6vwoNUF0ok1W-d8F2vVjCqP0",
+    authDomain: "club-frinchiken.firebaseapp.com",
+    projectId: "club-frinchiken",
+    storageBucket: "club-frinchiken.firebasestorage.app",
+    messagingSenderId: "993321884320",
+    appId: "1:993321884320:web:d4da17ddcc78f0482787c5"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+</script>
 
     /**
      * Duplicates a Firestore document by copying its data to a new document ID within the same collection.
