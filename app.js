@@ -11,12 +11,12 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 // 🔹 Cargar libro del mes dinámicamente
-db.collection("libroDelMes").doc("actual").onSnapshot(doc => {
+db.collection("retos").doc("2026_01").onSnapshot(doc => {
   if(doc.exists){
     const data = doc.data();
-    document.getElementById("titulo-libro").textContent = data.titulo;
-    document.getElementById("descripcion-libro").textContent = data.descripcion || "";
-    document.getElementById("portada-libro").src = `assets/portadas/${data.portada}`;
+    document.getElementById("titulo-libro").textContent = data.Titulo;
+    document.getElementById("Autor-libro").textContent = data.Autor || "";
+    document.getElementById("portada-libro").src = `assets/portadas/${data.portadaUrl}`;
   }
 });
 
