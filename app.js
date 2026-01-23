@@ -68,4 +68,23 @@ document.getElementById("marcar-leido").addEventListener("click", async () => {
   await ref.update({ experiencia: exp, nivel: nivel });
   alert(`¡Libro marcado! Nivel: ${nivel}, Experiencia: ${exp}`);
   mostrarRanking();
+
+   import { db } from "./firebase.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+async function cargarRetoActual() {
+  const ref = doc(db, "retos", "2026_01");
+  const snap = await getDoc(ref);
+
+  if (!snap.exists()) return;
+
+  const data = snap.data();
+
+  document.getElementById("titulo").textContent = data.titulo;
+  document.getElementById("autor").textContent = data.autor;
+  document.getElementById("portada").src = data.portadaUrl;
+}
+
+cargarRetoActual();
+
 });
