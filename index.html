@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+s<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -23,10 +23,11 @@
       const db = getFirestore(app);
 
       async function cargarLibroDelMes() {
-        const docRef = doc(db, "libroDelMes", "actual");
+        const docRef = doc(db, "retos", "2026_01");
+          
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-          document.getElementById("portada").src = `assets/portadas/${docSnap.data().imagen}`;
+          document.getElementById("portadaUrl").src = `assets/portadas/${docSnap.data().imagen}`;
           document.getElementById("titulo").textContent = docSnap.data().titulo;
         } else {
           console.log("No hay libro del mes");
