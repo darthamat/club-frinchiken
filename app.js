@@ -1,13 +1,12 @@
 // Configuración Firebase
-const firebaseConfig = {
-  apiKey: "TU_API_KEY",
-  authDomain: "TU_PROYECTO.firebaseapp.com",
-  projectId: "TU_PROYECTO",
-  storageBucket: "TU_PROYECTO.appspot.com",
-  messagingSenderId: "TU_SENDER_ID",
-  appId: "TU_APP_ID"
-};
-
+   const firebaseConfig = {
+    apiKey: "AIzaSyDcEUoGcKs6vwoNUF0ok1W-d8F2vVjCqP0",
+    authDomain: "club-frinchiken.firebaseapp.com",
+    projectId: "club-frinchiken",
+    storageBucket: "club-frinchiken.firebasestorage.app",
+    messagingSenderId: "993321884320",
+    appId: "1:993321884320:web:d4da17ddcc78f0482787c5"
+  };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
