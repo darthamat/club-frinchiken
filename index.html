@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+s<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -32,7 +32,7 @@ const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
 
       async function cargarLibroDelMes() {
-        const docRef = doc(db, "libroDelMes", "actual");
+        const docRef = doc(db, "retos", "reto_actual");
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           document.getElementById("portada").src = `assets/portadas/${docSnap.data().imagen}`;
