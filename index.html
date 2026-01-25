@@ -39,8 +39,8 @@
             if (snap.exists()) {
                 const data = snap.data();
 
-                document.getElementById("titulo").textContent = data.titulo;
-                document.getElementById("autor").textContent = "Autor: " + data.autor;
+                document.getElementById("titulo").textContent = data.Titulo;
+                document.getElementById("autor").textContent = "Autor: " + data.Autor;
                 document.getElementById("portada").src = data.portadaUrl;
             } else {
                 document.getElementById("titulo").textContent = "Libro no encontrado";
