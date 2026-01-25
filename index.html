@@ -1,40 +1,54 @@
-s<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Club de Lectura</title>
-    <link rel="stylesheet" href="style.css">
-    <script defer src="app.js"></script>
-    <!-- Firebase -->
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-      import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
-
- 
-
-      const app = initializeApp(firebaseConfig);
-      const db = getFirestore(app);
-
-      async function cargarLibroDelMes() {
-        const docRef = doc(db, "retos", "2026_01");
-          
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          document.getElementById("portada").src = data.portadaUrl;
-          document.getElementById("titulo").textContent = docSnap.data().titulo;
-        } else {
-          console.log("No hay libro del mes");
-        }
-      }
-
-      window.onload = cargarLibroDelMes;
-    </script>
+    <title>Club de Lectura Frinchicken v2</title>
 </head>
 <body>
-    <h1>Club de Lectura</h1>
-    <h2 id="titulo"></h2>
-    <img id="portada-libro1" src="./assets/portadas/Narraciones%20extraordinarias%20-%20Edgar%20Allan%20Poe.jpg" alt="Portada del libro" width="300">
-    <script type="module" src="app.js"></script>
+
+    <h1 id="titulo">Cargando...</h1>
+    <p id="autor"></p>
+    <img id="portada" src="" alt="Portada del libro" width="200">
+
+    <!-- Firebase -->
+    <script type="module">
+        // 1️⃣ Importamos lo necesario de Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // 2️⃣ Configuración de Firebase (AHORA hablamos de seguridad 👇)
+        const firebaseConfig = {
+            apiKey: "TU_API_KEY",
+            authDomain: "TU_PROYECTO.firebaseapp.com",
+            projectId: "TU_PROYECTO",
+            storageBucket: "TU_PROYECTO.appspot.com",
+            messagingSenderId: "XXXX",
+            appId: "XXXX"
+        };
+
+        // 3️⃣ Inicializamos Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // 4️⃣ Leemos el libro desde Firestore
+        async function cargarLibro() {
+            const ref = doc(db, "libros", "libroActual");
+            const snap = await getDoc(ref);
+
+            if (snap.exists()) {
+                const data = snap.data();
+
+                document.getElementById("titulo").textContent = data.titulo;
+                document.getElementById("autor").textContent = "Autor: " + data.autor;
+                document.getElementById("portada").src = data.portadaURL;
+            } else {
+                document.getElementById("titulo").textContent = "Libro no encontrado";
+            }
+        }
+
+        cargarLibro();
+    </script>
+
 </body>
 </html>
 
