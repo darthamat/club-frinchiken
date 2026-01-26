@@ -6,16 +6,13 @@ body {
 }
 
 .estilo1 {
-    max-width: 200px;
-    
+    max-width: 60%;    
     background-color: #ffffe6;
     padding: 10px;
   border-radius: 5px;
     color: #f0f0f0;
   opacity: 0.5;
-    position: absolute;
-  text-align: center;
-    z-index: 1;
+   text-align: center;
 
 section {
   max-width: 200px;
