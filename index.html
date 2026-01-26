@@ -1,115 +1,50 @@
 <!DOCTYPE html>
+    <header class="top-bar">
+  <button class="btn-acceder">Acceder</button>
+        
+            <!-- Modal Login -->
+<div id="loginModal" class="modal hidden">
+  <div class="modal-content">
+      <div class="div11">
+    <h3>Acceder</h3>
+          </div>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Contraseña">
+    <button class="btn-acceder" id="loginBtn">ENTRAR</button>
+      <button >Registrar</button>
+    <p id="loginError"></p>
+  </div>
+</div>
+    
+</header>
+<hr class="divider">
 <html lang="es">
+    
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
+      <script type="module" src="app.js"></script>
     <title>Club de Lectura Frinchiken v3</title>
 </head>
-<body>
-<h1>===+++---RETO ACTUAL---+++===</h1>
     
+
+<body>
+   
+  
+<div class="div1">
+    
+<h1>===+++---RETO ACTUAL---+++===</h1>
+   </div>
+   
     <h1 id="titulo">Cargando...</h1>
     <p id="autor"></p>
-    <img id="portada" src=" " alt="Portada del libro">
- 
-
+    <img class="portada" id="portada" src=" " alt="Portada del libro">
     
-    <!-- Firebase -->
-    <script type="module">
-        // 1️⃣ Importamos lo necesario de Firebase
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        // 2️⃣ Configuración de Firebase (AHORA hablamos de seguridad 👇)
-          const firebaseConfig = {
-    apiKey: "AIzaSyDcEUoGcKs6vwoNUF0ok1W-d8F2vVjCqP0",
-    authDomain: "club-frinchiken.firebaseapp.com",
-    projectId: "club-frinchiken",
-    storageBucket: "club-frinchiken.firebasestorage.app",
-    messagingSenderId: "993321884320",
-    appId: "1:993321884320:web:d4da17ddcc78f0482787c5"
-  };;
-
-        // 3️⃣ Inicializamos Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        // 4️⃣ Leemos el libro desde Firestore
-        async function cargarLibro() {
-            const ref = doc(db, "retos", "2026_01");
-            const snap = await getDoc(ref);
-
-            if (snap.exists()) {
-                const data = snap.data();
-
-                document.getElementById("titulo").textContent = data.Titulo;
-                document.getElementById("autor").textContent = "Autor: " + data.Autor;
-                document.getElementById("portada").src = data.portadaUrl;
-            } else {
-                document.getElementById("titulo").textContent = "Libro no encontrado";
-            }
-        }
-
-        cargarLibro();
-    </script>
-    
-   
-
+    <div class="div1">
+    <h1>LOGROS CONSEGUIDOS</h1>
+      <div class="div11"></div>
+           
+    </div>
+     
 </body>
 </html>
-
- <style>
-    body {
-        background-image: url("./assets/background.jpg");
-min-height: 90%;
-background-repeat: repeat;
-background-attachment: fixed;
-background-position: center;
-background-size: auto;
- background-blend-mode: overlay;
-        background-color: #f4f1ea;
-        font-family: Georgia, serif;
-        text-align: center;
-        padding: 40px;
-        
-        
-    }
-
-    h1 {
-        letter-spacing: 1px;
-    }
-
-    /img1 {
-        margin-top: 20px;
-         height: 100%;
-    width: auto;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-    }
-        
-        /div1{
-           height: 80vh;
-        height: auto;
-            padding: 20px;
-            background: rgba(4, 170, 109, 0.3);
-            border: 1px solid;
-            border-radius: 15px;
-            display: flex;
-           }
-     
-     div{
-           height: 80vh;
-        height: auto;
-          background: rgba(4, 170, 109, 0.3);
-            border: 1px solid;
-            border-radius: 15px;
-         padding: 20px;
-         }
-     
-     img{
-            height: 100%;
-    width: auto;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-         border-radius: 15px;
-     }
-
-     
-</style>
