@@ -8,9 +8,11 @@ body {
 .estilo1 {
     width: 200px;
     height: 100px;
-    background-color: transparent;
+    background-color: #ffffe6;
     padding: 10px;
-    color: #0000FF;
+  border-radius: 5px;
+    color: #f0f0f0;
+  opacity: 0.5;
     position: absolute;
     z-index: 1;
 
@@ -19,9 +21,9 @@ section {
   margin-bottom: 10px;
   border-radius: 5px;
   font-family: 'Arial', sans-serif;
-  background-color: #ffffe6;
+  
   color: #f0f0f0;
-  opacity: 0.5;
+  
   text-align: center;
 }
 
