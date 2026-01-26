@@ -20,6 +20,12 @@ img {
   border-radius: 5px;
 }
 
+actual {
+  max-width: 200px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+}
+
 input, button {
   padding: 5px 10px;
   margin: 5px;
