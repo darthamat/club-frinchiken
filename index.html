@@ -2,20 +2,16 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="style.css">
-    <title>Club de Lectura Frinchicken v2</title>
+    <title>Club de Lectura Frinchiken v3</title>
 </head>
 <body>
-<h1 id="actual">-----RETO ACTUAL------</h1>
-   
+<h1 i>+++===---RETO ACTUAL---===+++</h1>
+    <div>
     <h1 id="titulo">Cargando...</h1>
     <p id="autor"></p>
-    <img id="img" src="" alt="Portada del libro" width="800">
-   
+    <img id="portada" src=" " alt="Portada del libro" width="200">
+    </div>
     
-    
-
-
     <!-- Firebase -->
     <script type="module">
         // 1️⃣ Importamos lo necesario de Firebase
@@ -23,8 +19,7 @@
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // 2️⃣ Configuración de Firebase (AHORA hablamos de seguridad 👇)
-        // Configuración Firebase
-   const firebaseConfig = {
+          const firebaseConfig = {
     apiKey: "AIzaSyDcEUoGcKs6vwoNUF0ok1W-d8F2vVjCqP0",
     authDomain: "club-frinchiken.firebaseapp.com",
     projectId: "club-frinchiken",
@@ -55,7 +50,45 @@
 
         cargarLibro();
     </script>
+    
+   
 
 </body>
 </html>
+ <style>
+    body {
+        background-image: url("./assets/background.jpg");
+min-height: 90%;
+background-repeat: repeat;
+background-attachment: fixed;
+background-position: center;
+background-size: auto;
+ background-blend-mode: overlay;
+        background-color: #f4f1ea;
+        font-family: Georgia, serif;
+        text-align: center;
+        padding: 40px;
+        
+        
+    }
+
+    h1 {
+        letter-spacing: 1px;
+    }
+
+    img {
+        margin-top: 20px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+        
+        div{
+           
+            background-image: -moz-repeating-linear-gradient();
+            background: rgba(4, 170, 109, 0.3);
+            padding-bottom: 20px;
+            border: 1px solid;
+            border-radius: 5px;
+  
+        }
+</style>
 
