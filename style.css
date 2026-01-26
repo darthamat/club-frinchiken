@@ -1,0 +1,88 @@
+
+    body {
+        
+        background-image: url("./assets/background.jpg");
+        min-height: 90%;      
+        background-repeat: repeat;
+        background-attachment: fixed;
+        background-position: center;
+        background-size: auto;
+        background-blend-mode: overlay;
+        background-color: #f4f1ea;
+        font-family: Georgia, serif;
+        text-align: center;
+        padding: 40px;
+
+    }
+
+    h1 {
+        letter-spacing: 1px;
+        font-family: Georgia, serif;
+    }
+
+    
+
+   .div1{
+           width: auto;
+           background: rgba(145, 240, 205, 0.3);
+            border: 1px solid;
+            border-radius: 15px;
+            padding: 10px;
+       }
+
+ .div11{
+           width: auto;
+           background: rgba(255, 255, 255, 0.56);
+            border: 1px solid;
+            border-radius: 15px;
+            border-color: crimson;
+            padding: 10px;
+       }
+     
+     img{
+         height: 100%;
+         width: auto;
+         box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+         border-radius: 15px;
+         justify-content: center;
+        align-items: center;
+         margin: auto;
+    }
+
+   /* Barra superior */
+.top-bar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+ 
+}
+
+/* Botón */
+.btn-acceder {
+  background:none;
+  
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: 500;
+    margin-bottom: 4px;
+}
+
+
+.btn-acceder:hover {
+  color: cornflowerblue;
+  
+}
+
+/* Línea divisoria */
+.divider {
+  width: 100%;
+  border: none;
+  border-top: 1px solid #151111;
+  margin: 0;
+    margin-bottom: 5px;
+}
+
+.portada{
+    margin-bottom: 20px;
+}
+
