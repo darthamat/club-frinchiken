@@ -6,8 +6,8 @@ body {
 }
 
 .estilo1 {
-    width: 90%;
-    height: 90%;
+    max-width: 200px;
+    height: 20%;
     background-color: #ffffe6;
     padding: 10px;
   border-radius: 5px;
