@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, setDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 // ---------------- CONFIG FIREBASE ----------------
@@ -11,68 +11,76 @@ const firebaseConfig = {
   messagingSenderId: "993321884320",
   appId: "1:993321884320:web:d4da17ddcc78f0482787c5"
 };
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth();
 
-// ---------------- ELEMENTOS ----------------
-const registrarBtn = document.getElementById("registrarBtn");
+// ---------------- ELEMENTOS DOM ----------------
+const btnRegister = document.getElementById("btnRegister");
+const nombreRealInput = document.getElementById("nombreReal");
+const nombrePersonajeInput = document.getElementById("nombrePersonaje");
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
-const registroError = document.getElementById("registroError");
-const registroExito = document.getElementById("registroExito");
+const errorMsg = document.getElementById("errorMsg");
 
 // ---------------- CLASES ALEATORIAS ----------------
-const clasesRPG = [
-  "Mago Enteraíllo", "Bardo Cuentacuentos", "Caballero de las Palabras",
-  "Pícaro de los Post-it", "Druida de Marcapáginas", "Arquitecto de Tramas",
-  "Explorador de Bibliotecas", "Alquimista de Historias", "Guardabibliotecas",
-  "Oráculo de Sinopsis", "Hechicero de Títulos Largos", "Viajero de Mundos Paralelos",
-  "Señor/a de las Comillas", "Monje de los Ensayos", "Ninja de las Notas al Pie",
-  "Gladiador de las Páginas", "Cazador de Spoilers", "Pirata de Bibliotecas",
-  "Arquero de la Lectura", "Alquimista de Café y Libros"
+const clasesPersonaje = [
+"Mago/a Sabe-lo-Todo", "Bardo/a Cuentacuentos", "Caballero de las Palabras",
+  "Pícaro/a de los Post-it", "Druida Romantasy", "Inventor/a de Tramas",
+  "Explorador/a de Bibliotecas", "Alquimista de Historias", "Guardabibliotecas",
+  "Adivinador/a de tramas", "Hechicero/a de Tochos Imposibles", "Viajero/a de Mundos Paralelos",
+  "Señor/a de las Comillas", "Monje de los Ensayos",
+  "Gladiador Poético", "Cazador de Spoilers", "Pirata de Libros Digitales",
+  "Arquero/a de la Lectura", "Alquimista de Café y Libros", "Ladrón/a de libros"
 ];
 
-// Función para elegir una clase aleatoria
-function claseAleatoria() {
-  return clasesRPG[Math.floor(Math.random() * clasesRPG.length)];
-}
-
-
 // ---------------- REGISTRO ----------------
-registrarBtn.addEventListener("click", async () => {
+btnRegister.addEventListener("click", async () => {
+  const nombreReal = nombreRealInput.value.trim();
+  let nombrePersonaje = nombrePersonajeInput.value.trim();
   const email = emailInput.value.trim();
   const password = passwordInput.value.trim();
-  registroError.textContent = "";
-  registroExito.textContent = "";
 
-  if(!email || !password){
-    registroError.textContent = "Completa todos los campos";
+  if(!nombreReal || !email || !password) {
+    errorMsg.textContent = "Completa los campos obligatorios";
     return;
   }
 
-  try {
-    const cred = await createUserWithEmailAndPassword(auth, email, password);
-    const user = cred.user;
+  // Si no pone nombre de personaje, se asigna uno aleatorio
+  if(!nombrePersonaje){
+    nombrePersonaje = clasesPersonaje[Math.floor(Math.random()*clasesPersonaje.length)];
+  }
 
-    // Asignar clase aleatoria
-    const clase = claseAleatoria();
+  try{
+    const cred = await createUserWithEmailAndPassword(auth,email,password);
 
-    // Crear documento en Firestore
-    await setDoc(doc(db,"users",user.uid),{
-      displayName: email,
+    // Guardar datos en Firestore
+    await setDoc(doc(db,"users",cred.user.uid),{
+      nombreReal,
+      nombrePersonaje,
+      displayName: nombrePersonaje,
       prestigio: 0,
       nivel: 1,
-      clase: clase,
+      fuerza: 10,
+      agilidad: 10,
+      inteligencia: 10,
+      sabiduria: 10,
+      fatiga: 0,
+      mente: 0,
+      corazon: 0,
       photoURL: "",
-      lecturas: []
     });
 
-    registroExito.textContent = `Usuario registrado! Tu clase es: ${clase}`;
-    emailInput.value = "";
-    passwordInput.value = "";
-  } catch (error) {
-    registroError.textContent = error.message;
+    errorMsg.style.color = "green";
+    errorMsg.textContent = "¡Registro completado! !Se ha asignado una clase aletoria! Puedes iniciar sesión.";
+    
+    // Redirigir al login después de 2s
+    setTimeout(()=>window.location.href="login.html",2000);
+    
+  } catch(e){
+    errorMsg.style.color = "red";
+    errorMsg.textContent = e.message;
   }
 });
 

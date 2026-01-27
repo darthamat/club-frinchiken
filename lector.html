@@ -1,49 +1,88 @@
- <link rel="stylesheet" href="style.css">
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="lector.css">
+  <title>Club de Lectura Frinchiken - Lector</title>
+</head>
+<body>
+
 <div class="hud">
 
+  <!-- ==================== PLAYER CARD ==================== -->
   <section class="player-card">
-    <img src="avatar.png" class="avatar">
+    <img src="avatar.png" class="avatar" alt="Avatar">
     <div>
-      <h2>Elena la Lectora</h2>
-      <p>Nivel <span id="nivel">12</span></p>
+      <h2 id="nombrePersonaje">Cargando...</h2>
+      <p>Clase: <span id="clasePersonaje">---</span></p>
+      <p>Nivel <span id="nivelUsuario">1</span></p>
       <div class="xp-bar">
-        <div class="xp-fill"></div>
+        <div class="xp-fill" id="barraXP"></div>
       </div>
-      <small>340 / 500 XP</small>
+      <small id="xpUsuario">0 / 100 XP</small>
     </div>
   </section>
 
+  <!-- ==================== PANELS ==================== -->
   <section class="panels">
-    <div class="panel">
+
+    <!-- Stats RPG -->
+    <div class="panel stats-panel">
       <h3>📊 Stats</h3>
-      <p>Páginas: 1240</p>
-      <p>Libros: 5</p>
-      <p>Racha: 7 días</p>
+      <div class="stat">Fuerza: <span id="statFuerza">10</span></div>
+      <div class="stat">Agilidad: <span id="statAgilidad">10</span></div>
+      <div class="stat">Inteligencia: <span id="statInteligencia">10</span></div>
+      <div class="stat">Sabiduría: <span id="statSabiduria">10</span></div>
+
+      <div class="stat">
+        Mente:
+        <div class="barra-stat">
+          <div class="barra-fill" id="statMente"></div>
+        </div>
+      </div>
+
+      <div class="stat">
+        Corazón:
+        <div class="barra-stat">
+          <div class="barra-fill" id="statCorazon"></div>
+        </div>
+      </div>
+
+      <div class="stat">
+        Fatiga:
+        <div class="barra-stat">
+          <div class="barra-fill" id="statFatiga"></div>
+        </div>
+      </div>
     </div>
 
-    <div class="panel">
+    <!-- Logros -->
+    <div class="panel logros-panel">
       <h3>🏆 Logros</h3>
-      <ul>
-        <li>📘 Primer libro</li>
-        <li>🔥 7 días seguidos</li>
+      <ul id="feedLogros">
+        <!-- Aquí se insertarán logros aleatorios -->
       </ul>
     </div>
+
   </section>
 
+  <!-- ==================== LECTURA ACTUAL ==================== -->
   <section class="panel lectura">
     <h3>📖 Lectura actual</h3>
-    <p>El nombre del viento</p>
+    <p id="tituloReto">Cargando libro del reto...</p>
 
     <div class="progress-bar">
-      <div class="progress-fill"></div>
+      <div class="progress-fill" id="progresoReto"></div>
     </div>
 
-    <button>Actualizar progreso</button>
-    <button class="gold">Libro terminado</button>
+    <button id="btnActualizarProgreso">Actualizar progreso</button>
+    <button class="gold" id="btnTerminarLibro">Libro terminado</button>
   </section>
 
 </div>
- <section class="registro-lectura">
+
+<!-- ==================== REGISTRO DE NUEVAS LECTURAS ==================== -->
+<section class="registro-lectura">
 
   <h2>📚 Registrar lectura</h2>
 
@@ -83,6 +122,8 @@
           <option>Ciencia ficción</option>
           <option>Ensayo</option>
           <option>Historia</option>
+          <option>Romance</option>
+          <option>Poesía</option>
         </select>
       </label>
     </div>
@@ -94,3 +135,10 @@
     <button class="btn-principal" id="btnRegistrar">📘 Registrar lectura</button>
   </div>
 </section>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
+
+
+

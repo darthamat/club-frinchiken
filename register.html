@@ -2,19 +2,100 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Registro - Club Frinchiken</title>
+  <title>Registro · Club Frinchiken</title>
   <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <h1>Registro de Usuario</h1>
 
+  <style>
+    body {
+      font-family: serif;
+      background: #111;
+      color: #eee;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .registro-container {
+      background: #1c1c1c;
+      border-radius: 12px;
+      max-width: 420px;
+      width: 100%;
+      padding: 20px;
+      box-shadow: 0 0 25px rgba(0,0,0,0.6);
+      text-align: center;
+    }
+
+    .registro-container img {
+      width: 100%;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+
+    .registro-container h2 {
+      font-size: 1.6em;
+      margin-bottom: 5px;
+    }
+
+    .registro-container em {
+      color: #cfa44a;
+      font-size: 0.95em;
+    }
+
+    input {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      font-size: 1em;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 15px;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: #cfa44a;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #e6be6b;
+    }
+
+    #errorMsg {
+      margin-top: 10px;
+      color: #ff6b6b;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="registro-container">
+
+  <!-- IMAGEN MONTY PYTHON -->
+  <img src="assets/bridge_of_death.jpg" alt="Bridge of Death - Monty Python">
+
+  <h2>🧙‍♂️ What is your name?</h2>
+  <em>El Guardián del Puente exige respuestas…</em>
+
+  <input type="text" id="nombreReal" placeholder="Tu nombre real">
+  <input type="text" id="nombrePersonaje" placeholder="Nombre de tu personaje (opcional)">
   <input type="email" id="email" placeholder="Email">
   <input type="password" id="password" placeholder="Contraseña">
-  <button id="registrarBtn">Registrarse</button>
 
-  <p id="registroError" style="color:red;"></p>
-  <p id="registroExito" style="color:green;"></p>
+  <button id="btnRegister">Responder al Guardián</button>
 
-  <script type="module" src="register.js"></script>
+  <p id="errorMsg"></p>
+
+</div>
+
+<script type="module" src="register.js"></script>
 </body>
 </html>
+

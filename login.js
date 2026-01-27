@@ -29,7 +29,7 @@ loginBtn.addEventListener("click", async ()=>{
   loginError.textContent = "";
   try{
     await signInWithEmailAndPassword(auth,email,password);
-    window.location.href = "dashboard.html"; // Redirige tras login
+    window.location.href = "lector.html"; // Redirige tras login
   }catch(e){
     loginError.textContent = e.message;
   }

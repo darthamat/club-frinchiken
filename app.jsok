@@ -1,0 +1,133 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, doc, getDoc, addDoc, setDoc, getDocs, updateDoc, Timestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+// ---------------- CONFIG FIREBASE ----------------
+const firebaseConfig = {
+  apiKey: "AIzaSyDcEUoGcKs6vwoNUF0ok1W-d8F2vVjCqP0",
+  authDomain: "club-frinchiken.firebaseapp.com",
+  projectId: "club-frinchiken",
+  storageBucket: "club-frinchiken.firebasestorage.app",
+  messagingSenderId: "993321884320",
+  appId: "1:993321884320:web:d4da17ddcc78f0482787c5"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth();
+
+// ---------------- ELEMENTOS ----------------
+const btnLoginPage = document.getElementById("btnLoginPage");
+
+const titulo = document.getElementById("titulo");
+const autor = document.getElementById("autor");
+const portada = document.getElementById("portada");
+
+const btnReto = document.getElementById("btnReto");
+const busquedaLibro = document.getElementById("busquedaLibro");
+const resultados = document.getElementById("resultados");
+const tituloLibro = document.getElementById("tituloLibro");
+const autorLibro = document.getElementById("autorLibro");
+const paginasLibro = document.getElementById("paginasLibro");
+const categoriaLibro = document.getElementById("categoriaLibro");
+const portadaLibro = document.getElementById("portadaLibro");
+const btnRegistrar = document.getElementById("btnRegistrar");
+const feedLogros = document.getElementById("feedLogros");
+
+// ---------------- LOGIN ----------------
+btnLoginPage.addEventListener("click", ()=>{
+  window.location.href = "login.html"; // Página independiente para login/registro
+});
+
+// ---------------- RETO ACTUAL ----------------
+async function cargarRetoActual(){
+  try{
+    const retoRef = doc(db,"retos","2026_01");
+    const snap = await getDoc(retoRef);
+    if(snap.exists()){
+      const reto = snap.data();
+      titulo.textContent = reto.Titulo || "Título desconocido";
+      autor.textContent = "Autor: " + (reto.Autor || "Desconocido");
+      portada.src = reto.portadaUrl || "";
+    } else {
+      titulo.textContent = "No hay reto activo";
+      autor.textContent = "";
+      portada.src = "";
+    }
+  }catch(e){
+    console.error(e);
+    titulo.textContent = "Error al cargar el reto";
+    autor.textContent = "";
+    portada.src = "";
+  }
+}
+cargarRetoActual();
+
+// ---------------- BOTON RETO ----------------
+btnReto.addEventListener("click", async ()=>{
+  try{
+    const retoRef = doc(db,"retos","2026_01");
+    const snap = await getDoc(retoRef);
+    if(snap.exists()){
+      const reto = snap.data();
+      tituloLibro.value = reto.Titulo || "";
+      autorLibro.value = reto.Autor || "";
+      paginasLibro.value = reto.paginas || 0;
+      categoriaLibro.value = reto.categoria || "Fantasía";
+      portadaLibro.src = reto.portadaUrl || "";
+    }
+  }catch(e){ console.error(e); }
+});
+
+// ---------------- BUSCADOR LIBROS ----------------
+let timeout;
+busquedaLibro.addEventListener("input", ()=>{
+  clearTimeout(timeout);
+  timeout = setTimeout(async ()=>{
+    const texto = busquedaLibro.value.trim();
+    if(texto.length<3) return;
+    const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(texto)}&langRestrict=es&maxResults=10`;
+    const res = await fetch(url);
+    const data = await res.json();
+    resultados.innerHTML = "";
+    if(!data.items) return;
+    data.items.forEach(lib=>{
+      const info = lib.volumeInfo;
+      const li = document.createElement("li");
+      li.innerHTML = `<strong>${info.title}</strong> - ${info.authors?.[0]||"Desconocido"}`;
+      li.addEventListener("click", ()=>{
+        tituloLibro.value = info.title || "";
+        autorLibro.value = info.authors?.[0] || "";
+        paginasLibro.value = info.pageCount || 0;
+        categoriaLibro.value = info.categories?.[0] || "Fantasía";
+        portadaLibro.src = info.imageLinks?.thumbnail || "";
+        resultados.classList.add("hidden");
+      });
+      resultados.appendChild(li);
+    });
+    resultados.classList.remove("hidden");
+  },400);
+});
+
+// ---------------- REGISTRAR LECTURA ----------------
+btnRegistrar.addEventListener("click", async ()=>{
+  const user = auth.currentUser;
+  if(!user){ alert("Debes iniciar sesión"); return; }
+
+  const lectura = {
+    titulo: tituloLibro.value.trim(),
+    autor: autorLibro.value.trim(),
+    paginas: parseInt(paginasLibro.value),
+    categoria: categoriaLibro.value,
+    portada: portadaLibro.src,
+    tipo: "libre",
+    estado: "terminado",
+    fechaInicio: Timestamp.now(),
+    fechaFin: Timestamp.now(),
+    prestigioOtorgado: parseInt(paginasLibro.value)
+  };
+
+  try{
+    await addDoc(collection(db,"users",user.uid,"lecturas"), lectura);
+    alert(`Lectura registrada: ${lectura.titulo}`);
+  }catch(e){ console.error(e); alert("Error registrando lectura"); }
+});

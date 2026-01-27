@@ -1,0 +1,75 @@
+body {
+  background: #1b1f2a;
+  font-family: 'Segoe UI', sans-serif;
+  color: #eee;
+}
+
+.hud {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+}
+
+.player-card {
+  display: flex;
+  gap: 20px;
+  background: #252b3a;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0,0,0,.4);
+}
+
+.avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  border: 3px solid gold;
+}
+
+.xp-bar, .progress-bar {
+  background: #333;
+  border-radius: 10px;
+  overflow: hidden;
+  height: 12px;
+}
+
+.xp-fill {
+  width: 68%;
+  height: 100%;
+  background: linear-gradient(90deg, gold, orange);
+}
+
+.progress-fill {
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(90deg, #00ffaa, #00cc88);
+}
+
+.panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.panel {
+  background: #252b3a;
+  padding: 15px;
+  border-radius: 12px;
+}
+
+button {
+  background: #3b82f6;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+button.gold {
+  background: linear-gradient(90deg, gold, orange);
+  color: black;
+}
