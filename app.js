@@ -1,5 +1,4 @@
-   
-        // ----------------------------
+// ----------------------------
 // 1️⃣ IMPORTS DE FIREBASE
 // ----------------------------
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -18,7 +17,6 @@ const firebaseConfig = {
   appId: "1:993321884320:web:d4da17ddcc78f0482787c5"
 };
 
-// Inicializar Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth();
@@ -40,6 +38,12 @@ const paginasInput = document.getElementById("paginas");
 const categoriaInput = document.getElementById("categoria");
 const portadaImg = document.querySelector(".libro-seleccionado img");
 
+// Elementos para mostrar info de usuario en index
+const displayNombre = document.getElementById("displayNombre");
+const displayPrestigio = document.getElementById("displayPrestigio");
+const displayNivel = document.getElementById("displayNivel");
+const displayFoto = document.getElementById("displayFoto");
+
 // ----------------------------
 // 4️⃣ LOGIN / LOGOUT
 // ----------------------------
@@ -48,8 +52,6 @@ btnAcceder.addEventListener("click", async () => {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
     console.log("Usuario logueado:", user.displayName);
-    btnAcceder.classList.add("hidden");
-    btnLogout.classList.remove("hidden");
   } catch (error) {
     console.error("Error al iniciar sesión:", error);
     alert("No se pudo iniciar sesión: " + error.message);
@@ -58,22 +60,53 @@ btnAcceder.addEventListener("click", async () => {
 
 btnLogout.addEventListener("click", async () => {
   await signOut(auth);
-  btnLogout.classList.add("hidden");
-  btnAcceder.classList.remove("hidden");
 });
 
-onAuthStateChanged(auth, (user) => {
+// Detecta cambios de sesión
+onAuthStateChanged(auth, async (user) => {
   if (user) {
     btnAcceder.classList.add("hidden");
     btnLogout.classList.remove("hidden");
+
+    // Mostrar info de usuario en index
+    await mostrarInfoUsuario(user.uid);
   } else {
     btnAcceder.classList.remove("hidden");
     btnLogout.classList.add("hidden");
+
+    // Limpiar info del usuario
+    displayNombre.textContent = "";
+    displayPrestigio.textContent = "";
+    displayNivel.textContent = "";
+    displayFoto.src = "https://via.placeholder.com/80";
   }
 });
 
 // ----------------------------
-// 5️⃣ FUNCIONES BUSCADOR GOOGLE BOOKS
+// 5️⃣ FUNCIONES PARA MOSTRAR INFO DE USUARIO
+// ----------------------------
+async function mostrarInfoUsuario(uid) {
+  try {
+    const userRef = doc(db, "users", uid);
+    const userSnap = await getDoc(userRef);
+
+    if (!userSnap.exists()) {
+      console.log("No existe el usuario en Firestore");
+      return;
+    }
+
+    const user = userSnap.data();
+    displayNombre.textContent = user.displayName || "Usuario";
+    displayPrestigio.textContent = `Prestigio: ${user.prestigio || 0}`;
+    displayNivel.textContent = `Nivel: ${user.nivel || 1}`;
+    displayFoto.src = user.photoURL || "https://via.placeholder.com/80";
+  } catch (error) {
+    console.error("Error al mostrar info usuario:", error);
+  }
+}
+
+// ----------------------------
+// 6️⃣ BUSCADOR GOOGLE BOOKS
 // ----------------------------
 async function buscarLibros(texto) {
   if (texto.length < 3) return [];
@@ -110,7 +143,7 @@ function mostrarResultados(libros) {
   resultados.classList.remove("hidden");
 }
 
-// Input con debounce para no saturar la API
+// Debounce input
 let timeoutBusqueda;
 inputBusqueda.addEventListener("input", () => {
   clearTimeout(timeoutBusqueda);
@@ -121,7 +154,7 @@ inputBusqueda.addEventListener("input", () => {
 });
 
 // ----------------------------
-// 6️⃣ RELLENAR FORMULARIO
+// 7️⃣ RELLENAR FORMULARIO
 // ----------------------------
 function rellenarFormulario(info, tipo) {
   tituloInput.value = info.title || "";
@@ -133,7 +166,7 @@ function rellenarFormulario(info, tipo) {
 }
 
 // ----------------------------
-// 7️⃣ BOTÓN RETO ACTUAL
+// 8️⃣ BOTÓN RETO ACTUAL
 // ----------------------------
 btnReto.addEventListener("click", async () => {
   const usuario = auth.currentUser;
@@ -142,7 +175,7 @@ btnReto.addEventListener("click", async () => {
     return;
   }
 
-  const retoRef = doc(db, "retos", "2026_01"); // Ejemplo de reto
+  const retoRef = doc(db, "retos", "2026_01"); // Ejemplo
   const retoSnap = await getDoc(retoRef);
 
   if (!retoSnap.exists()) {
@@ -162,7 +195,7 @@ btnReto.addEventListener("click", async () => {
 });
 
 // ----------------------------
-// 8️⃣ BOTÓN REGISTRAR LECTURA
+// 9️⃣ BOTÓN REGISTRAR LECTURA
 // ----------------------------
 btnRegistrar.addEventListener("click", async () => {
   const usuario = auth.currentUser;
@@ -205,4 +238,24 @@ btnRegistrar.addEventListener("click", async () => {
   });
 
   alert(`📘 Lectura registrada! Prestigio +${paginas}`);
+
+  // Actualizar info de usuario en la UI
+  mostrarInfoUsuario(usuario.uid);
 });
+// 4️⃣ Leemos el libro desde Firestore
+        async function cargarLibro() {
+            const ref = doc(db, "retos", "2026_01");
+            const snap = await getDoc(ref);
+
+            if (snap.exists()) {
+                const data = snap.data();
+
+                document.getElementById("titulo").textContent = data.Titulo;
+                document.getElementById("autor").textContent = "Autor: " + data.Autor;
+                document.getElementById("portada").src = data.portadaUrl;
+            } else {
+                document.getElementById("titulo").textContent = "Libro no encontrado";
+            }
+        }
+
+        cargarLibro();
