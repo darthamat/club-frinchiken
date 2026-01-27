@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
-  getFirestore, doc, getDoc, setDoc, collection, addDoc, getDocs
+  getFirestore, doc, getDoc, collection, addDoc, Timestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import {
   getAuth, onAuthStateChanged
@@ -25,20 +25,17 @@ const nombrePersonajeEl = document.getElementById("nombrePersonaje");
 const claseEl = document.getElementById("clasePersonaje");
 const nivelEl = document.getElementById("nivelUsuario");
 
-// búsqueda
-const inputBusqueda = document.getElementById("busquedaLibro");
+const busquedaLibro = document.getElementById("busquedaLibro");
+const resultados = document.getElementById("resultados");
 const btnBuscar = document.getElementById("btnBuscar");
-const resultadosEl = document.getElementById("resultados");
 
-// registrar lectura
 const btnRegistrar = document.getElementById("btnRegistrar");
 const btnReto = document.getElementById("btnReto");
 
-// campos libro
 const tituloInput = document.getElementById("titulo");
 const autorInput = document.getElementById("autor");
 const paginasInput = document.getElementById("paginas");
-const categoriaSelect = document.getElementById("categoria");
+const categoriaInput = document.getElementById("categoria");
 
 let usuarioActual = null;
 
@@ -51,60 +48,54 @@ onAuthStateChanged(auth, async (user) => {
 
   usuarioActual = user;
   cargarPerfilUsuario();
-  cargarRetoActual();
 });
 
-// ---------------- PERFIL USUARIO ----------------
+// ---------------- PERFIL ----------------
 async function cargarPerfilUsuario() {
   const ref = doc(db, "users", usuarioActual.uid);
   const snap = await getDoc(ref);
-
   if (!snap.exists()) return;
 
-  const data = snap.data();
-  nombrePersonajeEl.textContent = data.nombrePersonaje || "Sin nombre";
-  claseEl.textContent = data.clase || "Aventurero";
-  nivelEl.textContent = data.nivel || 1;
+  const u = snap.data();
+  nombrePersonajeEl.textContent = u.nombrePersonaje || "Sin nombre";
+  claseEl.textContent = u.clase || "Aventurero";
+  nivelEl.textContent = u.nivel || 1;
 }
 
-// ---------------- RETO ACTUAL ----------------
-async function cargarRetoActual() {
+// ---------------- BOTÓN RETO ----------------
+btnReto.addEventListener("click", async () => {
   const ref = doc(db, "retos", "2026_01");
   const snap = await getDoc(ref);
-
   if (!snap.exists()) return;
 
-  const reto = snap.data();
+  const r = snap.data();
+  tituloInput.value = r.Titulo || "";
+  autorInput.value = r.Autor || "";
+  paginasInput.value = r.paginas || "";
+  categoriaInput.value = r.categoria || "Fantasía";
+});
 
-  btnReto.onclick = () => {
-    tituloInput.value = reto.Titulo;
-    autorInput.value = reto.Autor;
-    paginasInput.value = reto.paginas || "";
-    categoriaSelect.value = reto.categoria || "Fantasía";
-  };
-}
-
-// ---------------- BUSCAR LIBROS (Google Books) ----------------
+// ---------------- BUSCADOR LIBROS ----------------
 btnBuscar.addEventListener("click", buscarLibros);
 
 async function buscarLibros() {
-  const q = inputBusqueda.value.trim();
-  if (!q) return;
+  const q = busquedaLibro.value.trim();
+  if (q.length < 3) return;
 
-  resultadosEl.innerHTML = "";
-  resultadosEl.classList.remove("hidden");
+  resultados.innerHTML = "";
+  resultados.classList.remove("hidden");
 
   const res = await fetch(
-    `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}`
+    `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=8`
   );
   const data = await res.json();
 
   if (!data.items) {
-    resultadosEl.innerHTML = "<li>No se encontraron libros</li>";
+    resultados.innerHTML = "<li>No se encontraron libros</li>";
     return;
   }
 
-  data.items.slice(0, 5).forEach(libro => {
+  data.items.forEach(libro => {
     const info = libro.volumeInfo;
     const li = document.createElement("li");
     li.textContent = `${info.title} — ${info.authors?.[0] || "Autor desconocido"}`;
@@ -113,29 +104,29 @@ async function buscarLibros() {
       tituloInput.value = info.title || "";
       autorInput.value = info.authors?.[0] || "";
       paginasInput.value = info.pageCount || "";
-      resultadosEl.classList.add("hidden");
+      resultados.classList.add("hidden");
     };
 
-    resultadosEl.appendChild(li);
+    resultados.appendChild(li);
   });
 }
 
 // ---------------- REGISTRAR LECTURA ----------------
 btnRegistrar.addEventListener("click", async () => {
-  const lectura = {
-    titulo: tituloInput.value,
-    autor: autorInput.value,
-    paginas: Number(paginasInput.value),
-    categoria: categoriaSelect.value,
-    progreso: 0,
-    activa: true,
-    fechaInicio: new Date()
-  };
-
-  if (!lectura.titulo) {
+  if (!tituloInput.value) {
     alert("Falta el título");
     return;
   }
+
+  const lectura = {
+    titulo: tituloInput.value.trim(),
+    autor: autorInput.value.trim(),
+    paginas: Number(paginasInput.value),
+    categoria: categoriaInput.value,
+    progreso: 0,
+    activa: true,
+    fechaInicio: Timestamp.now()
+  };
 
   await addDoc(
     collection(db, "users", usuarioActual.uid, "lecturas"),
@@ -144,3 +135,4 @@ btnRegistrar.addEventListener("click", async () => {
 
   alert("📘 Lectura registrada");
 });
+
