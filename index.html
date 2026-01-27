@@ -1,50 +1,74 @@
 <!DOCTYPE html>
-    <header class="top-bar">
-  <button class="btn-acceder">Acceder</button>
-        
-            <!-- Modal Login -->
-<div id="loginModal" class="modal hidden">
-  <div class="modal-content">
-      <div class="div11">
-    <h3>Acceder</h3>
-          </div>
-    <input type="email" id="email" placeholder="Email">
-    <input type="password" id="password" placeholder="Contraseña">
-    <button class="btn-acceder" id="loginBtn">ENTRAR</button>
-      <button >Registrar</button>
-    <p id="loginError"></p>
-  </div>
-</div>
-    
-</header>
-<hr class="divider">
 <html lang="es">
-    
 <head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="style.css">
-      
-    <title>Club de Lectura Frinchiken v3</title>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="style.css">
+  <title>Club de Lectura Frinchiken v3</title>
+  <style>
+    /* Simple CSS para modal */
+    .hidden { display: none; }
+    .modal {
+      position: fixed;
+      top: 0; left: 0; right:0; bottom:0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 300px;
+      text-align: center;
+      position: relative;
+    }
+    .modal-content button {
+      margin-top: 10px;
+      width: 100%;
+    }
+  </style>
 </head>
-    
-
 <body>
-   
-  
-<div class="div1">
-    
-<h1>===+++---RETO ACTUAL---+++===</h1>
-   </div>
-   
-    <h1 id="titulo">Cargando...</h1>
-    <p id="autor"></p>
-    <img class="portada" id="portada" src=" " alt="Portada del libro">
-    
-    <div class="div1">
-    <h1>LOGROS CONSEGUIDOS</h1>
-      <div class="div11"></div>
-           
+
+<!-- ==================== HEADER ==================== -->
+<header class="top-bar">
+  <button id="btnAcceder">Acceder</button>
+  <button id="btnLogout" class="hidden">Logout</button>
+
+  <!-- Modal Login -->
+  <div id="loginModal" class="modal hidden">
+    <div class="modal-content">
+      <h3>Acceder / Registrarse</h3>
+      <input type="email" id="email" placeholder="Email" style="width: 100%; margin-bottom: 5px;">
+      <input type="password" id="password" placeholder="Contraseña" style="width: 100%; margin-bottom: 10px;">
+      <button id="loginBtn">ENTRAR</button>
+      <button id="registrarBtn">REGISTRARSE</button>
+      <button id="btnGoogle">Acceder con Google</button>
+      <p id="loginError" style="color:red; margin-top:5px;"></p>
     </div>
-     <script type="module" src="app.js"></script>
+  </div>
+</header>
+
+<hr class="divider">
+
+<!-- ==================== RETO ACTUAL ==================== -->
+<div class="div1">
+  <h1>===+++---RETO ACTUAL---+++===</h1>
+</div>
+
+<h1 id="titulo">Cargando...</h1>
+<p id="autor"></p>
+<img class="portada" id="portada" src=" " alt="Portada del libro">
+
+<!-- ==================== LOGROS ==================== -->
+<div class="div1">
+  <h1>LOGROS CONSEGUIDOS</h1>
+  <div class="div11"></div>
+</div>
+
+<script type="module" src="app.js"></script>
 </body>
 </html>
+
