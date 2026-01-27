@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, doc, getDoc, updateDoc, Timestamp, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import {
   getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut,
   signInWithEmailAndPassword, createUserWithEmailAndPassword
@@ -30,13 +30,6 @@ const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 const loginError = document.getElementById("loginError");
 
-// Datos de lectura
-const tituloInput = document.getElementById("titulo");
-const autorInput = document.getElementById("autor");
-const paginasInput = document.getElementById("paginas");
-const categoriaInput = document.getElementById("categoria");
-const portadaImg = document.querySelector(".portada");
-
 // ---------------- POPUP LOGIN ----------------
 // Abrir modal
 btnAcceder.addEventListener("click", () => loginModal.classList.remove("hidden"));
@@ -46,12 +39,12 @@ loginModal.addEventListener("click", (e) => {
   if (e.target === loginModal) loginModal.classList.add("hidden");
 });
 
-// ---------------- LOGIN / REGISTRO ----------------
+// ---------------- LOGIN / REGISTRO EMAIL ----------------
 loginBtn.addEventListener("click", async () => {
   const email = emailInput.value.trim();
   const password = passwordInput.value.trim();
   try {
-    const cred = await signInWithEmailAndPassword(auth, email, password);
+    await signInWithEmailAndPassword(auth, email, password);
     loginError.textContent = "";
     loginModal.classList.add("hidden");
   } catch (error) {
@@ -64,7 +57,6 @@ registrarBtn.addEventListener("click", async () => {
   const password = passwordInput.value.trim();
   try {
     const cred = await createUserWithEmailAndPassword(auth, email, password);
-    // Crear doc usuario en Firestore
     await setDoc(doc(db,"users",cred.user.uid),{
       displayName: email,
       prestigio: 0,
@@ -78,6 +70,7 @@ registrarBtn.addEventListener("click", async () => {
   }
 });
 
+// ---------------- LOGIN GOOGLE ----------------
 btnGoogle.addEventListener("click", async () => {
   try {
     const result = await signInWithPopup(auth, provider);
@@ -101,72 +94,10 @@ onAuthStateChanged(auth, async (user)=>{
   if(user){
     btnAcceder.classList.add("hidden");
     btnLogout.classList.remove("hidden");
-    // Aquí puedes mostrar info usuario si quieres
   } else {
     btnAcceder.classList.remove("hidden");
     btnLogout.classList.add("hidden");
   }
 });
-
-// Abrir modal al pulsar acceder
-btnAcceder.addEventListener("click", () => {
-  loginModal.classList.remove("hidden");
-});
-
-// Cerrar modal al pinchar fuera del contenido
-loginModal.addEventListener("click", (e) => {
-  if (e.target === loginModal) { // solo si clicas en la capa, no en el contenido
-    loginModal.classList.add("hidden");
-  }
-});
-
-// Login Email/Password
-loginBtn.addEventListener("click", async () => {
-  const email = emailInput.value.trim();
-  const password = passwordInput.value.trim();
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-    loginError.textContent = "";
-    loginModal.classList.add("hidden");
-  } catch (error) {
-    loginError.textContent = error.message;
-  }
-});
-
-// Registro Email/Password
-registrarBtn.addEventListener("click", async () => {
-  const email = emailInput.value.trim();
-  const password = passwordInput.value.trim();
-  try {
-    const cred = await createUserWithEmailAndPassword(auth, email, password);
-    await setDoc(doc(db,"users",cred.user.uid),{
-      displayName: email,
-      prestigio: 0,
-      nivel: 1,
-      photoURL: ""
-    });
-    loginError.textContent = "";
-    loginModal.classList.add("hidden");
-  } catch (error) {
-    loginError.textContent = error.message;
-  }
-});
-
-// Login Google
-btnGoogle.addEventListener("click", async () => {
-  try {
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user;
-    const userRef = doc(db,"users",user.uid);
-    const snap = await getDoc(userRef);
-    if(!snap.exists()){
-      await setDoc(userRef,{ displayName:user.displayName, prestigio:0, nivel:1, photoURL:user.photoURL||"" });
-    }
-    loginModal.classList.add("hidden");
-  } catch(e){
-    alert(e.message);
-  }
-});
-
 
 
