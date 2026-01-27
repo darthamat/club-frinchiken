@@ -99,5 +99,85 @@ onAuthStateChanged(auth, async (user)=>{
     btnLogout.classList.add("hidden");
   }
 });
+const feedLogros = document.getElementById("feedLogros");
 
+// Función para mostrar un logro con animación
+function mostrarLogro(logro){
+  const div = document.createElement("div");
+  div.classList.add("logro-feed");
 
+  // Clase y emoji según rareza
+  let clase = "logro-normal emoji-normal";
+  if(logro.botin.tipo === "raro") clase = "logro-raro emoji-raro";
+  if(logro.botin.tipo === "legendario") clase = "logro-legendario emoji-legendario";
+  div.classList.add(clase);
+
+  div.textContent += `${logro.usuario} ha conseguido: ${logro.botin.item} (${logro.botin.tipo})`;
+
+  feedLogros.appendChild(div);
+
+  // Borrar después de animación (0.8s)
+  setTimeout(()=>div.remove(), 1000);
+}
+
+// Cargar logros aleatorios de usuarios
+async function cargarLogrosFeed(){
+  const usersSnap = await getDocs(collection(db,"users"));
+  let todosLogros = [];
+
+  usersSnap.forEach(userDoc=>{
+    const data = userDoc.data();
+    const lecturas = data.lecturas || [];
+    lecturas.forEach(l=>{
+      if(l.botinGenerado && l.botin){
+        todosLogros.push({
+          usuario: data.displayName || "Anónimo",
+          libro: l.titulo,
+          botin: l.botin
+        });
+      }
+    });
+  });
+
+  // Mezclar
+  todosLogros.sort(()=>Math.random()-0.5);
+
+  // Mostrar 1-2 logros aleatorios cada intervalo
+  const n = Math.floor(Math.random()*2)+1;
+  for(let i=0;i<n;i++){
+    const l = todosLogros[i % todosLogros.length];
+    mostrarLogro(l);
+  }
+}
+
+// Actualizar cada 3 segundos
+setInterval(cargarLogrosFeed, 3000);
+cargarLogrosFeed();
+
+// Función para cargar el reto actual
+async function cargarRetoActual() {
+  try {
+    // Ajusta el ID del reto según tu Firestore
+    const retoRef = doc(db, "retos", "2026_01");
+    const snap = await getDoc(retoRef);
+
+    if (snap.exists()) {
+      const reto = snap.data();
+      titulo.textContent = reto.Titulo || "Título desconocido";
+      autor.textContent = "Autor: " + (reto.Autor || "Desconocido");
+      portada.src = reto.portadaUrl || "";
+    } else {
+      tituloEl.textContent = "No hay reto activo";
+      autorEl.textContent = "";
+      portadaEl.src = "";
+    }
+  } catch (error) {
+    console.error("Error cargando reto:", error);
+    tituloEl.textContent = "Error al cargar el reto";
+    autorEl.textContent = "";
+    portadaEl.src = "";
+  }
+}
+
+// Ejecutar al cargar la página
+cargarRetoActual();

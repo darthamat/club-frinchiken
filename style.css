@@ -14,7 +14,14 @@
         padding: 40px;
 
     }
-
+#portada {
+  display: block;
+  max-width: 100%;
+  width: 400px; /* más grande */
+  margin: 15px auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
     h1 {
         letter-spacing: 1px;
         font-family: Georgia, serif;
@@ -28,6 +35,8 @@
             border: 1px solid;
             border-radius: 15px;
             padding: 10px;
+     margin-left: 10%;
+     margin-right: 10%;
        }
 
  .div11{
@@ -331,4 +340,52 @@ button.gold {
 .hidden {
   display: none;
 }
+.feed-logros {
+  width: 100%; /* se adapta al div padre */
+  height: 180px;
+  overflow: hidden;
+  background: #f0f4f8;
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-right: 15px;
+}
 
+  .logro-feed {
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-weight: bold;
+  color: white;
+  opacity: 0;
+  transform: translateY(20px) scale(0.9);
+  animation: popup 0.8s forwards;
+
+}
+
+/* Animación “pop” + fade */
+@keyframes popup {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-5px) scale(1.05);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-50px) scale(0.9);
+  }
+}
+
+/* Colores según rareza */
+.logro-normal { background: #f1c40f; }
+.logro-raro { background: #2980b9; }
+.logro-legendario { background: #9b59b6; }
+
+/* Emoji por rareza */
+.emoji-normal::before { content: "📦 "; }
+.emoji-raro::before { content: "💎 "; }
+.emoji-legendario::before { content: "🏆 "; }
