@@ -3,8 +3,9 @@ import {
   getFirestore, doc, getDoc, collection, addDoc, Timestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import {
-  getAuth, onAuthStateChanged
+  getAuth, onAuthStateChanged, signOut
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
 
 // ---------------- FIREBASE ----------------
 const firebaseConfig = {
@@ -50,6 +51,13 @@ onAuthStateChanged(auth, async (user) => {
   cargarPerfilUsuario();
 });
 
+const btnLogout = document.getElementById("btnLogout");
+
+btnLogout.addEventListener("click", async () => {
+  await signOut(auth);
+  window.location.href = "index.html";
+});
+
 // ---------------- PERFIL ----------------
 async function cargarPerfilUsuario() {
   const ref = doc(db, "users", usuarioActual.uid);
@@ -76,40 +84,46 @@ btnReto.addEventListener("click", async () => {
 });
 
 // ---------------- BUSCADOR LIBROS ----------------
-btnBuscar.addEventListener("click", buscarLibros);
-
-async function buscarLibros() {
+btnBuscar.addEventListener("click", async () => {
   const q = busquedaLibro.value.trim();
   if (q.length < 3) return;
 
   resultados.innerHTML = "";
   resultados.classList.remove("hidden");
 
-  const res = await fetch(
-    `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=8`
-  );
-  const data = await res.json();
+  try {
+    const res = await fetch(
+      `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&langRestrict=es&maxResults=8`
+    );
 
-  if (!data.items) {
-    resultados.innerHTML = "<li>No se encontraron libros</li>";
-    return;
+    const data = await res.json();
+
+    if (!data.items) {
+      resultados.innerHTML = "<li>No se encontraron libros</li>";
+      return;
+    }
+
+    data.items.forEach(libro => {
+      const info = libro.volumeInfo;
+      const li = document.createElement("li");
+
+      li.textContent = `${info.title} — ${info.authors?.[0] || "Autor desconocido"}`;
+
+      li.addEventListener("click", () => {
+        tituloInput.value = info.title || "";
+        autorInput.value = info.authors?.[0] || "";
+        paginasInput.value = info.pageCount || "";
+        resultados.classList.add("hidden");
+      });
+
+      resultados.appendChild(li);
+    });
+
+  } catch (e) {
+    console.error(e);
+    resultados.innerHTML = "<li>Error al buscar libros</li>";
   }
-
-  data.items.forEach(libro => {
-    const info = libro.volumeInfo;
-    const li = document.createElement("li");
-    li.textContent = `${info.title} — ${info.authors?.[0] || "Autor desconocido"}`;
-
-    li.onclick = () => {
-      tituloInput.value = info.title || "";
-      autorInput.value = info.authors?.[0] || "";
-      paginasInput.value = info.pageCount || "";
-      resultados.classList.add("hidden");
-    };
-
-    resultados.appendChild(li);
-  });
-}
+});
 
 // ---------------- REGISTRAR LECTURA ----------------
 btnRegistrar.addEventListener("click", async () => {

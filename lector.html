@@ -8,7 +8,7 @@
 <body>
 
 <div class="hud">
-
+<button id="btnLogout" class="btn-secundario">🚪 Salir</button>
   <!-- ==================== PLAYER CARD ==================== -->
   <section class="player-card">
    <label class="avatar-wrapper">
@@ -16,10 +16,10 @@
   <input type="file" id="avatarInput" accept="image/*" hidden>
 </label>
     <div>
-      <!--<h2 id="nombrePersonaje">Cargando...</h2>-->
-      <input id="nombrePersonaje"
+      <h2 id="nombrePersonaje">Cargando...</h2>
+     <!-- <input id="nombrePersonaje"
        class="nombre-personaje"
-       placeholder="Nombre del personaje">
+       placeholder="Nombre del personaje">-->
       <p>Clase: <span id="clasePersonaje">---</span></p>
       <p>Nivel <span id="nivelUsuario">1</span></p>
       <div class="xp-bar">
@@ -98,7 +98,7 @@
   <!-- Buscador normal -->
   <div class="buscador">
     <input id="busquedaLibro" type="text" placeholder="Buscar libro..." />
-    <button id="btnBuscar">🔍</button>
+    <button type="button" id="btnBuscar">🔍</button>
   </div>
 
   <!-- Lista de resultados -->
