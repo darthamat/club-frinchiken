@@ -38,6 +38,13 @@ const autorInput = document.getElementById("autor");
 const paginasInput = document.getElementById("paginas");
 const categoriaInput = document.getElementById("categoria");
 
+const tituloLibro = document.getElementById("titulo");
+const autorLibro = document.getElementById("autor");
+const paginasLibro = document.getElementById("paginas");
+const categoriaLibro = document.getElementById("categoria");
+const portadaLibro = document.getElementById("portadaLibro"); // este id no estaba en tu HTML
+
+
 let usuarioActual = null;
 
 // ---------------- SESIÓN ----------------
@@ -72,81 +79,95 @@ async function cargarPerfilUsuario() {
 
 // ---------------- BOTÓN RETO ----------------
 btnReto.addEventListener("click", async () => {
-  const ref = doc(db, "retos", "2026_01");
-  const snap = await getDoc(ref);
-  if (!snap.exists()) return;
-
-  const r = snap.data();
-  tituloInput.value = r.Titulo || "";
-  autorInput.value = r.Autor || "";
-  paginasInput.value = r.paginas || "";
-  categoriaInput.value = r.categoria || "Fantasía";
+  try {
+    const retoRef = doc(db, "retos", "2026_01");
+    const snap = await getDoc(retoRef);
+    if (snap.exists()) {
+      const reto = snap.data();
+      tituloLibro.value = reto.Titulo || "";
+      autorLibro.value = reto.Autor || "";
+      paginasLibro.value = reto.Paginas || 0;
+      categoriaLibro.value = reto.categoria || "Fantasía";
+      portadaLibro.src = reto.portadaUrl || "";
+    }
+  } catch (e) {
+    console.error(e);
+  }
 });
 
 // ---------------- BUSCADOR LIBROS ----------------
-btnBuscar.addEventListener("click", async () => {
-  const q = busquedaLibro.value.trim();
-  if (q.length < 3) return;
+busquedaLibro.addEventListener("input", async () => {
+  const texto = busquedaLibro.value.trim();
+  if (texto.length < 3) return;
 
   resultados.innerHTML = "";
   resultados.classList.remove("hidden");
 
-  try {
-    const res = await fetch(
-      `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&langRestrict=es&maxResults=8`
-    );
+  const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(texto)}&maxResults=5`);
+  const data = await res.json();
+  if (!data.items) return;
 
-    const data = await res.json();
-
-    if (!data.items) {
-      resultados.innerHTML = "<li>No se encontraron libros</li>";
-      return;
-    }
-
-    data.items.forEach(libro => {
-      const info = libro.volumeInfo;
-      const li = document.createElement("li");
-
-      li.textContent = `${info.title} — ${info.authors?.[0] || "Autor desconocido"}`;
-
-      li.addEventListener("click", () => {
-        tituloInput.value = info.title || "";
-        autorInput.value = info.authors?.[0] || "";
-        paginasInput.value = info.pageCount || "";
-        resultados.classList.add("hidden");
-      });
-
-      resultados.appendChild(li);
+  data.items.forEach(libro => {
+    const info = libro.volumeInfo;
+    const li = document.createElement("li");
+    li.textContent = `${info.title} — ${info.authors?.[0] || "Desconocido"}`;
+    li.addEventListener("click", () => {
+      tituloLibro.value = info.title || "";
+      autorLibro.value = info.authors?.[0] || "";
+      paginasLibro.value = info.pageCount || "";
+      categoriaLibro.value = info.categories?.[0] || "Fantasía";
+      portadaLibro.src = info.imageLinks?.thumbnail || "";
+      resultados.classList.add("hidden");
     });
-
-  } catch (e) {
-    console.error(e);
-    resultados.innerHTML = "<li>Error al buscar libros</li>";
-  }
+    resultados.appendChild(li);
+  });
 });
 
-// ---------------- REGISTRAR LECTURA ----------------
-btnRegistrar.addEventListener("click", async () => {
-  if (!tituloInput.value) {
-    alert("Falta el título");
-    return;
+//nuevas categorias dinamicas
+li.addEventListener("click", () => {
+  tituloLibro.value = info.title || "";
+  autorLibro.value = info.authors?.[0] || "";
+  paginasLibro.value = info.pageCount || "";
+
+  // Categoría
+  let categoria = info.categories?.[0] || "Fantasía";
+
+  // Si no existe en el select, la añadimos
+  if (![...categoriaLibro.options].some(opt => opt.value === categoria)) {
+    const option = document.createElement("option");
+    option.value = categoria;
+    option.textContent = categoria;
+    categoriaLibro.appendChild(option);
   }
+
+  categoriaLibro.value = categoria;
+
+  // Portada
+  portadaLibro.src = info.imageLinks?.thumbnail || "";
+
+  resultados.classList.add("hidden");
+});
+
+
+btnRegistrar.addEventListener("click", async () => {
+  const user = auth.currentUser;
+  if (!user) { alert("Debes iniciar sesión"); return; }
 
   const lectura = {
-    titulo: tituloInput.value.trim(),
-    autor: autorInput.value.trim(),
-    paginas: Number(paginasInput.value),
-    categoria: categoriaInput.value,
-    progreso: 0,
-    activa: true,
-    fechaInicio: Timestamp.now()
+    titulo: tituloLibro.value.trim(),
+    autor: autorLibro.value.trim(),
+    paginas: Number(paginasLibro.value),
+    categoria: categoriaLibro.value,
+    portada: portadaLibro.src,
+    fechaInicio: new Date(),
+    estado: "activa"
   };
 
-  await addDoc(
-    collection(db, "users", usuarioActual.uid, "lecturas"),
-    lectura
-  );
-
-  alert("📘 Lectura registrada");
+  try {
+    await addDoc(collection(db, "users", user.uid, "lecturas"), lectura);
+    alert(`📘 Lectura registrada: ${lectura.titulo}`);
+  } catch (e) {
+    console.error(e);
+    alert("Error registrando lectura");
+  }
 });
-

@@ -4,10 +4,28 @@ body {
   color: #eee;
 }
 
+body {
+  background:
+    linear-gradient(rgba(245, 245, 240, 0.9), rgba(245, 245, 240, 0.9)),
+    url("assets/background.jpg");
+  background-size: cover;
+  background-attachment: fixed;
+  font-family: 'Segoe UI', sans-serif;
+  color: eee222;
+}
+
 .hud {
   max-width: 900px;
   margin: auto;
   padding: 20px;
+}
+.nombrePersonaje {
+  font-size: 1.3em;
+  font-weight: bold;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid #c9a227;
+  outline: none;
 }
 
 .player-card {

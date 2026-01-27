@@ -69,11 +69,15 @@ btnRegister.addEventListener("click", async () => {
       fatiga: 0,
       mente: 0,
       corazon: 0,
-      photoURL: "",
+      imagen_avatar: "",
+      clase: clasesPersonaje,
+      experiencia: 0,
+      experienciaNecesario: 0,
+
     });
 
     errorMsg.style.color = "green";
-    errorMsg.textContent = "¡Registro completado! !Se ha asignado una clase aletoria! Puedes iniciar sesión.";
+    errorMsg.textContent = "¡Registro completado! !Se ha asignado una clase aleatoria! Puedes iniciar sesión.";
     
     // Redirigir al login después de 2s
     setTimeout(()=>window.location.href="login.html",2000);
