@@ -108,4 +108,65 @@ onAuthStateChanged(auth, async (user)=>{
   }
 });
 
+// Abrir modal al pulsar acceder
+btnAcceder.addEventListener("click", () => {
+  loginModal.classList.remove("hidden");
+});
+
+// Cerrar modal al pinchar fuera del contenido
+loginModal.addEventListener("click", (e) => {
+  if (e.target === loginModal) { // solo si clicas en la capa, no en el contenido
+    loginModal.classList.add("hidden");
+  }
+});
+
+// Login Email/Password
+loginBtn.addEventListener("click", async () => {
+  const email = emailInput.value.trim();
+  const password = passwordInput.value.trim();
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    loginError.textContent = "";
+    loginModal.classList.add("hidden");
+  } catch (error) {
+    loginError.textContent = error.message;
+  }
+});
+
+// Registro Email/Password
+registrarBtn.addEventListener("click", async () => {
+  const email = emailInput.value.trim();
+  const password = passwordInput.value.trim();
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, password);
+    await setDoc(doc(db,"users",cred.user.uid),{
+      displayName: email,
+      prestigio: 0,
+      nivel: 1,
+      photoURL: ""
+    });
+    loginError.textContent = "";
+    loginModal.classList.add("hidden");
+  } catch (error) {
+    loginError.textContent = error.message;
+  }
+});
+
+// Login Google
+btnGoogle.addEventListener("click", async () => {
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+    const userRef = doc(db,"users",user.uid);
+    const snap = await getDoc(userRef);
+    if(!snap.exists()){
+      await setDoc(userRef,{ displayName:user.displayName, prestigio:0, nivel:1, photoURL:user.photoURL||"" });
+    }
+    loginModal.classList.add("hidden");
+  } catch(e){
+    alert(e.message);
+  }
+});
+
+
 

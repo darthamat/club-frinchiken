@@ -87,27 +87,27 @@
 }
 
 /* Modal */
+.hidden {
+  display: none;
+}
+
 .modal {
   position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.5);
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5); /* fondo semitransparente */
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1000;
 }
 
 .modal-content {
-  background: rgba(145, 240, 205, 0.5);
+  background: #fff;
   padding: 20px;
-  width: 280px;
-  border-radius: 8px;
-  display: flex;
- 
-  flex-direction: column;
-  gap: 10px;
-}
-.hidden {
-  display: none;
+  border-radius: 10px;
+  width: 300px;
+  text-align: center;
+  position: relative;
 }
 
 /*registro lecturas*/
