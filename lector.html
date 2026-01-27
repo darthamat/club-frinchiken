@@ -1,0 +1,96 @@
+ <link rel="stylesheet" href="style.css">
+<div class="hud">
+
+  <section class="player-card">
+    <img src="avatar.png" class="avatar">
+    <div>
+      <h2>Elena la Lectora</h2>
+      <p>Nivel <span id="nivel">12</span></p>
+      <div class="xp-bar">
+        <div class="xp-fill"></div>
+      </div>
+      <small>340 / 500 XP</small>
+    </div>
+  </section>
+
+  <section class="panels">
+    <div class="panel">
+      <h3>📊 Stats</h3>
+      <p>Páginas: 1240</p>
+      <p>Libros: 5</p>
+      <p>Racha: 7 días</p>
+    </div>
+
+    <div class="panel">
+      <h3>🏆 Logros</h3>
+      <ul>
+        <li>📘 Primer libro</li>
+        <li>🔥 7 días seguidos</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="panel lectura">
+    <h3>📖 Lectura actual</h3>
+    <p>El nombre del viento</p>
+
+    <div class="progress-bar">
+      <div class="progress-fill"></div>
+    </div>
+
+    <button>Actualizar progreso</button>
+    <button class="gold">Libro terminado</button>
+  </section>
+
+</div>
+ <section class="registro-lectura">
+
+  <h2>📚 Registrar lectura</h2>
+
+  <!-- Botón para rellenar el libro del reto -->
+  <button class="btn-reto" id="btnReto">📖 Reto Actual</button>
+
+  <!-- Buscador normal -->
+  <div class="buscador">
+    <input id="busquedaLibro" type="text" placeholder="Buscar libro..." />
+    <button id="btnBuscar">🔍</button>
+  </div>
+
+  <!-- Lista de resultados -->
+  <ul id="resultados" class="resultados hidden"></ul>
+
+  <!-- Formulario de la lectura -->
+  <div class="libro-seleccionado">
+    <img src="https://via.placeholder.com/120x180" alt="Portada" />
+
+    <div class="datos-libro">
+      <label>
+        Título
+        <input type="text" id="titulo">
+      </label>
+      <label>
+        Autor
+        <input type="text" id="autor">
+      </label>
+      <label>
+        Páginas
+        <input type="number" id="paginas">
+      </label>
+      <label>
+        Categoría
+        <select id="categoria">
+          <option>Fantasía</option>
+          <option>Ciencia ficción</option>
+          <option>Ensayo</option>
+          <option>Historia</option>
+        </select>
+      </label>
+    </div>
+  </div>
+
+  <!-- Botón para registrar la lectura -->
+  <div class="acciones">
+    <button class="btn-secundario">Cancelar</button>
+    <button class="btn-principal" id="btnRegistrar">📘 Registrar lectura</button>
+  </div>
+</section>

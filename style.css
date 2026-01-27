@@ -3,8 +3,8 @@
         
         background-image: url("./assets/background.jpg");
         min-height: 90%;      
-        background-repeat: no-repeat;
-        background-attachment: fixed;
+        background-repeat:repeat-y;
+        background-attachment:scroll;
         background-position: center;
         background-size: auto;
         background-blend-mode: overlay;
@@ -106,6 +106,228 @@
   flex-direction: column;
   gap: 10px;
 }
+.hidden {
+  display: none;
+}
+
+/*registro lecturas*/
+.registro-lectura {
+  background: #1f2937;
+  color: #e5e7eb;
+  max-width: 700px;
+  margin: 30px auto;
+  padding: 20px;
+  border-radius: 14px;
+  box-shadow: 0 0 25px rgba(0,0,0,.4);
+}
+
+.registro-lectura h2 {
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+/* Buscador */
+.buscador {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.buscador input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  font-size: 16px;
+}
+
+.buscador button {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background: #3b82f6;
+  color: white;
+}
+
+/* Libro seleccionado */
+.libro-seleccionado {
+  display: flex;
+  gap: 15px;
+  background: #111827;
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+}
+
+.libro-seleccionado img {
+  width: 120px;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid #374151;
+}
+
+/* Datos */
+.datos-libro {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  flex: 1;
+}
+
+.datos-libro label {
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+.datos-libro input,
+.datos-libro select {
+  margin-top: 4px;
+  padding: 8px;
+  border-radius: 6px;
+  border: none;
+  background: #374151;
+  color: white;
+}
+
+/* Acciones */
+.acciones {
+  display: flex;
+  justify-content: space-between;
+}
+
+.btn-principal {
+  background: linear-gradient(90deg, gold, orange);
+  border: none;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-secundario {
+  background: transparent;
+  border: 1px solid #6b7280;
+  color: #d1d5db;
+  padding: 10px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+/*lector*/
+body {
+  background: #1b1f2a;
+  font-family: 'Segoe UI', sans-serif;
+  color: #eee;
+}
+
+.hud {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+}
+
+.player-card {
+  display: flex;
+  gap: 20px;
+  background: #252b3a;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0,0,0,.4);
+}
+
+.avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  border: 3px solid gold;
+}
+
+.xp-bar, .progress-bar {
+  background: #333;
+  border-radius: 10px;
+  overflow: hidden;
+  height: 12px;
+}
+
+.xp-fill {
+  width: 68%;
+  height: 100%;
+  background: linear-gradient(90deg, gold, orange);
+}
+
+.progress-fill {
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(90deg, #00ffaa, #00cc88);
+}
+
+.panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.panel {
+  background: #252b3a;
+  padding: 15px;
+  border-radius: 12px;
+}
+
+button {
+  background: #3b82f6;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+button.gold {
+  background: linear-gradient(90deg, gold, orange);
+  color: black;
+}
+
+/*resutlados busqueda*/
+.resultados {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: #111827;
+  border-radius: 10px;
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 15px;
+}
+
+.resultados li {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #374151;
+}
+
+.resultados li:hover {
+  background: #1f2937;
+}
+
+.resultados img {
+  width: 40px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.resultados .info {
+  font-size: 14px;
+}
+
 .hidden {
   display: none;
 }
