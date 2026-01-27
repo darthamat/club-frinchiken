@@ -22,6 +22,24 @@ const db = getFirestore(app);
 const auth = getAuth();
 const provider = new GoogleAuthProvider();
 
+// 0 Leemos el libro desde Firestore
+        async function cargarLibro() {
+            const ref = doc(db, "retos", "2026_01");
+            const snap = await getDoc(ref);
+
+            if (snap.exists()) {
+                const data = snap.data();
+
+                document.getElementById("titulo").textContent = data.Titulo;
+                document.getElementById("autor").textContent = "Autor: " + data.Autor;
+                document.getElementById("portada").src = data.portadaUrl;
+            } else {
+                document.getElementById("titulo").textContent = "Libro no encontrado";
+            }
+        }
+
+        cargarLibro();
+
 // ----------------------------
 // 3️⃣ ELEMENTOS DEL DOM
 // ----------------------------
@@ -242,20 +260,4 @@ btnRegistrar.addEventListener("click", async () => {
   // Actualizar info de usuario en la UI
   mostrarInfoUsuario(usuario.uid);
 });
-// 4️⃣ Leemos el libro desde Firestore
-        async function cargarLibro() {
-            const ref = doc(db, "retos", "2026_01");
-            const snap = await getDoc(ref);
 
-            if (snap.exists()) {
-                const data = snap.data();
-
-                document.getElementById("titulo").textContent = data.Titulo;
-                document.getElementById("autor").textContent = "Autor: " + data.Autor;
-                document.getElementById("portada").src = data.portadaUrl;
-            } else {
-                document.getElementById("titulo").textContent = "Libro no encontrado";
-            }
-        }
-
-        cargarLibro();
