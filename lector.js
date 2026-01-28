@@ -193,10 +193,10 @@ async function cargarLecturas() {
       li.textContent += " [RETO ACTUAL]";
     } else {
       // Botón para marcar como terminado
-      const btnTerminar = document.createElement("button");
-      btnTerminar.textContent = "📗 Terminado";
-      btnTerminar.style.marginLeft = "10px";
-      btnTerminar.addEventListener("click", async () => {
+      const btnTerminarLibro = document.createElement("button");
+      btnTerminarLibro.textContent = "📗 Terminado";
+      btnTerminarLibro.style.marginLeft = "10px";
+      btnTerminarLibro.addEventListener("click", async () => {
         try {
           const lecturaDoc = lecturasDocs[index];
           if (lecturaDoc.ref) {
@@ -208,7 +208,7 @@ async function cargarLecturas() {
           alert("Error al marcar como terminado");
         }
       });
-      li.appendChild(btnTerminar);
+      li.appendChild(btnTerminarLibro);
     }
 
     listaLecturasEl.appendChild(li);
