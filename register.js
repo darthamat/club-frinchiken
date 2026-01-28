@@ -35,6 +35,11 @@ const clasesPersonaje = [
   "Arquero/a de la Lectura", "Alquimista de Café y Libros", "Ladrón/a de libros"
 ];
 
+ // 👉 Clase aleatoria SIEMPRE
+  const claseAleatoria = clasesPersonaje[
+    Math.floor(Math.random() * clasesPersonaje.length)
+  ];
+
 // ---------------- REGISTRO ----------------
 btnRegister.addEventListener("click", async () => {
   const nombreReal = nombreRealInput.value.trim();
@@ -47,9 +52,9 @@ btnRegister.addEventListener("click", async () => {
     return;
   }
 
-  // Si no pone nombre de personaje, se asigna uno aleatorio
+  // Si no pone nombre de personaje, se asigna uno anonimo
   if(!nombrePersonaje){
-    nombrePersonaje = clasesPersonaje[Math.floor(Math.random()*clasesPersonaje.length)];
+    nombrePersonaje = "Lector/a Sin Nombre";
   }
 
   try{
@@ -70,7 +75,7 @@ btnRegister.addEventListener("click", async () => {
       mente: 0,
       corazon: 0,
       imagen_avatar: "",
-      clase: nombrePersonaje,
+      clase: claseAleatoria,
       experiencia: 0,
       experienciaNecesario: 0,
 

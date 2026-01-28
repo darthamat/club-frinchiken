@@ -95,3 +95,42 @@ button.gold {
   max-width: 700px;
   margin: 20px auto;
 }
+
+#portadaLibro {
+  display: block;
+  max-width: 100%;
+  width: 400px; /* más grande */
+  margin: 15px auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+.resultados {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  background: #1f2533;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0,0,0,.4);
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.resultados li {
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(255,255,255,.05);
+  cursor: pointer;
+  transition: background .2s ease, transform .15s ease;
+}
+
+.resultados li:last-child {
+  border-bottom: none;
+}
+
+.resultados li:hover {
+  background: linear-gradient(90deg, rgba(255,215,0,.25), rgba(255,165,0,.15));
+  transform: translateX(4px);
+}
+
+.resultados li:active {
+  background: rgba(255,215,0,.35);
+}

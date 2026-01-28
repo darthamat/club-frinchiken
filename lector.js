@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
-  getFirestore, doc, getDoc, collection, addDoc, Timestamp
+  getFirestore, doc, getDoc, collection, addDoc, Timestamp, query, where, getDocs
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import {
   getAuth, onAuthStateChanged, signOut
@@ -35,7 +35,7 @@ const btnReto = document.getElementById("btnReto");
 
 const tituloInput = document.getElementById("titulo");
 const autorInput = document.getElementById("autor");
-const paginasInput = document.getElementById("paginas");
+const paginasInput = document.getElementById("Paginas");
 const categoriaInput = document.getElementById("categoria");
 
 const tituloLibro = document.getElementById("titulo");
@@ -43,6 +43,8 @@ const autorLibro = document.getElementById("autor");
 const paginasLibro = document.getElementById("paginas");
 const categoriaLibro = document.getElementById("categoria");
 const portadaLibro = document.getElementById("portadaLibro"); // este id no estaba en tu HTML
+
+const listaLecturasEl = document.getElementById("listaLecturas");
 
 
 let usuarioActual = null;
@@ -56,6 +58,7 @@ onAuthStateChanged(auth, async (user) => {
 
   usuarioActual = user;
   cargarPerfilUsuario();
+  cargarLecturas();
 });
 
 const btnLogout = document.getElementById("btnLogout");
@@ -77,23 +80,42 @@ async function cargarPerfilUsuario() {
   nivelEl.textContent = u.nivel || 1;
 }
 
-// ---------------- BOTÓN RETO ----------------
+
+//boton reto
 btnReto.addEventListener("click", async () => {
   try {
     const retoRef = doc(db, "retos", "2026_01");
     const snap = await getDoc(retoRef);
-    if (snap.exists()) {
-      const reto = snap.data();
-      tituloLibro.value = reto.Titulo || "";
-      autorLibro.value = reto.Autor || "";
-      paginasLibro.value = reto.Paginas || 0;
-      categoriaLibro.value = reto.categoria || "Fantasía";
-      portadaLibro.src = reto.portadaUrl || "";
+    if (!snap.exists()) return;
+
+    const reto = snap.data();
+
+    // Rellenar formulario
+    tituloInput.value = reto.Titulo || "";
+    autorInput.value = reto.Autor || "";
+    paginasInput.value = reto.Paginas ||150;
+
+    const categoria = reto.categoria || "Fantasía";
+
+    // Añadir categoría si no existe
+    if (![...categoriaInput.options].some(o => o.value === categoria)) {
+      const opt = document.createElement("option");
+      opt.value = categoria;
+      opt.textContent = categoria;
+      categoriaInput.appendChild(opt);
     }
+    categoriaInput.value = categoria;
+
+    // Portada si existe
+    if (reto.portadaUrl && portadaLibro) {
+      portadaLibro.src = reto.portadaUrl;
+    }
+
   } catch (e) {
     console.error(e);
   }
 });
+
 
 // ---------------- BUSCADOR LIBROS ----------------
 busquedaLibro.addEventListener("input", async () => {
@@ -103,7 +125,9 @@ busquedaLibro.addEventListener("input", async () => {
   resultados.innerHTML = "";
   resultados.classList.remove("hidden");
 
-  const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(texto)}&maxResults=5`);
+  const res = await fetch(
+    `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(texto)}&maxResults=5`
+  );
   const data = await res.json();
   if (!data.items) return;
 
@@ -111,41 +135,33 @@ busquedaLibro.addEventListener("input", async () => {
     const info = libro.volumeInfo;
     const li = document.createElement("li");
     li.textContent = `${info.title} — ${info.authors?.[0] || "Desconocido"}`;
+
     li.addEventListener("click", () => {
-      tituloLibro.value = info.title || "";
-      autorLibro.value = info.authors?.[0] || "";
-      paginasLibro.value = info.pageCount || "";
-      categoriaLibro.value = info.categories?.[0] || "Fantasía";
-      portadaLibro.src = info.imageLinks?.thumbnail || "";
+      tituloInput.value = info.title || "";
+      autorInput.value = info.authors?.[0] || "";
+      paginasInput.value = info.pageCount || 0;
+
+      // Categoría dinámica
+      const categoria = info.categories?.[0] || "Fantasía";
+
+      if (![...categoriaInput.options].some(o => o.value === categoria)) {
+        const opt = document.createElement("option");
+        opt.value = categoria;
+        opt.textContent = categoria;
+        categoriaInput.appendChild(opt);
+      }
+      categoriaInput.value = categoria;
+
+      // Portada
+      if (info.imageLinks?.thumbnail && portadaLibro) {
+        portadaLibro.src = info.imageLinks.thumbnail;
+      }
+
       resultados.classList.add("hidden");
     });
+
     resultados.appendChild(li);
   });
-});
-
-//nuevas categorias dinamicas
-li.addEventListener("click", () => {
-  tituloLibro.value = info.title || "";
-  autorLibro.value = info.authors?.[0] || "";
-  paginasLibro.value = info.pageCount || "";
-
-  // Categoría
-  let categoria = info.categories?.[0] || "Fantasía";
-
-  // Si no existe en el select, la añadimos
-  if (![...categoriaLibro.options].some(opt => opt.value === categoria)) {
-    const option = document.createElement("option");
-    option.value = categoria;
-    option.textContent = categoria;
-    categoriaLibro.appendChild(option);
-  }
-
-  categoriaLibro.value = categoria;
-
-  // Portada
-  portadaLibro.src = info.imageLinks?.thumbnail || "";
-
-  resultados.classList.add("hidden");
 });
 
 // ---------------- CARGAR LECTURAS ACTIVAS ----------------
@@ -224,26 +240,88 @@ btnRegistrar.addEventListener("click", async () => {
     titulo: tituloInput.value.trim(),
     autor: autorInput.value.trim(),
     paginas: Number(paginasInput.value),
-    categoria: categoriaSelect.value,
+    categoria: categoriaInput.value,
     activa: true,
+    esReto: false,
     fechaInicio: new Date()
   };
 
   if (!lectura.titulo || !lectura.autor) {
-    return alert("Debe poner título y autor");
+    return alert("Faltan datos");
   }
 
-  try {
-    await addDoc(collection(db, "users", usuarioActual.uid, "lecturas"), lectura);
-    tituloInput.value = "";
-    autorInput.value = "";
-    paginasInput.value = "";
-    categoriaSelect.value = "Fantasía";
+  await addDoc(
+    collection(db, "users", usuarioActual.uid, "lecturas"),
+    lectura
+  );
 
-    // Refrescar lista inmediatamente
-    cargarLecturas();
-  } catch (e) {
-    console.error(e);
-    alert("Error registrando lectura");
-  }
+  // limpiar formulario
+  tituloInput.value = "";
+  autorInput.value = "";
+  paginasInput.value = "";
+  categoriaInput.value = "Fantasía";
+
+  // 🔥 refrescar lista
+  cargarLecturas();
 });
+
+
+//lecturas activas
+
+async function cargarLecturas() {
+  listaLecturasEl.innerHTML = "";
+
+  // 🔹 1. Lecturas activas del usuario
+  const q = query(
+    collection(db, "users", usuarioActual.uid, "lecturas"),
+    where("activa", "==", true)
+  );
+  const snap = await getDocs(q);
+
+  const lecturas = [];
+  snap.forEach(doc => lecturas.push({ id: doc.id, ...doc.data() }));
+
+  // 🔹 2. Comprobar reto actual
+  const retoRef = doc(db, "retos", "2026_01");
+  const retoSnap = await getDoc(retoRef);
+
+  if (retoSnap.exists()) {
+    const reto = retoSnap.data();
+    const yaExiste = lecturas.some(l => l.esReto);
+
+    if (!yaExiste) {
+      // 👉 lo añadimos automáticamente
+      const nuevaLecturaReto = {
+        titulo: reto.Titulo,
+        autor: reto.Autor,
+        categoria: reto.categoria || "Fantasía",
+        paginas: reto.paginas || 0,
+        activa: true,
+        esReto: true,
+        fechaInicio: new Date()
+      };
+
+      await addDoc(
+        collection(db, "users", usuarioActual.uid, "lecturas"),
+        nuevaLecturaReto
+      );
+
+      lecturas.unshift(nuevaLecturaReto);
+    }
+  }
+
+  // 🔹 3. Pintar lecturas
+  lecturas.forEach(l => {
+    const li = document.createElement("li");
+    li.textContent = `${l.titulo} — ${l.autor}`;
+
+    if (l.esReto) {
+      li.style.color = "#FFD700";
+      li.style.fontWeight = "bold";
+      li.textContent += " [RETO]";
+    }
+
+    listaLecturasEl.appendChild(li);
+  });
+}
+
