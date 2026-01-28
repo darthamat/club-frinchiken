@@ -70,7 +70,7 @@ btnRegister.addEventListener("click", async () => {
       mente: 0,
       corazon: 0,
       imagen_avatar: "",
-      clase: clasesPersonaje,
+      clase: nombrePersonaje,
       experiencia: 0,
       experienciaNecesario: 0,
 

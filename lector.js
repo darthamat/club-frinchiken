@@ -148,24 +148,100 @@ li.addEventListener("click", () => {
   resultados.classList.add("hidden");
 });
 
+// ---------------- CARGAR LECTURAS ACTIVAS ----------------
+async function cargarLecturas() {
+  listaLecturasEl.innerHTML = "Cargando lecturas...";
 
+  // 1️⃣ Lecturas activas del usuario
+  const q = query(collection(db, "users", usuarioActual.uid, "lecturas"), where("activa", "==", true));
+  const snap = await getDocs(q);
+
+  const lecturas = [];
+  const lecturasDocs = []; // guardamos el docRef para actualizar
+  snap.forEach(docSnap => {
+    lecturas.push(docSnap.data());
+    lecturasDocs.push({ id: docSnap.id, ref: docSnap.ref });
+  });
+
+  // 2️⃣ Cargar reto actual
+  const retoRef = doc(db, "retos", "2026_01");
+  const retoSnap = await getDoc(retoRef);
+  if (retoSnap.exists()) {
+    const reto = retoSnap.data();
+    const existe = lecturas.some(l => l.titulo === reto.Titulo);
+    if (!existe) {
+      lecturas.unshift({
+        titulo: reto.Titulo,
+        autor: reto.Autor,
+        categoria: reto.categoria || "Fantasía",
+        reto: true
+      });
+      lecturasDocs.unshift({ id: null, ref: null }); // sin doc para reto
+    }
+  }
+
+  // 3️⃣ Mostrar en pantalla
+  listaLecturasEl.innerHTML = "";
+  lecturas.forEach((l, index) => {
+    const li = document.createElement("li");
+    li.textContent = `${l.titulo} — ${l.autor} (${l.categoria})`;
+
+    if (l.reto) {
+      li.style.fontWeight = "bold";
+      li.style.color = "#FFD700"; // dorado para el reto
+      li.dataset.reto = "true";
+      li.textContent += " [RETO ACTUAL]";
+    } else {
+      // Botón para marcar como terminado
+      const btnTerminar = document.createElement("button");
+      btnTerminar.textContent = "📗 Terminado";
+      btnTerminar.style.marginLeft = "10px";
+      btnTerminar.addEventListener("click", async () => {
+        try {
+          const lecturaDoc = lecturasDocs[index];
+          if (lecturaDoc.ref) {
+            await setDoc(lecturaDoc.ref, { activa: false, fechaFin: new Date() }, { merge: true });
+            cargarLecturas();
+          }
+        } catch (e) {
+          console.error(e);
+          alert("Error al marcar como terminado");
+        }
+      });
+      li.appendChild(btnTerminar);
+    }
+
+    listaLecturasEl.appendChild(li);
+  });
+}
+
+
+// ---------------- REGISTRAR NUEVA LECTURA ----------------
 btnRegistrar.addEventListener("click", async () => {
-  const user = auth.currentUser;
-  if (!user) { alert("Debes iniciar sesión"); return; }
+  if (!usuarioActual) return alert("Debes iniciar sesión");
 
   const lectura = {
-    titulo: tituloLibro.value.trim(),
-    autor: autorLibro.value.trim(),
-    paginas: Number(paginasLibro.value),
-    categoria: categoriaLibro.value,
-    portada: portadaLibro.src,
-    fechaInicio: new Date(),
-    estado: "activa"
+    titulo: tituloInput.value.trim(),
+    autor: autorInput.value.trim(),
+    paginas: Number(paginasInput.value),
+    categoria: categoriaSelect.value,
+    activa: true,
+    fechaInicio: new Date()
   };
 
+  if (!lectura.titulo || !lectura.autor) {
+    return alert("Debe poner título y autor");
+  }
+
   try {
-    await addDoc(collection(db, "users", user.uid, "lecturas"), lectura);
-    alert(`📘 Lectura registrada: ${lectura.titulo}`);
+    await addDoc(collection(db, "users", usuarioActual.uid, "lecturas"), lectura);
+    tituloInput.value = "";
+    autorInput.value = "";
+    paginasInput.value = "";
+    categoriaSelect.value = "Fantasía";
+
+    // Refrescar lista inmediatamente
+    cargarLecturas();
   } catch (e) {
     console.error(e);
     alert("Error registrando lectura");
