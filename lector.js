@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
-  getFirestore, doc, getDoc, collection, addDoc, Timestamp, query, where, getDocs
+  getFirestore, doc, getDoc, collection, addDoc, Timestamp, query, where, getDocs, setDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import {
   getAuth, onAuthStateChanged, signOut
@@ -38,11 +38,12 @@ const autorInput = document.getElementById("autor");
 const paginasInput = document.getElementById("Paginas");
 const categoriaInput = document.getElementById("categoria");
 
-const tituloLibro = document.getElementById("titulo");
+/*const tituloLibro = document.getElementById("titulo");
 const autorLibro = document.getElementById("autor");
 const paginasLibro = document.getElementById("paginas");
 const categoriaLibro = document.getElementById("categoria");
 const portadaLibro = document.getElementById("portadaLibro"); // este id no estaba en tu HTML
+*/
 
 const listaLecturasEl = document.getElementById("listaLecturas");
 
@@ -83,37 +84,16 @@ async function cargarPerfilUsuario() {
 
 //boton reto
 btnReto.addEventListener("click", async () => {
-  try {
-    const retoRef = doc(db, "retos", "2026_01");
-    const snap = await getDoc(retoRef);
-    if (!snap.exists()) return;
+  const retoRef = doc(db, "retos", "2026_01");
+  const snap = await getDoc(retoRef);
 
-    const reto = snap.data();
+  if (!snap.exists()) return;
 
-    // Rellenar formulario
-    tituloInput.value = reto.Titulo || "";
-    autorInput.value = reto.Autor || "";
-    paginasInput.value = reto.Paginas ||150;
-
-    const categoria = reto.categoria || "Fantasía";
-
-    // Añadir categoría si no existe
-    if (![...categoriaInput.options].some(o => o.value === categoria)) {
-      const opt = document.createElement("option");
-      opt.value = categoria;
-      opt.textContent = categoria;
-      categoriaInput.appendChild(opt);
-    }
-    categoriaInput.value = categoria;
-
-    // Portada si existe
-    if (reto.portadaUrl && portadaLibro) {
-      portadaLibro.src = reto.portadaUrl;
-    }
-
-  } catch (e) {
-    console.error(e);
-  }
+  const reto = snap.data();
+  tituloInput.value = reto.Titulo || "";
+  autorInput.value = reto.Autor || "";
+  paginasInput.value = reto.Paginas || "";
+  categoriaInput.value = reto.categoria || "Fantasía";
 });
 
 
@@ -164,73 +144,6 @@ busquedaLibro.addEventListener("input", async () => {
   });
 });
 
-// ---------------- CARGAR LECTURAS ACTIVAS ----------------
-async function cargarLecturas() {
-  listaLecturasEl.innerHTML = "Cargando lecturas...";
-
-  // 1️⃣ Lecturas activas del usuario
-  const q = query(collection(db, "users", usuarioActual.uid, "lecturas"), where("activa", "==", true));
-  const snap = await getDocs(q);
-
-  const lecturas = [];
-  const lecturasDocs = []; // guardamos el docRef para actualizar
-  snap.forEach(docSnap => {
-    lecturas.push(docSnap.data());
-    lecturasDocs.push({ id: docSnap.id, ref: docSnap.ref });
-  });
-
-  // 2️⃣ Cargar reto actual
-  const retoRef = doc(db, "retos", "2026_01");
-  const retoSnap = await getDoc(retoRef);
-  if (retoSnap.exists()) {
-    const reto = retoSnap.data();
-    const existe = lecturas.some(l => l.titulo === reto.Titulo);
-    if (!existe) {
-      lecturas.unshift({
-        titulo: reto.Titulo,
-        autor: reto.Autor,
-        categoria: reto.categoria || "Fantasía",
-        reto: true
-      });
-      lecturasDocs.unshift({ id: null, ref: null }); // sin doc para reto
-    }
-  }
-
-  // 3️⃣ Mostrar en pantalla
-  listaLecturasEl.innerHTML = "";
-  lecturas.forEach((l, index) => {
-    const li = document.createElement("li");
-    li.textContent = `${l.titulo} — ${l.autor} (${l.categoria})`;
-
-    if (l.reto) {
-      li.style.fontWeight = "bold";
-      li.style.color = "#FFD700"; // dorado para el reto
-      li.dataset.reto = "true";
-      li.textContent += " [RETO ACTUAL]";
-    } else {
-      // Botón para marcar como terminado
-      const btnTerminarLibro = document.createElement("button");
-      btnTerminarLibro.textContent = "📗 Terminado";
-      btnTerminarLibro.style.marginLeft = "10px";
-      btnTerminarLibro.addEventListener("click", async () => {
-        try {
-          const lecturaDoc = lecturasDocs[index];
-          if (lecturaDoc.ref) {
-            await setDoc(lecturaDoc.ref, { activa: false, fechaFin: new Date() }, { merge: true });
-            cargarLecturas();
-          }
-        } catch (e) {
-          console.error(e);
-          alert("Error al marcar como terminado");
-        }
-      });
-      li.appendChild(btnTerminarLibro);
-    }
-
-    listaLecturasEl.appendChild(li);
-  });
-}
-
 
 // ---------------- REGISTRAR NUEVA LECTURA ----------------
 btnRegistrar.addEventListener("click", async () => {
@@ -268,6 +181,56 @@ btnRegistrar.addEventListener("click", async () => {
 
 //lecturas activas
 
+async function cargarLecturas() {
+  listaLecturasEl.innerHTML = "";
+
+  const q = query(
+    collection(db, "users", usuarioActual.uid, "lecturas"),
+    where("activa", "==", true)
+  );
+  const snap = await getDocs(q);
+
+  const lecturas = [];
+  snap.forEach(d => lecturas.push({ id: d.id, ...d.data() }));
+
+  // 🔹 reto
+  const retoSnap = await getDoc(doc(db, "retos", "2026_01"));
+  if (retoSnap.exists()) {
+    const reto = retoSnap.data();
+    const yaExiste = lecturas.some(l => l.esReto && l.retoId === "2026_01");
+
+
+    if (!yaExiste) {
+      await addDoc(
+        collection(db, "users", usuarioActual.uid, "lecturas"),
+        {
+          titulo: reto.Titulo,
+          autor: reto.Autor,
+          categoria: reto.categoria || "Fantasía",
+          activa: true,
+          esReto: true,
+          fechaInicio: new Date()
+        }
+      );
+      return cargarLecturas(); // 🔁 recarga limpia
+    }
+  }
+
+  lecturas.forEach(l => {
+    const li = document.createElement("li");
+    li.textContent = `${l.titulo} — ${l.autor}`;
+
+    if (l.esReto) {
+      li.style.color = "#FFD700";
+      li.style.fontWeight = "bold";
+      li.textContent += " [RETO]";
+    }
+
+    listaLecturasEl.appendChild(li);
+  });
+}
+
+/*
 async function cargarLecturas() {
   listaLecturasEl.innerHTML = "";
 
@@ -324,4 +287,5 @@ async function cargarLecturas() {
     listaLecturasEl.appendChild(li);
   });
 }
+*/
 
