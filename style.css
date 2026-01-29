@@ -440,3 +440,7 @@ button.gold {
   0% { transform: translateY(0); }
   100% { transform: translateY(-100%); }
 }
+#logrosComunidad {
+  margin: 0 auto;        /* centra horizontalmente */
+  display: block;         /* asegúrate que se comporte como bloque */
+}
