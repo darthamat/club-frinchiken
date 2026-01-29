@@ -88,3 +88,42 @@ async function cargarLogrosFeed(){
 }
 cargarLogrosFeed();
 setInterval(cargarLogrosFeed,3000);
+
+
+
+async function mostrarLogrosVisuales() {
+  const logros = await cargarLogrosComunidad();
+  if (!logros.length) return;
+
+  const ticker = document.getElementById("tickerComunidad");
+  ticker.innerHTML = "";
+
+  // Selecciona 10 logros aleatorios para el ticker
+  const seleccionados = [];
+  while (seleccionados.length < 10 && logros.length > 0) {
+    const index = Math.floor(Math.random() * logros.length);
+    seleccionados.push(logros.splice(index, 1)[0]);
+  }
+
+  seleccionados.forEach(l => {
+    const div = document.createElement("div");
+    div.className = `ticker-item ${l.rareza}`;
+
+    // Icono según rareza
+    let icon = "⭐"; // por defecto
+    if (l.rareza === "legendario") icon = "💎";
+    else if (l.rareza === "raro") icon = "✨";
+
+    div.innerHTML = `
+      <span class="icon">${icon}</span>
+      <strong>${l.usuario}</strong>: ${l.titulo}
+    `;
+
+    ticker.appendChild(div);
+  });
+}
+
+// Actualiza el ticker cada 15 segundos
+mostrarLogrosVisuales();
+setInterval(mostrarLogrosVisuales, 15000);
+
