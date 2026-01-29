@@ -309,6 +309,8 @@ async function buscarLibros(texto) {
       categoriaInput.value = info.categories?.[0] || "Fantasía";
       portadaLibro.src = info.imageLinks?.thumbnail || portadaLibro.src;
       resultados.classList.add("hidden");
+      busquedaLibro = "";
+      buscarLibros(texto);
     };
 
     resultados.appendChild(li);
