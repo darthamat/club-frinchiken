@@ -124,6 +124,8 @@ async function mostrarLogrosVisuales() {
 }
 
 // Actualiza el ticker cada 15 segundos
-mostrarLogrosVisuales();
-setInterval(mostrarLogrosVisuales, 15000);
+document.addEventListener("DOMContentLoaded", () => {
+  mostrarLogrosVisuales();
+  setInterval(mostrarLogrosVisuales, 15000);
+});
 
