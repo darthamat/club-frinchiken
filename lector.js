@@ -135,7 +135,7 @@ async function cargarPerfilUsuario() {
 }
 
 function actualizarXP(actual, necesario) {
-  if (necesario <= 0) necesario = 1;
+  if (necesario <= 0) necesario = 100;
 
   const porcentaje = Math.min(100, Math.floor((actual / necesario) * 100));
 
