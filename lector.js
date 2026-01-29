@@ -288,7 +288,7 @@ function pintarLecturas() {
   }
 
   // 2️⃣ LÓGICA RPG NUEVA 🔥
-  const userRef = doc(db, "users", usuarioActual.uid);
+  //const userRef = doc(db, "users", usuarioActual.uid);
 
   if (l.esReto) {
     // XP = 1 por página
