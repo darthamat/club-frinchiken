@@ -38,9 +38,9 @@ body {
 }
 
 .avatar {
-  width: 90px;
-  height: 90px;
-  border-radius: 50%;
+  width: 200px;
+  height: 200px;
+  border-radius: 15%;
   border: 3px solid gold;
 }
 
