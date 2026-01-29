@@ -98,12 +98,13 @@ let lecturasCache = [];
 let retoCache = null;
 let mostrarTerminados = false;
 
-const userRef = doc(db, "users", usuarioActual.uid);
+
 
 // ---------------- SESIÓN ----------------
 onAuthStateChanged(auth, async (user) => {
   if (!user) return window.location.href == "login.html";
-
+  
+  const userRef = doc(db, "users", usuarioActual.uid);
   usuarioActual = user;
   await cargarPerfilUsuario();
   await cargarLecturas(); // ⬅️ UNA SOLA VEZ
