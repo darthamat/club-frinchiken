@@ -254,6 +254,7 @@ async function cargarPerfilUsuario() {
   usuarioMonedas.textContent = usuarioData.monedas;
 
   actualizarXP(usuarioData.experiencia, usuarioData.experienciaNecesario);
+  pintarLogros();
 }
 
 function actualizarXP(actual, necesario) {
@@ -264,7 +265,7 @@ function actualizarXP(actual, necesario) {
   xpBarraEl.style.width = `${porcentaje}%`;
   xpTextoEl.textContent = `${actual} / ${necesario} XP`;
 }
-pintarLogros();
+
 
 // ---------------- RETO ----------------
 async function cargarReto() {
