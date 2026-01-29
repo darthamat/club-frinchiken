@@ -42,6 +42,7 @@ body {
   height: 200px;
   border-radius: 15%;
   border: 3px solid gold;
+  margin-top: 20px;
 }
 
 .xp-bar, .progress-bar {
