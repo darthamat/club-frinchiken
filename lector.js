@@ -254,7 +254,7 @@ async function terminarLectura(l) {
   if (l.esReto) {
     await updateDoc(userRef, { experiencia: increment(l.paginas) });
     
-  // usuarioXP.textContent = Number(usuarioXP.textContent) + l.paginas;
+   usuarioXP.textContent = Number(usuarioXP.textContent) + l.paginas;
 
      usuarioData.experiencia += l.paginas;
   actualizarXP(usuarioData.experiencia, usuarioData.experienciaNecesario);
@@ -266,7 +266,7 @@ comprobarNivel();
   } else {
     await updateDoc(userRef, { prestigio: increment(l.paginas) });
     
-   // usuarioPrestigio.textContent = Number(usuarioPrestigio.textContent) + l.paginas;
+    usuarioPrestigio.textContent = Number(usuarioPrestigio.textContent) + l.paginas;
     
     alert(`⭐ Lectura completada. Prestigio + ${l.paginas}`);
   }
@@ -277,8 +277,8 @@ comprobarNivel();
   if (recompensa.monedas) {
     await updateDoc(userRef, { monedas: increment(recompensa.monedas) });
    
-    //usuarioMonedas.textContent =
-      //Number(usuarioMonedas.textContent) + recompensa.monedas;
+    usuarioMonedas.textContent =
+    Number(usuarioMonedas.textContent) + recompensa.monedas;
 
 usuarioData.monedas += recompensa.monedas;
   usuarioMonedas.textContent = usuarioData.monedas;
