@@ -247,8 +247,8 @@ async function terminarLectura(l) {
     alert(`🎉 ¡Reto completado! +${l.paginas} XP`);
   } else {
     await updateDoc(userRef, { prestigio: increment(1) });
-    usuarioPrestigio.textContent = Number(usuarioPrestigio.textContent) + 1;
-    alert(`⭐ Lectura completada. Prestigio +1`);
+    usuarioPrestigio.textContent = Number(usuarioPrestigio.textContent) + l.paginas;
+    alert(`⭐ Lectura completada. Prestigio + l.paginas`);
   }
 
   // Recompensas
@@ -258,7 +258,7 @@ async function terminarLectura(l) {
     await updateDoc(userRef, { monedas: increment(recompensa.monedas) });
     usuarioMonedas.textContent =
       Number(usuarioMonedas.textContent) + recompensa.monedas;
-    alert(`💰 Has ganado ${recompensa.monedas} monedas!`);
+    alert(`💰 Has conseguido ${recompensa.monedas} marcapáginas!`);
   }
 
   if (recompensa.objeto) {
