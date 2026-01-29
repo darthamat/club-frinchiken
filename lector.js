@@ -76,7 +76,14 @@ const objetosRaros = [
 
 const objetosLegendarios = [
   "El Anillo Único",
-  "La Auryin",
+  "Un huevo de dragon de Daenerys",
+  "La dragonlance",
+  "La segunda bola de dragon",
+  "Sombrero de Terry Pratchett",
+  "Tercer libro de El nombre del Viento",
+  "La granada de Antioquia",
+  "Chapines de rubies",
+  "La pipa de Bilbo";
   "Tiara de Donut",
   "eBook de Mithril",
   "Gafas de lectura Jhony N5",
