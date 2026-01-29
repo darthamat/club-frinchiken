@@ -60,6 +60,8 @@ btnToggleTerminadas.textContent = "Mostrar lecturas terminadas";
 listaLecturasEl.parentNode.insertBefore(btnToggleTerminadas, listaLecturasEl.nextSibling);
 const btnBuscar = document.getElementById("btnBuscar");
 
+const userRef = doc(db, "users", usuarioActual.uid);
+
 const objetosRaros = [
   "Marcapáginas de dragón",
   "Lupa de detective",
