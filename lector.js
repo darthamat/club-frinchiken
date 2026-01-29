@@ -181,8 +181,8 @@ async function cargarLecturas() {
     lecturasCache.unshift({
       titulo: reto.Titulo,
       autor: reto.Autor,
-      categoria: reto.categoria || "Fantasía",
-      paginas: reto.Paginas || 0,
+      categoria: reto.categoria,
+      paginas: reto.Paginas,
       activa: true,
       progreso: 0,
       esReto: true,
