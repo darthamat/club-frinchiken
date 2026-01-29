@@ -116,16 +116,33 @@ async function cargarPerfilUsuario() {
   const snap = await getDoc(doc(db, "users", usuarioActual.uid));
   if (!snap.exists()) return;
 
-  usuarioData = snap.data();
+ // usuarioData = snap.data();
+
+  usuarioData = {
+  experiencia: 0,
+  experienciaNecesario: 100,
+  prestigio: 0,
+  monedas: 0,
+  ...snap.data()
+};
 
   nombrePersonajeEl.textContent = usuarioData.nombrePersonaje || "Sin nombre";
   claseEl.textContent = usuarioData.clase || "Aventurero";
   nivelEl.textContent = usuarioData.nivel || 1;
 
-  actualizarXP(
-    usuarioData.experiencia || 0,
-    usuarioData.experienciaNecesario || 100
-  );
+
+  usuarioData.experiencia += l.paginas;
+actualizarXP(
+  usuarioData.experiencia,
+  usuarioData.experienciaNecesario
+
+  usuarioData.prestigio += 1;
+usuarioPrestigio.textContent = usuarioData.prestigio;
+
+  usuarioData.monedas += recompensa.monedas;
+usuarioMonedas.textContent = usuarioData.monedas;
+  
+);
 }
 
 function actualizarXP(actual, necesario) {
@@ -242,7 +259,7 @@ async function terminarLectura(l) {
 
   // RPG logic
   if (l.esReto) {
-    await updateDoc(userRef, { xp: increment(l.paginas) });
+    await updateDoc(userRef, { experiencia: increment(l.paginas) });
     usuarioXP.textContent = Number(usuarioXP.textContent) + l.paginas;
     alert(`🎉 ¡Reto completado! +${l.paginas} XP`);
   } else {
