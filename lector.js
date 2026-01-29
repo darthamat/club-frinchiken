@@ -57,6 +57,7 @@ const listaLecturasEl = document.getElementById("listaLecturas");
 const btnToggleTerminadas = document.createElement("button");
 btnToggleTerminadas.textContent = "Mostrar lecturas terminadas";
 listaLecturasEl.parentNode.insertBefore(btnToggleTerminadas, listaLecturasEl.nextSibling);
+const btnBuscar = document.getElementById("btnBuscar");
 
 // ---------------- ESTADO ----------------
 let usuarioActual = null;
