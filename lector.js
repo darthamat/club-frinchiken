@@ -315,11 +315,14 @@ async function buscarLibros(texto) {
       tituloInput.value = info.title || "";
       autorInput.value = info.authors?.[0] || "";
       paginasInput.value = info.pageCount || 0;
-      categoriaSeleccionada =
-    info.volumeInfo.categories?.[0] || "";
+     const categoriaSeleccionada =
+        info.categories?.[0] || "Sin categoría";
 
-  categoriaInput.value = categoriaSeleccionada;
+      categoriaInput.value = categoriaSeleccionada;
+
+     
       portadaLibro.src = info.imageLinks?.thumbnail || portadaLibro.src;
+      
       resultados.classList.add("hidden");
    
     };
