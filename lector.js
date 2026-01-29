@@ -620,3 +620,6 @@ function pintarLogros() {
     cont.appendChild(div);
   });
 }
+function mostrarNotificacionLogro(logro) {
+  alert(`🏆 Logro desbloqueado: ${logro.titulo}`);
+}
