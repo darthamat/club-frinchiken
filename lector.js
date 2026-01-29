@@ -10,7 +10,8 @@ import {
   deleteDoc,
   query,
   getDocs,
-  enableIndexedDbPersistence
+  enableIndexedDbPersistence,
+  increment 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
