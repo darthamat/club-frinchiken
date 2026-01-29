@@ -340,6 +340,7 @@ button.gold {
 .hidden {
   display: none;
 }
+
 .feed-logros {
   width: 100%; /* se adapta al div padre */
   height: 180px;
@@ -389,3 +390,53 @@ button.gold {
 .emoji-normal::before { content: "📦 "; }
 .emoji-raro::before { content: "💎 "; }
 .emoji-legendario::before { content: "🏆 "; }
+
+.panel-comunidad {
+  width: 360px;
+  max-height: 200px;
+  overflow: hidden;
+  background: #111;
+  color: #fff;
+  border: 2px solid #555;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.5);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.ticker {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  animation: scrollUp 15s linear infinite;
+}
+
+.ticker-item {
+  background: #222;
+  padding: 8px 12px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  font-size: 0.9em;
+  transition: transform 0.3s;
+}
+
+.ticker-item:hover {
+  transform: scale(1.05);
+}
+
+.ticker-item .icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  display: inline-block;
+}
+
+.ticker-item.legendario { border-left: 4px solid gold; }
+.ticker-item.raro { border-left: 4px solid violet; }
+.ticker-item.comun { border-left: 4px solid #aaa; }
+
+@keyframes scrollUp {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-100%); }
+}
