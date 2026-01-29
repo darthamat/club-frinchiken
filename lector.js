@@ -274,8 +274,6 @@ btnToggleTerminadas.addEventListener("click", () => {
 
 let timeoutBusqueda = null;
 
-const btnBuscar = document.getElementById("btnBuscar");
-
 btnBuscar.addEventListener("click", () => {
   const texto = busquedaLibro.value.trim();
 
