@@ -386,7 +386,7 @@ async function buscarLibros(texto) {
 async function terminarLectura(lectura) {
   if (!usuarioActual) return;
 
-  const userRef = doc(db, "users", usuarioActual.uid);
+  
   const lecturaRef = doc(
     db,
     "users",
