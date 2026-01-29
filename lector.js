@@ -89,6 +89,128 @@ const objetosLegendarios = [
   "Armadura de páginas de la primera Biblia"
 ];
 
+const LOGROS = [
+  // 🧩 RETOS
+  {
+    id: "reto_enero",
+    titulo: "Reto de Enero superado",
+    descripcion: "Completaste el reto mensual",
+    tipo: "reto"
+  },
+
+  // 📚 PÁGINAS
+  {
+    id: "tocho_1000",
+    titulo: "Lector/a de tochos",
+    descripcion: "Leíste un libro de 1000 páginas o más",
+    condicion: (l) => l.paginas >= 1000
+  },
+
+  // 📦 GÉNEROS
+  {
+    id: "romantico",
+    titulo: "Corazón de tinta",
+    descripcion: "Leíste un libro romántico",
+    condicion: (l) => l.categoria?.toLowerCase().includes("romance")
+  },
+  {
+    id: "erotico",
+    titulo: "Lector/a cachondo/a 😏",
+    descripcion: "Leíste literatura erótica",
+    condicion: (l) => l.categoria?.toLowerCase().includes("erótico")
+  },
+   {
+    id: "fantasia",
+    titulo: "Amante de dragones",
+    descripcion: "Leíste literatura fantñastica",
+    condicion: (l) => l.categoria?.toLowerCase().includes("fantasia")
+  },
+   {
+    id: "terror",
+    titulo: "Terrores nocturnos",
+    descripcion: "Leíste un libro de terror",
+    condicion: (l) => l.categoria?.toLowerCase().includes("terror")
+  },
+
+  // 🌙 HÁBITOS
+  {
+    id: "nocturno",
+    titulo: "Lector/a nocturno",
+    descripcion: "Terminaste un libro entre las 00:00 y las 06:00",
+    condicion: () => {
+      const h = new Date().getHours();
+      return h >= 0 && h < 6;
+    }
+  }
+{
+  id: "mes_10_libros",
+  titulo: "Devorador/a de libros",
+  condicion: () => {
+    const ahora = new Date();
+    const mes = ahora.getMonth();
+    const año = ahora.getFullYear();
+
+    const librosMes = lecturasCache.filter(l => {
+      if (!l.fechaFin) return false;
+      const f = l.fechaFin.toDate();
+      return f.getMonth() === mes && f.getFullYear() === año;
+    });
+
+    return librosMes.length >= 10;
+  }
+}
+{
+  id: "mes_5_libros",
+  titulo: "Bebe libros",
+  condicion: () => {
+    const ahora = new Date();
+    const mes = ahora.getMonth();
+    const año = ahora.getFullYear();
+
+    const librosMes = lecturasCache.filter(l => {
+      if (!l.fechaFin) return false;
+      const f = l.fechaFin.toDate();
+      return f.getMonth() === mes && f.getFullYear() === año;
+    });
+
+    return librosMes.length >= 5;
+  }
+}
+
+{
+  id: "anio_20_libros",
+  titulo: "Devorador/a anual",
+  condicion: () => {
+    const añoActual = new Date().getFullYear();
+
+    const librosAnio = lecturasCache.filter(l => {
+      if (!l.fechaFin) return false;
+      const f = l.fechaFin.toDate();
+      return f.getFullYear() === añoActual;
+    });
+
+    return librosAnio.length >= 30;
+  }
+}
+
+{
+  id: "anio_30_libros",
+  titulo: "Devorador/a de bibliotecas",
+  condicion: () => {
+    const añoActual = new Date().getFullYear();
+
+    const librosAnio = lecturasCache.filter(l => {
+      if (!l.fechaFin) return false;
+      const f = l.fechaFin.toDate();
+      return f.getFullYear() === añoActual;
+    });
+
+    return librosAnio.length >= 30;
+  }
+}
+  
+];
+
 // ---------------- ESTADO ----------------
 let usuarioActual = null;
 let usuarioData = null;
@@ -142,6 +264,7 @@ function actualizarXP(actual, necesario) {
   xpBarraEl.style.width = `${porcentaje}%`;
   xpTextoEl.textContent = `${actual} / ${necesario} XP`;
 }
+pintarLogros();
 
 // ---------------- RETO ----------------
 async function cargarReto() {
@@ -291,6 +414,11 @@ usuarioData.monedas += recompensa.monedas;
   }
 
   pintarLecturas();
+  await comprobarLogros(l);
+  
+  if (l.esReto) {
+  await desbloquearLogro("reto_" + l.titulo.replace(/\s+/g, "_"));
+}
 }
 
 // ---------------- PINTAR LECTURAS ----------------
@@ -439,4 +567,55 @@ function xpNecesariaParaNivel(nivel) {
   if (nivel <= 5) return 400 + (nivel - 1) * 150;
   if (nivel <= 10) return 1300 + (nivel - 6) * 350;
   return 3600 + (nivel - 11) * 1000;
+}
+
+//logros
+
+async function comprobarLogros(lectura) {
+  const userRef = doc(db, "users", usuarioActual.uid);
+  usuarioData.logros ??= {};
+
+  for (const logro of LOGROS) {
+    if (usuarioData.logros[logro.id]) continue;
+
+    if (logro.condicion?.(lectura)) {
+      usuarioData.logros[logro.id] = {
+        fecha: new Date(),
+        titulo: logro.titulo
+      };
+
+      await updateDoc(userRef, {
+        [`logros.${logro.id}`]: {
+          fecha: new Date(),
+          titulo: logro.titulo
+        }
+      });
+
+      mostrarNotificacionLogro(logro);
+    }
+  }
+}
+
+//pintar logros
+
+function pintarLogros() {
+  const cont = document.getElementById("feedLogros");
+  cont.innerHTML = "";
+
+  const logros = usuarioData.logros || {};
+
+  if (Object.keys(logros).length === 0) {
+    cont.textContent = "Aún no has desbloqueado logros";
+    return;
+  }
+
+  Object.values(logros).forEach(l => {
+    const div = document.createElement("div");
+    div.className = "logro";
+    div.innerHTML = `
+      <strong>${l.titulo}</strong><br>
+      <small>${new Date(l.fecha.seconds * 1000).toLocaleDateString()}</small>
+    `;
+    cont.appendChild(div);
+  });
 }
