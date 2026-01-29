@@ -95,7 +95,8 @@ const LOGROS = [
     id: "reto_enero",
     titulo: "Reto de Enero superado",
     descripcion: "Completaste el reto mensual",
-    tipo: "reto"
+    tipo: "reto",
+    condicion: (l) => l.esReto === true
   },
 
   // 📚 PÁGINAS
@@ -417,9 +418,7 @@ usuarioData.monedas += recompensa.monedas;
   pintarLecturas();
   await comprobarLogros(l);
   
-  if (l.esReto) {
-  await desbloquearLogro("reto_" + l.titulo.replace(/\s+/g, "_"));
-}
+  
 }
 
 // ---------------- PINTAR LECTURAS ----------------
