@@ -1,6 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getUserBin, saveUserBin } from "./jsonbin.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDcEUoGcKs6vwoNUF0ok1W-d8F2vVjCqP0",
@@ -35,31 +36,57 @@ loginBtn.addEventListener("click", async ()=>{
   }
 });
 
-// LOGIN GOOGLE
-btnGoogle.addEventListener("click", async ()=>{
-  try{
-    const result = await signInWithPopup(auth,provider);
-    const user = result.user;
-    const userRef = doc(db,"users",user.uid);
-    const snap = await getDoc(userRef);
-    if(!snap.exists()){
-      // Si es usuario nuevo, asigna clase aleatoria
-      const clasesRPG = [
-        "BiblioGuerrero","MagoEnciclopédico","ClérigoLiterario",
-        "ExploradorNovelesco","PícaroEnsayista","BardoPoético","DruidaLecturasVerdes"
-      ];
-      const clase = clasesRPG[Math.floor(Math.random()*clasesRPG.length)];
-      await setDoc(userRef,{
-        displayName:user.displayName,
-        prestigio:0,
-        nivel:1,
-        clase:clase,
-        photoURL:user.photoURL||"",
-        lecturas:[]
-      });
-    }
-    window.location.href = "dashboard.html";
-  }catch(e){
-    loginError.textContent = e.message;
+async function initUsuario(uid, binId) {
+  try {
+    const userData = await getUserBin(binId);
+    return userData; // ya existe
+  } catch {
+    // crear nuevo
+    const nuevoUsuario = {
+      uid,
+      perfil: {
+        nombreReal: "",
+        nombrePersonaje: "Lector/a Errante y Sin nombre",
+        clase: "Lector/a Sin Clase",
+        avatarUrl: "",
+        nivel: 1,
+        xp: 0,
+        xpNecesaria: 100,
+        prestigio: 0
+      },
+      stats: {
+        fuerza: 10,
+        agilidad: 10,
+        inteligencia: 10,
+        sabiduria: 10,
+        mente: 0,
+        corazon: 0,
+        fatiga: 0
+      },
+      lecturas: {
+        activas: [],
+        terminadas: []
+      },
+      retos: {
+        actual: null,
+        completados: []
+      },
+      logros: [],
+      economia: {
+        oro: 0,
+        botines: []
+      },
+      config: {
+        tema: "claro",
+        mostrarTerminadas: false
+      },
+      meta: {
+        fechaRegistro: new Date().toISOString(),
+        ultimaConexion: new Date().toISOString()
+      }
+    };
+
+    await saveUserBin(binId, nuevoUsuario);
+    return nuevoUsuario;
   }
-});
+}

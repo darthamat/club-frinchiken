@@ -12,6 +12,29 @@ const firebaseConfig = {
   appId: "1:993321884320:web:d4da17ddcc78f0482787c5"
 };
 
+
+/*
+ * //nuevo proyecto firebase
+ * // Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyBEaCwZuFP5I9ytwMeorBJC9p3jzcEiWvQ",
+  authDomain: "usuariosclub-956c3.firebaseapp.com",
+  projectId: "usuariosclub-956c3",
+  storageBucket: "usuariosclub-956c3.firebasestorage.app",
+  messagingSenderId: "291177141580",
+  appId: "1:291177141580:web:5deb5b3bc406ab909dabe9"
+};
+
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+*/
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth();
