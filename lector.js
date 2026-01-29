@@ -102,8 +102,10 @@ let mostrarTerminados = false;
 onAuthStateChanged(auth, async (user) => {
   if (!user) return window.location.href == "login.html";
   
-  const userRef = doc(db, "users", usuarioActual.uid);
+  
   usuarioActual = user;
+const userRef = doc(db, "users", usuarioActual.uid);
+  
   await cargarPerfilUsuario();
   await cargarLecturas(); // ⬅️ UNA SOLA VEZ
 });
