@@ -81,7 +81,7 @@ const objetosLegendarios = [
   "Tercer libro de El nombre del Viento",
   "La granada de Antioquia",
   "Chapines de rubies",
-  "La pipa de Bilbo";
+  "La pipa de Bilbo",
   "Tiara de Donut",
   "eBook de Mithril",
   "Gafas de lectura Jhony N5",
