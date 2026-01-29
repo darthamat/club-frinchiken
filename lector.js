@@ -64,8 +64,6 @@ const usuarioXP = document.getElementById("xpUsuario");
 const usuarioPrestigio = document.getElementById("usuarioPrestigio");
 const usuarioMonedas = document.getElementById("usuarioMonedas");
 
-const userRef = doc(db, "users", usuarioActual.uid);
-
 const objetosRaros = [
   "Marcapáginas de dragón",
   "Lupa de detective",
