@@ -258,13 +258,19 @@ async function cargarPerfilUsuario() {
   pintarLogros();
 }
 
-function actualizarXP(actual, necesario) {
-  if (necesario <= 0) necesario = 100;
 
-  const porcentaje = Math.min(100, Math.floor((actual / necesario) * 100));
+function actualizarXP(actual, usuarioData) {
+  while (actual >= usuarioData.experienciaNecesario) {
+    actual -= usuarioData.experienciaNecesario;
+    usuarioData.nivel++;
+    usuarioData.experienciaNecesario = xpNecesariaParaNivel(usuarioData.nivel);
+    alert(`✨ ¡Has subido al nivel ${usuarioData.nivel}!`);
+  }
 
-  xpBarraEl.style.width = `${porcentaje}%`;
-  xpTextoEl.textContent = `${actual} / ${necesario} XP`;
+  usuarioData.experiencia = actual;
+
+  xpBarraEl.style.width = `${Math.min(100, (actual / usuarioData.experienciaNecesario) * 100)}%`;
+  xpTextoEl.textContent = `${actual} / ${usuarioData.experienciaNecesario} XP`;
 }
 
 
