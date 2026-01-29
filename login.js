@@ -39,7 +39,7 @@ try {
 
   
 async function initUsuario(uid) {
-  const userRef = doc(db, "usuarios", uid);
+  const userRef = doc(db, "users", uid);
   const snap = await getDoc(userRef);
 
   if (snap.exists()) {
