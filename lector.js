@@ -129,6 +129,8 @@ btnReto.addEventListener("click", async () => {
 btnRegistrar.addEventListener("click", async () => {
   if (!usuarioActual) return;
 
+  let categoriaSeleccionada = "";
+
   const lectura = {
     titulo: tituloInput.value.trim(),
     autor: autorInput.value.trim(),
@@ -153,10 +155,15 @@ btnRegistrar.addEventListener("click", async () => {
   tituloInput.value = "";
   autorInput.value = "";
   paginasInput.value = "";
-  categoriaInput.value = "";
+  
+ categoriaInput.value = "";
+  
   portadaLibro.src = "https://via.placeholder.com/120x180";
-     busquedaLibro.value = "";
-    resultados.classList.add("hidden");
+
+  //limpieza buscador
+ busquedaLibro.value = "";
+  resultados.innerHTML = "";          // <-- CLAVE
+  resultados.classList.add("hidden"); // <-- OCULTAR
 });
 
 // ---------------- CARGAR LECTURAS (UNA VEZ) ----------------
@@ -308,7 +315,10 @@ async function buscarLibros(texto) {
       tituloInput.value = info.title || "";
       autorInput.value = info.authors?.[0] || "";
       paginasInput.value = info.pageCount || 0;
-      categoriaInput.value = info.categories?.[0] || "";
+      categoriaSeleccionada =
+    info.volumeInfo.categories?.[0] || "";
+
+  categoriaInput.value = categoriaSeleccionada;
       portadaLibro.src = info.imageLinks?.thumbnail || portadaLibro.src;
       resultados.classList.add("hidden");
    
