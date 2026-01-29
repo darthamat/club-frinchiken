@@ -274,24 +274,25 @@ btnToggleTerminadas.addEventListener("click", () => {
 
 let timeoutBusqueda = null;
 
-btnBuscar.addEventListener("click", () => {
-  clearTimeout(timeoutBusqueda);
+const btnBuscar = document.getElementById("btnBuscar");
 
+btnBuscar.addEventListener("click", () => {
   const texto = busquedaLibro.value.trim();
+
   if (texto.length < 3) {
     resultados.classList.add("hidden");
     return;
   }
 
-  timeoutBusqueda = setTimeout(() => buscarLibros(texto), 400);
+  buscarLibros(texto);
 });
 
 async function buscarLibros(texto) {
   resultados.innerHTML = "";
   resultados.classList.remove("hidden");
 
-    const res = await fetch(
-    `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(texto)}&maxResults=5&`
+  const res = await fetch(
+    `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(texto)}&maxResults=5`
   );
 
   const data = await res.json();
