@@ -112,7 +112,7 @@ btnLogout.addEventListener("click", async () => {
 });
 
 // ---------------- PERFIL ----------------
-async function cargarPerfilUsuario() {
+/*async function cargarPerfilUsuario() {
   const snap = await getDoc(doc(db, "users", usuarioActual.uid));
   if (!snap.exists()) return;
 
@@ -149,7 +149,39 @@ usuarioMonedas.textContent = usuarioData.monedas;
 function actualizarXP(actual, necesario) {
   xpBarraEl.style.width = `${Math.min(100, (actual / necesario) * 100)}%`;
   xpTextoEl.textContent = `${actual} / ${necesario} XP`;
+}*/
+
+
+async function cargarPerfilUsuario() {
+  const snap = await getDoc(doc(db, "users", usuarioActual.uid));
+  if (!snap.exists()) return;
+
+  usuarioData = {
+    experiencia: 0,
+    experienciaNecesario: 100,
+    prestigio: 0,
+    monedas: 0,
+    nivel: 1,
+    ...snap.data()
+  };
+
+  nombrePersonajeEl.textContent = usuarioData.nombrePersonaje || "Sin nombre";
+  claseEl.textContent = usuarioData.clase || "Aventurero";
+  nivelEl.textContent = usuarioData.nivel;
+  usuarioPrestigio.textContent = usuarioData.prestigio;
+  usuarioMonedas.textContent = usuarioData.monedas;
+
+  actualizarXP(usuarioData.experiencia, usuarioData.experienciaNecesario);
 }
+
+
+
+
+
+
+
+
+
 
 // ---------------- RETO ----------------
 async function cargarReto() {
@@ -261,12 +293,22 @@ async function terminarLectura(l) {
   // RPG logic
   if (l.esReto) {
     await updateDoc(userRef, { experiencia: increment(l.paginas) });
-    usuarioXP.textContent = Number(usuarioXP.textContent) + l.paginas;
+    
+  // usuarioXP.textContent = Number(usuarioXP.textContent) + l.paginas;
+
+     usuarioData.experiencia += l.paginas;
+  actualizarXP(usuarioData.experiencia, usuarioData.experienciaNecesario);
+    
     alert(`🎉 ¡Reto completado! +${l.paginas} XP`);
+    
+comprobarNivel();
+    
   } else {
-    await updateDoc(userRef, { prestigio: increment(1) });
-    usuarioPrestigio.textContent = Number(usuarioPrestigio.textContent) + l.paginas;
-    alert(`⭐ Lectura completada. Prestigio + l.paginas`);
+    await updateDoc(userRef, { prestigio: increment(l.paginas) });
+    
+   // usuarioPrestigio.textContent = Number(usuarioPrestigio.textContent) + l.paginas;
+    
+    alert(`⭐ Lectura completada. Prestigio + ${l.paginas}`);
   }
 
   // Recompensas
@@ -274,8 +316,13 @@ async function terminarLectura(l) {
 
   if (recompensa.monedas) {
     await updateDoc(userRef, { monedas: increment(recompensa.monedas) });
-    usuarioMonedas.textContent =
-      Number(usuarioMonedas.textContent) + recompensa.monedas;
+   
+    //usuarioMonedas.textContent =
+      //Number(usuarioMonedas.textContent) + recompensa.monedas;
+
+usuarioData.monedas += recompensa.monedas;
+  usuarioMonedas.textContent = usuarioData.monedas;
+    
     alert(`💰 Has conseguido ${recompensa.monedas} marcapáginas!`);
   }
 
@@ -402,7 +449,7 @@ async function buscarLibros(texto) {
 
 // ---------------- RECOMPENSAS ----------------
 function generarRecompensas(paginas) {
-  const monedas = Math.floor(Math.random() * (paginas * 10)) + 1;
+  const monedas = Math.floor(Math.random() * (paginas * 1)) + 1;
   const rand = Math.random() * 100;
   let objeto = null;
 
@@ -410,6 +457,22 @@ function generarRecompensas(paginas) {
   else if (rand > 85) objeto = objetosRaros[Math.floor(Math.random() * objetosRaros.length)];
 
   return { monedas, objeto };
+}
+function comprobarNivel() {
+  while (usuarioData.experiencia >= usuarioData.experienciaNecesario) {
+    usuarioData.experiencia -= usuarioData.experienciaNecesario;
+    usuarioData.nivel += 1;
+    usuarioData.experienciaNecesario = Math.floor(usuarioData.experienciaNecesario * 1.5);
+  }
+
+  nivelEl.textContent = usuarioData.nivel;
+  actualizarXP(usuarioData.experiencia, usuarioData.experienciaNecesario);
+
+  updateDoc(doc(db, "users", usuarioActual.uid), {
+    nivel: usuarioData.nivel,
+    experiencia: usuarioData.experiencia,
+    experienciaNecesario: usuarioData.experienciaNecesario
+  });
 }
 
 
