@@ -49,7 +49,7 @@ const btnLogout = document.getElementById("btnLogout");
 
 const tituloInput = document.getElementById("titulo");
 const autorInput = document.getElementById("autor");
-const paginasInput = document.getElementById("paginas");
+const paginasInput = document.getElementById("Paginas");
 const categoriaInput = document.getElementById("categoria");
 const portadaLibro = document.getElementById("portadaLibro");
 
