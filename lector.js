@@ -242,18 +242,47 @@ function pintarLecturas() {
     // Terminar
     const btnTerminar = document.createElement("button");
     btnTerminar.textContent = "📗 Terminar";
-    btnTerminar.onclick = async () => {
-      l.activa = false;
-      pintarLecturas();
+  btnTerminar.onclick = async () => {
+  // 1️⃣ MARCAR LECTURA COMO INACTIVA (TU LÓGICA EXISTENTE)
+  l.activa = false;
+  pintarLecturas();
 
-      if (l.id) {
-        await updateDoc(
-          doc(db, "users", usuarioActual.uid, "lecturas", l.id),
-          { activa: false, fechaFin: new Date() }
-        );
-      }
-    };
-    li.appendChild(btnTerminar);
+  if (l.id) {
+    await updateDoc(
+      doc(db, "users", usuarioActual.uid, "lecturas", l.id),
+      { activa: false, fechaFin: new Date() }
+    );
+  }
+
+  // 2️⃣ LÓGICA RPG NUEVA 🔥
+  const userRef = doc(db, "users", usuarioActual.uid);
+
+  if (l.esReto) {
+    // XP = 1 por página
+    await updateDoc(userRef, {
+      xp: increment(l.paginas)
+    });
+
+    // Actualizar panel visual
+    usuarioXP.textContent =
+      Number(usuarioXP.textContent) + l.paginas;
+
+    alert(`🎉 ¡Reto completado! +${l.paginas} XP`);
+  } else {
+    // Lectura libre → Prestigio +1
+    await updateDoc(userRef, {
+      prestigio: increment(1)
+    });
+
+    // Actualizar panel visual
+    usuarioPrestigio.textContent =
+      Number(usuarioPrestigio.textContent) + 1;
+
+    alert(`⭐ Lectura completada. Prestigio +1`);
+  }
+};
+
+li.appendChild(btnTerminar);
 
     // Eliminar
     const btnEliminar = document.createElement("button");
@@ -271,6 +300,10 @@ function pintarLecturas() {
     listaLecturasEl.appendChild(li);
   });
 }
+
+
+
+
 
 // ---------------- TOGGLE TERMINADAS ----------------
 btnToggleTerminadas.addEventListener("click", () => {
@@ -332,5 +365,45 @@ async function buscarLibros(texto) {
     resultados.appendChild(li);
   });
 }
+async function terminarLectura(lectura) {
+  if (!usuarioActual) return;
 
+  const userRef = doc(db, "users", usuarioActual.uid);
+  const lecturaRef = doc(
+    db,
+    "users",
+    usuarioActual.uid,
+    "lecturas",
+    lectura.id
+  );
+
+  // 🎮 RPG logic
+  if (lectura.esReto) {
+    // XP = 1 por página
+    await updateDoc(userRef, {
+      xp: increment(lectura.paginas)
+    });
+
+    usuarioXP.textContent =
+      Number(usuarioXP.textContent) + lectura.paginas;
+
+  } else {
+    // Prestigio por lectura libre
+    await updateDoc(userRef, {
+      prestigio: increment(1)
+    });
+
+    usuarioPrestigio.textContent =
+      Number(usuarioPrestigio.textContent) + 1;
+  }
+
+  // 📦 mover a histórico
+  await updateDoc(lecturaRef, {
+    activa: false,
+    fechaFin: new Date()
+  });
+
+  // 🖼️ UI
+  ocultarLecturaDelPanel(lectura.id);
+}
 
