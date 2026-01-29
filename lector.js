@@ -156,7 +156,7 @@ btnRegistrar.addEventListener("click", async () => {
   categoriaInput.value = "Fantasía";
   portadaLibro.src = "https://via.placeholder.com/120x180";
      busquedaLibro.value = "";
-      buscarLibros(texto);
+    resultados.classList.add("hidden");
 });
 
 // ---------------- CARGAR LECTURAS (UNA VEZ) ----------------
@@ -308,7 +308,7 @@ async function buscarLibros(texto) {
       tituloInput.value = info.title || "";
       autorInput.value = info.authors?.[0] || "";
       paginasInput.value = info.pageCount || 0;
-      categoriaInput.value = info.categories?.[0] || "Fantasía";
+      categoriaInput.value = info.categories?.[0] || "";
       portadaLibro.src = info.imageLinks?.thumbnail || portadaLibro.src;
       resultados.classList.add("hidden");
    
