@@ -135,6 +135,7 @@ async function cargarPerfilUsuario() {
 actualizarXP(
   usuarioData.experiencia,
   usuarioData.experienciaNecesario
+  );
 
   usuarioData.prestigio += 1;
 usuarioPrestigio.textContent = usuarioData.prestigio;
@@ -142,7 +143,7 @@ usuarioPrestigio.textContent = usuarioData.prestigio;
   usuarioData.monedas += recompensa.monedas;
 usuarioMonedas.textContent = usuarioData.monedas;
   
-);
+
 }
 
 function actualizarXP(actual, necesario) {
