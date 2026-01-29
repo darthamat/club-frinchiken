@@ -315,8 +315,10 @@ async function buscarLibros(texto) {
       tituloInput.value = info.title || "";
       autorInput.value = info.authors?.[0] || "";
       paginasInput.value = info.pageCount || 0;
-     const categoriaSeleccionada =
-        info.categories?.[0] || "Sin categoría";
+     
+     const categoriaSeleccionada = info.categories
+  ? info.categories.join(", ")
+  : "Sin categoría";
 
       categoriaInput.value = categoriaSeleccionada;
 
