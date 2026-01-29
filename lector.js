@@ -134,6 +134,15 @@ async function cargarPerfilUsuario() {
   actualizarXP(usuarioData.experiencia, usuarioData.experienciaNecesario);
 }
 
+function actualizarXP(actual, necesario) {
+  if (necesario <= 0) necesario = 1;
+
+  const porcentaje = Math.min(100, Math.floor((actual / necesario) * 100));
+
+  xpBarraEl.style.width = `${porcentaje}%`;
+  xpTextoEl.textContent = `${actual} / ${necesario} XP`;
+}
+
 // ---------------- RETO ----------------
 async function cargarReto() {
   if (retoCache) return retoCache;
