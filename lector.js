@@ -405,5 +405,64 @@ async function terminarLectura(lectura) {
 
   // 🖼️ UI
   ocultarLecturaDelPanel(lectura.id);
-}
 
+  // 1️⃣ Desactivar lectura
+  l.activa = false;
+  pintarLecturas();
+
+  if (l.id) {
+    await updateDoc(
+      doc(db, "users", usuarioActual.uid, "lecturas", l.id),
+      { activa: false, fechaFin: new Date() }
+    );
+  }
+
+  const userRef = doc(db, "users", usuarioActual.uid);
+
+  // 2️⃣ RPG clásico: XP y Prestigio
+  if (l.esReto) {
+    await updateDoc(userRef, { xp: increment(l.paginas) });
+    usuarioXP.textContent =
+      Number(usuarioXP.textContent) + l.paginas;
+  } else {
+    await updateDoc(userRef, { prestigio: increment(1) });
+    usuarioPrestigio.textContent =
+      Number(usuarioPrestigio.textContent) + 1;
+  }
+
+  // 3️⃣ Recompensas
+  const recompensa = generarRecompensas(l.paginas);
+
+  // Guardar monedas en Firestore
+  if (recompensa.monedas) {
+    await updateDoc(userRef, { monedas: increment(recompensa.monedas) });
+    // Actualizar panel visual
+    usuarioMonedas.textContent =
+      Number(usuarioMonedas.textContent) + recompensa.monedas;
+  }
+
+  // Mostrar objeto mágico si lo hay
+  if (recompensa.objeto) {
+    alert(`🎁 Has encontrado un objeto mágico: ${recompensa.objeto}`);
+  }
+
+  // 4️⃣ Feedback visual (opcional)
+  if (recompensa.monedas) alert(`💰 Has ganado ${recompensa.monedas} monedas!`);
+}
+function generarRecompensas(paginas) {
+  // Monedas aleatorias
+  const monedas = Math.floor(Math.random() * (paginas * 10)) + 1;
+
+  // Objeto aleatorio
+  const rand = Math.random() * 100; // 0-100
+  let objeto = null;
+
+  if (rand > 95) { // 5%
+    objeto = objetosLegendarios[Math.floor(Math.random() * objetosLegendarios.length)];
+  } else if (rand > 85) { // 10%
+    objeto = objetosRaros[Math.floor(Math.random() * objetosRaros.length)];
+  }
+  // 80% → objeto = null, solo monedas
+
+  return { monedas, objeto };
+}
