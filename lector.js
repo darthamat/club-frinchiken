@@ -155,7 +155,7 @@ btnRegistrar.addEventListener("click", async () => {
   paginasInput.value = "";
   categoriaInput.value = "Fantasía";
   portadaLibro.src = "https://via.placeholder.com/120x180";
-     busquedaLibro = "";
+     busquedaLibro.value = "";
       buscarLibros(texto);
 });
 
