@@ -59,6 +59,24 @@ btnToggleTerminadas.textContent = "Mostrar lecturas terminadas";
 listaLecturasEl.parentNode.insertBefore(btnToggleTerminadas, listaLecturasEl.nextSibling);
 const btnBuscar = document.getElementById("btnBuscar");
 
+const objetosRaros = [
+  "Marcapáginas de dragón",
+  "Lupa de detective",
+  "Pluma encantada",
+  "Taza de café mágico",
+  "Capa de invisibilidad de biblioteca"
+];
+
+const objetosLegendarios = [
+  "El Anillo Único",
+  "La Auryin",
+  "Tiara de Donut",
+  "eBook de Mithril",
+  "Gafas de lectura Jhony N5",
+  "Espada de Gandalf",
+  "Armadura de páginas de la primera Biblia"
+];
+
 // ---------------- ESTADO ----------------
 let usuarioActual = null;
 let usuarioData = null;
