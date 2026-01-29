@@ -141,7 +141,7 @@ const LOGROS = [
       const h = new Date().getHours();
       return h >= 0 && h < 6;
     }
-  }
+  },
 {
   id: "mes_10_libros",
   titulo: "Devorador/a de libros",
@@ -158,7 +158,7 @@ const LOGROS = [
 
     return librosMes.length >= 10;
   }
-}
+},
 {
   id: "mes_5_libros",
   titulo: "Bebe libros",
@@ -175,7 +175,7 @@ const LOGROS = [
 
     return librosMes.length >= 5;
   }
-}
+},
 
 {
   id: "anio_20_libros",
@@ -191,7 +191,7 @@ const LOGROS = [
 
     return librosAnio.length >= 30;
   }
-}
+},
 
 {
   id: "anio_30_libros",
