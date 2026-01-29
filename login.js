@@ -1,7 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getUserBin, saveUserBin } from "./jsonbin.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDcEUoGcKs6vwoNUF0ok1W-d8F2vVjCqP0",
@@ -11,6 +10,7 @@ const firebaseConfig = {
   messagingSenderId: "993321884320",
   appId: "1:993321884320:web:d4da17ddcc78f0482787c5"
 };
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth();
@@ -28,65 +28,68 @@ loginBtn.addEventListener("click", async ()=>{
   const email = emailInput.value.trim();
   const password = passwordInput.value.trim();
   loginError.textContent = "";
-  try{
-    await signInWithEmailAndPassword(auth,email,password);
-    window.location.href = "lector.html"; // Redirige tras login
-  }catch(e){
+try {
+    const cred = await signInWithEmailAndPassword(auth, email, password);
+    await initUsuario(cred.user.uid);
+    window.location.href = "lector.html";
+  } catch (e) {
     loginError.textContent = e.message;
   }
 });
 
-async function initUsuario(uid, binId) {
-  try {
-    const userData = await getUserBin(binId);
-    return userData; // ya existe
-  } catch {
-    // crear nuevo
-    const nuevoUsuario = {
-      uid,
-      perfil: {
-        nombreReal: "",
-        nombrePersonaje: "Lector/a Errante y Sin nombre",
-        clase: "Lector/a Sin Clase",
-        avatarUrl: "",
-        nivel: 1,
-        xp: 0,
-        xpNecesaria: 100,
-        prestigio: 0
-      },
-      stats: {
-        fuerza: 10,
-        agilidad: 10,
-        inteligencia: 10,
-        sabiduria: 10,
-        mente: 0,
-        corazon: 0,
-        fatiga: 0
-      },
-      lecturas: {
-        activas: [],
-        terminadas: []
-      },
-      retos: {
-        actual: null,
-        completados: []
-      },
-      logros: [],
-      economia: {
-        oro: 0,
-        botines: []
-      },
-      config: {
-        tema: "claro",
-        mostrarTerminadas: false
-      },
-      meta: {
-        fechaRegistro: new Date().toISOString(),
-        ultimaConexion: new Date().toISOString()
-      }
-    };
+  
+async function initUsuario(uid) {
+  const userRef = doc(db, "usuarios", uid);
+  const snap = await getDoc(userRef);
 
-    await saveUserBin(binId, nuevoUsuario);
-    return nuevoUsuario;
+  if (snap.exists()) {
+    return snap.data(); // usuario ya existe
   }
+
+  const nuevoUsuario = {
+    perfil: {
+      nombreReal: "",
+      nombrePersonaje: "Lector/a Errante y Sin nombre",
+      clase: "Lector/a Sin Clase",
+      avatarUrl: "",
+      nivel: 1,
+      xp: 0,
+      xpNecesaria: 100,
+      prestigio: 0
+    },
+    stats: {
+      fuerza: 10,
+      agilidad: 10,
+      inteligencia: 10,
+      sabiduria: 10,
+      mente: 0,
+      corazon: 0,
+      fatiga: 0
+    },
+    lecturas: {
+      activas: [],
+      terminadas: []
+    },
+    retos: {
+      actual: null,
+      completados: []
+    },
+    logros: [],
+    economia: {
+      oro: 0,
+      botines: []
+    },
+    config: {
+      tema: "claro",
+      mostrarTerminadas: false
+    },
+    meta: {
+      fechaRegistro: new Date().toISOString(),
+      ultimaConexion: new Date().toISOString()
+    }
+  };
+
+  await setDoc(userRef, nuevoUsuario);
+  return nuevoUsuario;
 }
+
