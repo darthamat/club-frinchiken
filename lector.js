@@ -161,7 +161,7 @@ const LOGROS = [
 },
 {
   id: "mes_5_libros",
-  titulo: "Bebe libros",
+  titulo: "Super lector/a",
   condicion: () => {
     const ahora = new Date();
     const mes = ahora.getMonth();
@@ -179,7 +179,7 @@ const LOGROS = [
 
 {
   id: "anio_20_libros",
-  titulo: "Devorador/a anual",
+  titulo: "Devorador/a de libros",
   condicion: () => {
     const añoActual = new Date().getFullYear();
 
@@ -189,7 +189,7 @@ const LOGROS = [
       return f.getFullYear() === añoActual;
     });
 
-    return librosAnio.length >= 30;
+    return librosAnio.length >= 20;
   }
 },
 
