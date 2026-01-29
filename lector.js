@@ -121,7 +121,7 @@ btnReto.addEventListener("click", async () => {
   tituloInput.value = reto.Titulo || "";
   autorInput.value = reto.Autor || "";
   paginasInput.value = reto.Paginas || "";
-  categoriaInput.value = reto.categoria || "Fantasía";
+  categoriaInput.value = reto.categoria || "";
   portadaLibro.src = reto.portadaUrl || "";
 });
 
@@ -153,7 +153,7 @@ btnRegistrar.addEventListener("click", async () => {
   tituloInput.value = "";
   autorInput.value = "";
   paginasInput.value = "";
-  categoriaInput.value = "Fantasía";
+  categoriaInput.value = "";
   portadaLibro.src = "https://via.placeholder.com/120x180";
      busquedaLibro.value = "";
     resultados.classList.add("hidden");
