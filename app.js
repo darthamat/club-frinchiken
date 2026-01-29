@@ -80,16 +80,6 @@ async function cargarRetoActual(){
 }
 cargarRetoActual();
 
-// ---------------- LOGROS ALEATORIOS ----------------
-// Este código es solo de ejemplo, puedes adaptarlo a tu estructura de Firestore
-async function cargarLogrosFeed(){
-  feedLogros.innerHTML = "<p>Cargando logros...</p>";
-  // Aquí puedes leer los logros de los usuarios y mostrarlos
-}
-cargarLogrosFeed();
-setInterval(cargarLogrosFeed,3000);
-
-
 
 async function mostrarLogrosVisuales() {
   const logros = await cargarLogrosComunidad();
