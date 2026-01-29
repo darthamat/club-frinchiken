@@ -435,7 +435,7 @@ async function terminarLectura(lectura) {
     );
   }
 
-  const userRef = doc(db, "users", usuarioActual.uid);
+  
 
   // 2️⃣ RPG clásico: XP y Prestigio
   if (l.esReto) {
