@@ -122,12 +122,12 @@ const LOGROS = [
    {
     id: "fantasia",
     titulo: "Amante de dragones",
-    descripcion: "Leíste literatura fantñastica",
+    descripcion: "Leíste literatura fantástica",
     condicion: (l) => l.categoria?.toLowerCase().includes("fantasia")
   },
    {
     id: "terror",
-    titulo: "Terrores nocturnos",
+    titulo: "Mal  rollito ",
     descripcion: "Leíste un libro de terror",
     condicion: (l) => l.categoria?.toLowerCase().includes("terror")
   },
