@@ -118,4 +118,59 @@ document.addEventListener("DOMContentLoaded", () => {
   mostrarLogrosVisuales();
   setInterval(mostrarLogrosVisuales, 15000);
 });
+async function cargarLogrosComunidad() {
+  const snap = await getDocs(collection(db, "users"));
+  let todosLogros = [];
+
+  snap.forEach(userDoc => {
+    const user = userDoc.data();
+    if (!user.logros) return;
+    for (const [id, logro] of Object.entries(user.logros)) {
+      let rareza = "comun";
+      if (id.includes("reto") || id.includes("tocho")) rareza = "legendario";
+      else if (id.includes("erotico") || id.includes("nocturno")) rareza = "raro";
+
+      todosLogros.push({
+        usuario: user.nombrePersonaje || "Desconocido",
+        titulo: logro.titulo,
+        fecha: logro.fecha,
+        rareza
+      });
+    }
+  });
+
+  return todosLogros;
+}
+
+async function mostrarLogrosVisuales() {
+  const logros = await cargarLogrosComunidad();
+  if (!logros.length) return;
+
+  const ticker = document.getElementById("tickerComunidad");
+  if (!ticker) return; // previene errores si el div no existe
+  ticker.innerHTML = "";
+
+  const seleccionados = [];
+  while (seleccionados.length < 10 && logros.length > 0) {
+    const index = Math.floor(Math.random() * logros.length);
+    seleccionados.push(logros.splice(index, 1)[0]);
+  }
+
+  seleccionados.forEach(l => {
+    const div = document.createElement("div");
+    div.className = `ticker-item ${l.rareza}`;
+
+    let icon = "⭐";
+    if (l.rareza === "legendario") icon = "💎";
+    else if (l.rareza === "raro") icon = "✨";
+
+    div.innerHTML = `<span class="icon">${icon}</span> <strong>${l.usuario}</strong>: ${l.titulo}`;
+    ticker.appendChild(div);
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  mostrarLogrosVisuales();
+  setInterval(mostrarLogrosVisuales, 15000);
+});
 
