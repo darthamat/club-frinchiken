@@ -239,13 +239,18 @@ async function cargarPerfilUsuario() {
   const snap = await getDoc(doc(db, "users", usuarioActual.uid));
   if (!snap.exists()) return;
 
+  const data = snap.data();
+
   usuarioData = {
-    experiencia: 0,
-    experienciaNecesario: 100,
-    prestigio: 0,
-    monedas: 0,
-    nivel: 1,
-    ...snap.data()
+    experiencia: data.experiencia ?? 0,
+    nivel: data.nivel ?? 1,
+    experienciaNecesario:
+      data.experienciaNecesario ?? xpNecesariaParaNivel(data.nivel ?? 1),
+    prestigio: data.prestigio ?? 0,
+    monedas: data.monedas ?? 0,
+    logros: data.logros ?? {},
+    nombrePersonaje: data.nombrePersonaje,
+    clase: data.clase
   };
 
   nombrePersonajeEl.textContent = usuarioData.nombrePersonaje || "Sin nombre";
@@ -254,7 +259,7 @@ async function cargarPerfilUsuario() {
   usuarioPrestigio.textContent = usuarioData.prestigio;
   usuarioMonedas.textContent = usuarioData.monedas;
 
-  actualizarXP();
+  actualizarXP(false); // ⛔ sin alert al cargar
   pintarLogros();
 }
 
