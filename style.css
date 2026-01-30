@@ -1,19 +1,23 @@
 
-    body {
-        
-        background-image: url("./assets/background.jpg");
-        min-height: 90%;      
-        background-repeat:repeat-y;
-        background-attachment:scroll;
-        background-position: center;
-        background-size: auto;
-        background-blend-mode: overlay;
-        background-color: #f4f1ea;
-        font-family: Georgia, serif;
-        text-align: center;
-        padding: 40px;
+ body {
+  min-height: 100vh;
 
-    }
+  background:
+    linear-gradient(
+      rgba(244, 241, 234, 0.92),
+      rgba(244, 241, 234, 0.92)
+    ),
+    url("./assets/background.jpg");
+
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+
+  font-family: Georgia, serif;
+  text-align: center;
+  padding: 40px;
+}
 #portada {
   display: block;
   max-width: 100%;
@@ -449,8 +453,8 @@ button.gold {
 
   body {
     padding: 15px;
-    background-size: cover;
-    background-repeat: no-repeat;
+    background-attachment: scroll;
+    background-position: center;
   }
 
   .div1 {
@@ -485,5 +489,6 @@ button.gold {
     justify-content: center;
   }
 }
+
 
 
