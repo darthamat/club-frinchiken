@@ -389,7 +389,7 @@ async function terminarLectura(l) {
    usuarioXP.textContent = Number(usuarioXP.textContent) + l.paginas;
 
      usuarioData.experiencia += l.paginas;
-  actualizarXP(usuarioData.experiencia, usuarioData.experienciaNecesario);
+  actualizarXP();
     
     alert(`🎉 ¡Reto completado! +${l.paginas} XP`);
     
