@@ -143,7 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-async function mostrarLogrosVisuales() {
+/*async function mostrarLogrosVisuales() {
   const logros = await cargarLogrosComunidad();
   if (!logros.length) return;
 
@@ -168,7 +168,7 @@ async function mostrarLogrosVisuales() {
     div.innerHTML = `<span class="icon">${icon}</span> <strong>${l.usuario}</strong>: ${l.titulo}`;
     ticker.appendChild(div);
   });
-}
+}*/
 
 document.addEventListener("DOMContentLoaded", () => {
   mostrarLogrosVisuales();
