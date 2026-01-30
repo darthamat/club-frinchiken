@@ -80,6 +80,29 @@ async function cargarRetoActual(){
 }
 cargarRetoActual();
 
+async function cargarLogrosComunidad() {
+  const snap = await getDocs(collection(db, "users"));
+  let todosLogros = [];
+
+  snap.forEach(userDoc => {
+    const user = userDoc.data();
+    if (!user.logros) return;
+    for (const [id, logro] of Object.entries(user.logros)) {
+      let rareza = "comun";
+      if (id.includes("reto") || id.includes("tocho")) rareza = "legendario";
+      else if (id.includes("erotico") || id.includes("nocturno")) rareza = "raro";
+
+      todosLogros.push({
+        usuario: user.nombrePersonaje || "Desconocido",
+        titulo: logro.titulo,
+        fecha: logro.fecha,
+        rareza
+      });
+    }
+  });
+
+  return todosLogros;
+}
 
 async function mostrarLogrosVisuales() {
   const logros = await cargarLogrosComunidad();
@@ -118,29 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
   mostrarLogrosVisuales();
   setInterval(mostrarLogrosVisuales, 15000);
 });
-async function cargarLogrosComunidad() {
-  const snap = await getDocs(collection(db, "users"));
-  let todosLogros = [];
 
-  snap.forEach(userDoc => {
-    const user = userDoc.data();
-    if (!user.logros) return;
-    for (const [id, logro] of Object.entries(user.logros)) {
-      let rareza = "comun";
-      if (id.includes("reto") || id.includes("tocho")) rareza = "legendario";
-      else if (id.includes("erotico") || id.includes("nocturno")) rareza = "raro";
-
-      todosLogros.push({
-        usuario: user.nombrePersonaje || "Desconocido",
-        titulo: logro.titulo,
-        fecha: logro.fecha,
-        rareza
-      });
-    }
-  });
-
-  return todosLogros;
-}
 
 async function mostrarLogrosVisuales() {
   const logros = await cargarLogrosComunidad();
