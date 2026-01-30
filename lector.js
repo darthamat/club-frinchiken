@@ -373,7 +373,17 @@ async function cargarLecturas() {
         fechaInicio: new Date()
       }
     );
-    lecturasCache.unshift({ id: ref.id, ...reto });
+    lecturasCache.unshift({
+  id: ref.id,
+  titulo: reto.Titulo,
+  autor: reto.Autor,
+  categoria: reto.categoria,
+  paginas: reto.Paginas,
+  activa: true,
+  progreso: 0,
+  esReto: true,
+  fechaInicio: new Date()
+});
   }
 
   pintarLecturas();
