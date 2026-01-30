@@ -445,5 +445,45 @@ button.gold {
   margin: 0 auto;        /* centra horizontalmente */
   display: block;         /* asegúrate que se comporte como bloque */
 }
+@media (max-width: 768px) {
+
+  body {
+    padding: 15px;
+    background-size: cover;
+    background-repeat: no-repeat;
+  }
+
+  .div1 {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  #portada {
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .panel-comunidad {
+    width: 100%;
+  }
+
+  .libro-seleccionado {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .datos-libro {
+    grid-template-columns: 1fr;
+  }
+
+  .panels {
+    grid-template-columns: 1fr;
+  }
+
+  .top-bar {
+    justify-content: center;
+  }
+}
 
 
