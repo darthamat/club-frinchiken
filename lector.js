@@ -556,7 +556,7 @@ function generarRecompensas(paginas) {
 
   return { monedas, objeto };
 }
-function comprobarNivel() {
+/*function comprobarNivel() {
   while (usuarioData.experiencia >= usuarioData.experienciaNecesario) {
     usuarioData.experiencia -= usuarioData.experienciaNecesario;
     usuarioData.nivel += 1;
@@ -572,7 +572,8 @@ function comprobarNivel() {
     experiencia: usuarioData.experiencia,
     experienciaNecesario: usuarioData.experienciaNecesario
   });
-}
+}*/
+
 function xpNecesariaParaNivel(nivel) {
   if (nivel <= 5) return 400 + (nivel - 1) * 150;
   if (nivel <= 10) return 1300 + (nivel - 6) * 350;
