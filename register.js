@@ -77,7 +77,7 @@ btnRegister.addEventListener("click", async () => {
       imagen_avatar: "",
       clase: claseAleatoria,
       experiencia: 0,
-      experienciaNecesario: 0,
+      experienciaNecesario: xpNecesariaParaNivel(1)
 
     });
 
