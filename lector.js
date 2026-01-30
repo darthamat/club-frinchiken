@@ -562,7 +562,7 @@ function comprobarNivel() {
   }
 
   nivelEl.textContent = usuarioData.nivel;
-  actualizarXP(usuarioData.experiencia, usuarioData.experienciaNecesario);
+  actualizarXP();
 
   updateDoc(doc(db, "users", usuarioActual.uid), {
     nivel: usuarioData.nivel,
