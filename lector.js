@@ -254,23 +254,24 @@ async function cargarPerfilUsuario() {
   usuarioPrestigio.textContent = usuarioData.prestigio;
   usuarioMonedas.textContent = usuarioData.monedas;
 
-  actualizarXP(usuarioData.experiencia, usuarioData.experienciaNecesario);
+  actualizarXP();
   pintarLogros();
 }
 
 
-function actualizarXP(actual, usuarioData) {
-  while (actual >= usuarioData.experienciaNecesario) {
-    actual -= usuarioData.experienciaNecesario;
+function actualizarXP() {
+  while (usuarioData.experiencia >= usuarioData.experienciaNecesario) {
+    usuarioData.experiencia -= usuarioData.experienciaNecesario;
     usuarioData.nivel++;
     usuarioData.experienciaNecesario = xpNecesariaParaNivel(usuarioData.nivel);
     alert(`✨ ¡Has subido al nivel ${usuarioData.nivel}!`);
   }
 
-  usuarioData.experiencia = actual;
-
-  xpBarraEl.style.width = `${Math.min(100, (actual / usuarioData.experienciaNecesario) * 100)}%`;
-  xpTextoEl.textContent = `${actual} / ${usuarioData.experienciaNecesario} XP`;
+  nivelEl.textContent = usuarioData.nivel;
+  xpBarraEl.style.width =
+    `${(usuarioData.experiencia / usuarioData.experienciaNecesario) * 100}%`;
+  xpTextoEl.textContent =
+    `${usuarioData.experiencia} / ${usuarioData.experienciaNecesario} XP`;
 }
 
 
