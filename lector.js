@@ -384,16 +384,19 @@ async function terminarLectura(l) {
 
   // RPG logic
   if (l.esReto) {
-    await updateDoc(userRef, { experiencia: increment(l.paginas) });
-    
-   usuarioXP.textContent = Number(usuarioXP.textContent) + l.paginas;
+  usuarioData.experiencia += l.paginas;
 
-     usuarioData.experiencia += l.paginas;
   actualizarXP();
-    
-    alert(`🎉 ¡Reto completado! +${l.paginas} XP`);
-    
-comprobarNivel();
+
+  await updateDoc(userRef, {
+    experiencia: usuarioData.experiencia,
+    nivel: usuarioData.nivel,
+    experienciaNecesario: usuarioData.experienciaNecesario
+  });
+
+  alert(`🎉 ¡Reto completado! +${l.paginas} XP`);
+
+//comprobarNivel();
     
   } else {
     await updateDoc(userRef, { prestigio: increment(l.paginas) });
