@@ -259,12 +259,19 @@ async function cargarPerfilUsuario() {
 }
 
 
-function actualizarXP() {
+function actualizarXP(mostrarAlert = false) {
+  if (!usuarioData.experienciaNecesario || usuarioData.experienciaNecesario <= 0) {
+    usuarioData.experienciaNecesario = xpNecesariaParaNivel(usuarioData.nivel);
+  }
+
   while (usuarioData.experiencia >= usuarioData.experienciaNecesario) {
     usuarioData.experiencia -= usuarioData.experienciaNecesario;
     usuarioData.nivel++;
     usuarioData.experienciaNecesario = xpNecesariaParaNivel(usuarioData.nivel);
-    alert(`✨ ¡Has subido al nivel ${usuarioData.nivel}!`);
+
+    if (mostrarAlert) {
+      alert(`✨ ¡Has subido al nivel ${usuarioData.nivel}!`);
+    }
   }
 
   nivelEl.textContent = usuarioData.nivel;
