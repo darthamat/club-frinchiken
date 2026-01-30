@@ -170,8 +170,8 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 }*/
 
-document.addEventListener("DOMContentLoaded", () => {
+/*8document.addEventListener("DOMContentLoaded", () => {
   mostrarLogrosVisuales();
   setInterval(mostrarLogrosVisuales, 15000);
-});
+});*/
 
