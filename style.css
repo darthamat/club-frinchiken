@@ -441,8 +441,9 @@ button.gold {
   100% { transform: translateY(-100%); }
 }
 #logrosComunidad {
-    margin-top: 20px;
+    margin-top: 300px;
   margin: 0 auto;        /* centra horizontalmente */
   display: block;         /* asegúrate que se comporte como bloque */
 }
+
 
