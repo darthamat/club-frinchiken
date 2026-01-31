@@ -222,7 +222,7 @@ const LOGROS = [
 ];
 
 // ---------------- ESTADO ----------------
-let usuarioActual = null;
+//let usuarioActual = null;
 let usuarioData = null;
 let lecturasCache = [];
 let retoCache = null;
