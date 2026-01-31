@@ -253,13 +253,7 @@ async function cargarPerfilUsuario() {
     clase: data.clase
   };
 
-  function mostrarBotonSegunRol() {
-  if (usuarioActual.role === "admin" || usuarioActual.tipoAdmin === "crear") {
-    document.getElementById("btn-nuevo-reto").style.display = "block";
-  } else {
-    document.getElementById("btn-nuevo-reto").style.display = "none";
-  }
-}
+
 
 // Llamamos a la función
 mostrarBotonSegunRol();
@@ -273,7 +267,13 @@ mostrarBotonSegunRol();
   actualizarXP(false); // ⛔ sin alert al cargar
   pintarLogros();
 }
-
+  function mostrarBotonSegunRol() {
+  if (usuarioActual.role === "admin" || usuarioActual.tipoAdmin === "crear") {
+    document.getElementById("btn-nuevo-reto").style.display = "block";
+  } else {
+    document.getElementById("btn-nuevo-reto").style.display = "none";
+  }
+}
 
 function actualizarXP(mostrarAlert = false) {
   if (!usuarioData.experienciaNecesario || usuarioData.experienciaNecesario <= 0) {
