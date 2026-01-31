@@ -146,7 +146,7 @@ button.gold {
 }
 
 .info-player {
-  flex: 1; /* Ocupa todo el espacio restante */
+  flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -154,9 +154,15 @@ button.gold {
 
 .botones-admin {
   display: flex;
-  justify-content: flex-end; /* Botones alineados a la derecha */
+  justify-content: flex-end;
   gap: 8px;
-  margin-top: 5px; /* separa un poco del nombre */
+  margin-top: 5px;
+}
+
+.botones-admin select {
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
 }
 
 .botones-admin button {
