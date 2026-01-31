@@ -17,8 +17,12 @@
 </label>
     <div>
       <h2 id="nombrePersonaje">Cargando...</h2>
-    <div class="botones-admin">
-      <button id="btn-asignar-admin" onclick="asignarAdmin()">Asignar nuevo admin</button>
+     <div class="botones-admin">
+      <!-- Combobox solo visible para admin global -->
+      <select id="selectAdmin" style="display:none;"></select>
+      <button id="btn-asignar-admin" onclick="mostrarSelectAdmin()">Asignar nuevo admin</button>
+
+      <!-- Botón de crear reto -->
       <button id="btn-nuevo-reto" onclick="crearRetoDesdePlantilla('reto-06')">Nuevo reto</button>
     </div>
       <p>Clase: <span id="clasePersonaje">---</span></p>
