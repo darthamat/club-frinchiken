@@ -64,6 +64,15 @@ const usuarioXP = document.getElementById("xpUsuario");
 const usuarioPrestigio = document.getElementById("usuarioPrestigio");
 const usuarioMonedas = document.getElementById("usuarioMonedas");
 
+let usuarioActual = {
+  uid: null,       // se llenará al cargar el usuario
+  role: null,
+  tipoAdmin: null
+};
+
+// Lista de usuarios (ejemplo, en tu proyecto la traes de Firestore)
+let usuarios = [];
+
 const objetosRaros = [
   "Marcapáginas de dragón",
   "Lupa de detective",
