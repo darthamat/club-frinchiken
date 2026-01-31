@@ -135,31 +135,43 @@ button.gold {
 .resultados li:active {
   background: rgba(255,215,0,.35);
 }
+.player-card {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  padding: 15px;
+  background: #252b3a;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.4);
+}
+
 .info-player {
+  flex: 1; /* Ocupa todo el espacio restante */
   display: flex;
-  flex-direction: column; /* Nombre arriba, combobox debajo si hace falta */
+  flex-direction: column;
+  justify-content: center;
+}
+
+.botones-admin {
+  display: flex;
+  justify-content: flex-end; /* Botones alineados a la derecha */
   gap: 8px;
+  margin-top: 5px; /* separa un poco del nombre */
 }
 
-.admin-selector {
-  display: flex;
-  align-items: center;   /* Alinea label, select y botón verticalmente */
-  gap: 8px;              /* Espacio entre label, select y botón */
-}
-
-.admin-selector select {
-  flex: 1;               /* Ocupa el espacio entre label y botón */
-  padding: 4px 8px;
+.botones-admin button {
+  padding: 5px 12px;
   border-radius: 6px;
-  border: 1px solid #ccc;
-}
-
-.admin-selector button {
-  padding: 4px 12px;
-  border-radius: 6px;
-  background: #3b82f6;
-  color: white;
   border: none;
   cursor: pointer;
+  color: white;
 }
 
+#btn-asignar-admin {
+  background: #3b82f6;
+}
+
+#btn-nuevo-reto {
+  background: linear-gradient(90deg, gold, orange);
+  color: black;
+}
