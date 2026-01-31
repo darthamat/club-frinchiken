@@ -253,6 +253,17 @@ async function cargarPerfilUsuario() {
     clase: data.clase
   };
 
+  function mostrarBotonSegunRol() {
+  if (usuarioActual.role === "admin" || usuarioActual.tipoAdmin === "crear") {
+    document.getElementById("btn-nuevo-reto").style.display = "block";
+  } else {
+    document.getElementById("btn-nuevo-reto").style.display = "none";
+  }
+}
+
+// Llamamos a la función
+mostrarBotonSegunRol();
+
   nombrePersonajeEl.textContent = usuarioData.nombrePersonaje || "Sin nombre";
   claseEl.textContent = usuarioData.clase || "Aventurero";
   nivelEl.textContent = usuarioData.nivel;
@@ -654,4 +665,38 @@ function pintarLogros() {
 }
 function mostrarNotificacionLogro(logro) {
   alert(`🏆 Logro desbloqueado: ${logro.titulo}`);
+}
+async function cargarUsuarios() {
+  const select = document.getElementById("selectAdmin");
+  select.innerHTML = ""; // limpiar
+
+  const snapshot = await db.collection("usuarios").get();
+  snapshot.forEach(doc => {
+    const data = doc.data();
+
+    // No mostrarte a ti mismo
+    if (data.role !== "admin") {
+      const option = document.createElement("option");
+      option.value = doc.id;
+      option.textContent = `${data.nombreReal} (${data.nombrePersonaje})`;
+      select.appendChild(option);
+    }
+  });
+}
+async function asignarAdmin() {
+  const select = document.getElementById("selectAdmin");
+  const uidNuevoAdmin = select.value;
+
+  const usuariosRef = db.collection("usuarios");
+
+  // Quitar admin temporal anterior
+  const snapshot = await usuariosRef.where("tipoAdmin", "==", "crear").get();
+  snapshot.forEach(async doc => {
+    await usuariosRef.doc(doc.id).update({ tipoAdmin: null });
+  });
+
+  // Dar admin temporal al usuario seleccionado
+  await usuariosRef.doc(uidNuevoAdmin).update({ tipoAdmin: "crear" });
+
+  alert("¡Admin temporal asignado!");
 }
