@@ -262,62 +262,7 @@ async function cargarPerfilUsuario() {
     clase: data.clase
   };
 
-const usuarioActual = {
-  uid: "admin_global_uid",  // tu UID
-  role: "admin",             // tú eres admin global
-  tipoAdmin: null
-};
 
-// Usuarios de ejemplo (en tu proyecto traerlos de Firestore)
-const usuarios = [
-  { uid: "u1", nombreReal: "Ana", nombrePersonaje: "La Maga", role: "user", tipoAdmin: null },
-  { uid: "u2", nombreReal: "Luis", nombrePersonaje: "El Guerrero", role: "user", tipoAdmin: null }
-];
-
-// Mostrar/ocultar botones según permisos
-function actualizarBotones() {
-  document.getElementById("btn-nuevo-reto").style.display =
-    (usuarioActual.role === "admin" || usuarioActual.tipoAdmin === "crear") ? "inline-block" : "none";
-
-  document.getElementById("btn-asignar-admin").style.display =
-    (usuarioActual.role === "admin") ? "inline-block" : "none";
-
-  document.getElementById("selectAdmin").style.display = "none"; // oculto por defecto
-}
-
-// Llamar al inicio
-actualizarBotones();
-
-// Mostrar combobox al pulsar botón
-function mostrarSelectAdmin() {
-  const select = document.getElementById("selectAdmin");
-  select.innerHTML = ""; // limpiar opciones
-  usuarios.forEach(u => {
-    if (u.uid !== usuarioActual.uid) { // no incluir al admin global
-      const option = document.createElement("option");
-      option.value = u.uid;
-      option.textContent = `${u.nombreReal} (${u.nombrePersonaje})`;
-      select.appendChild(option);
-    }
-  });
-  select.style.display = "inline-block"; // mostrar select
-  select.onchange = () => asignarAdmin(select.value);
-}
-
-// Función para asignar admin temporal
-function asignarAdmin(uidNuevoAdmin) {
-  // quitar admin temporal anterior
-  usuarios.forEach(u => { if(u.tipoAdmin === "crear") u.tipoAdmin = null; });
-
-  // asignar admin temporal al seleccionado
-  const nuevoAdmin = usuarios.find(u => u.uid === uidNuevoAdmin);
-  nuevoAdmin.tipoAdmin = "crear";
-
-  alert(`Nuevo admin temporal: ${nuevoAdmin.nombreReal} (${nuevoAdmin.nombrePersonaje})`);
-
-  // Actualizar la visibilidad de botones (si el admin temporal es tú, verás el botón)
-  actualizarBotones();
-}
   nombrePersonajeEl.textContent = usuarioData.nombrePersonaje || "Sin nombre";
   claseEl.textContent = usuarioData.clase || "Aventurero";
   nivelEl.textContent = usuarioData.nivel;
