@@ -253,6 +253,26 @@ async function cargarPerfilUsuario() {
     clase: data.clase
   };
 
+  const usuarioActual = {
+  uid: "abc123",
+  role: "admin",      // tu rol global
+  tipoAdmin: null     // "crear" si es admin temporal
+};
+
+// Solo tú puedes asignar nuevo admin
+if (usuarioActual.role === "admin") {
+  document.getElementById("btn-asignar-admin").style.display = "inline-block";
+} else {
+  document.getElementById("btn-asignar-admin").style.display = "none";
+}
+
+// Solo admin global o admin temporal puede crear reto
+if (usuarioActual.role === "admin" || usuarioActual.tipoAdmin === "crear") {
+  document.getElementById("btn-nuevo-reto").style.display = "inline-block";
+} else {
+  document.getElementById("btn-nuevo-reto").style.display = "none";
+}
+
   nombrePersonajeEl.textContent = usuarioData.nombrePersonaje || "Sin nombre";
   claseEl.textContent = usuarioData.clase || "Aventurero";
   nivelEl.textContent = usuarioData.nivel;
