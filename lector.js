@@ -253,26 +253,62 @@ async function cargarPerfilUsuario() {
     clase: data.clase
   };
 
-  const usuarioActual = {
-  uid: "abc123",
-  role: "admin",      // tu rol global
-  tipoAdmin: null     // "crear" si es admin temporal
+const usuarioActual = {
+  uid: "admin_global_uid",  // tu UID
+  role: "admin",             // tú eres admin global
+  tipoAdmin: null
 };
 
-// Solo tú puedes asignar nuevo admin
-if (usuarioActual.role === "admin") {
-  document.getElementById("btn-asignar-admin").style.display = "inline-block";
-} else {
-  document.getElementById("btn-asignar-admin").style.display = "none";
+// Usuarios de ejemplo (en tu proyecto traerlos de Firestore)
+const usuarios = [
+  { uid: "u1", nombreReal: "Ana", nombrePersonaje: "La Maga", role: "user", tipoAdmin: null },
+  { uid: "u2", nombreReal: "Luis", nombrePersonaje: "El Guerrero", role: "user", tipoAdmin: null }
+];
+
+// Mostrar/ocultar botones según permisos
+function actualizarBotones() {
+  document.getElementById("btn-nuevo-reto").style.display =
+    (usuarioActual.role === "admin" || usuarioActual.tipoAdmin === "crear") ? "inline-block" : "none";
+
+  document.getElementById("btn-asignar-admin").style.display =
+    (usuarioActual.role === "admin") ? "inline-block" : "none";
+
+  document.getElementById("selectAdmin").style.display = "none"; // oculto por defecto
 }
 
-// Solo admin global o admin temporal puede crear reto
-if (usuarioActual.role === "admin" || usuarioActual.tipoAdmin === "crear") {
-  document.getElementById("btn-nuevo-reto").style.display = "inline-block";
-} else {
-  document.getElementById("btn-nuevo-reto").style.display = "none";
+// Llamar al inicio
+actualizarBotones();
+
+// Mostrar combobox al pulsar botón
+function mostrarSelectAdmin() {
+  const select = document.getElementById("selectAdmin");
+  select.innerHTML = ""; // limpiar opciones
+  usuarios.forEach(u => {
+    if (u.uid !== usuarioActual.uid) { // no incluir al admin global
+      const option = document.createElement("option");
+      option.value = u.uid;
+      option.textContent = `${u.nombreReal} (${u.nombrePersonaje})`;
+      select.appendChild(option);
+    }
+  });
+  select.style.display = "inline-block"; // mostrar select
+  select.onchange = () => asignarAdmin(select.value);
 }
 
+// Función para asignar admin temporal
+function asignarAdmin(uidNuevoAdmin) {
+  // quitar admin temporal anterior
+  usuarios.forEach(u => { if(u.tipoAdmin === "crear") u.tipoAdmin = null; });
+
+  // asignar admin temporal al seleccionado
+  const nuevoAdmin = usuarios.find(u => u.uid === uidNuevoAdmin);
+  nuevoAdmin.tipoAdmin = "crear";
+
+  alert(`Nuevo admin temporal: ${nuevoAdmin.nombreReal} (${nuevoAdmin.nombrePersonaje})`);
+
+  // Actualizar la visibilidad de botones (si el admin temporal es tú, verás el botón)
+  actualizarBotones();
+}
   nombrePersonajeEl.textContent = usuarioData.nombrePersonaje || "Sin nombre";
   claseEl.textContent = usuarioData.clase || "Aventurero";
   nivelEl.textContent = usuarioData.nivel;
