@@ -17,9 +17,11 @@
 </label>
     <div>
       <h2 id="nombrePersonaje">Cargando...</h2>
-     <!-- <input id="nombrePersonaje"
-       class="nombre-personaje"
-       placeholder="Nombre del personaje">-->
+   <div class="admin-selector">
+      <label for="selectAdmin">Admin temporal:</label>
+      <select id="selectAdmin"></select>
+      <button onclick="asignarAdmin()">Pasar poder</button>
+    </div>
       <p>Clase: <span id="clasePersonaje">---</span></p>
       <p>Nivel <span id="nivelUsuario">1</span></p>
       <div class="xp-bar">
