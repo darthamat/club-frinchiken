@@ -253,11 +253,6 @@ async function cargarPerfilUsuario() {
     clase: data.clase
   };
 
-
-
-// Llamamos a la función
-mostrarBotonSegunRol();
-
   nombrePersonajeEl.textContent = usuarioData.nombrePersonaje || "Sin nombre";
   claseEl.textContent = usuarioData.clase || "Aventurero";
   nivelEl.textContent = usuarioData.nivel;
@@ -267,13 +262,7 @@ mostrarBotonSegunRol();
   actualizarXP(false); // ⛔ sin alert al cargar
   pintarLogros();
 }
-  function mostrarBotonSegunRol() {
-  if (usuarioActual.role === "admin" || usuarioActual.tipoAdmin === "crear") {
-    document.getElementById("btn-nuevo-reto").style.display = "block";
-  } else {
-    document.getElementById("btn-nuevo-reto").style.display = "none";
-  }
-}
+
 
 function actualizarXP(mostrarAlert = false) {
   if (!usuarioData.experienciaNecesario || usuarioData.experienciaNecesario <= 0) {
