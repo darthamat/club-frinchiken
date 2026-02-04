@@ -92,7 +92,7 @@
   width: 50%;
   border: none;
   border-top: 1px solid #151111;
-  margin: 0;
+  margin: 0 auto;
     margin-bottom: 5px;
 }
 
@@ -490,6 +490,7 @@ button.gold {
     justify-content: center;
   }
 }
+
 
 
 
