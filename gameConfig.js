@@ -29,14 +29,14 @@ const OBJETOS_RAROS = [
     bonusMonedas: 10,
     rareza: "raro"
   },
-  
-  
+
+
   "Marcapáginas de dragón",
   "Lupa de detective",
   "Pluma encantada",
   "Taza de café mágico",
   "Capa de invisibilidad de biblioteca"
-  
+
 ];
 
 // 🟡 Objetos legendarios
@@ -69,7 +69,7 @@ const OBJETOS_LEGENDARIOS = [
   "Gafas de lectura Jhony N5",
   "Espada de Gandalf",
   "Armadura de páginas de la primera Biblia"
-  
+
 ];
 
 // 🏆 Logros posibles
