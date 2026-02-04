@@ -17,6 +17,7 @@
   font-family: Georgia, serif;
   text-align: center;
   padding: 40px;
+  
 }
 #portada {
   display: block;
@@ -88,7 +89,7 @@
 
 /* Línea divisoria */
 .divider {
-  width: 100%;
+  width: 50%;
   border: none;
   border-top: 1px solid #151111;
   margin: 0;
@@ -489,6 +490,7 @@ button.gold {
     justify-content: center;
   }
 }
+
 
 
 
