@@ -500,7 +500,7 @@ function rellenarFormularioLectura(libro) {
   portadaLibro.src = libro.portadaUrl || "https://via.placeholder.com/120x180";
 
   // Categoría solo si existe
-  categoriaInput.value = libro.categoria;
+  categoriaInput.value = libro.categoria || "";
 }
 
 // ------------------ FUNCIÓN ORIGINAL REGISTRAR LECTURA ------------------
@@ -595,7 +595,7 @@ btnRegistrar.addEventListener("click", async () => {
       titulo: tituloInput.value,
       autor: autorInput.value,
       paginas: Number(paginasInput.value),
-      categoria: categoriaInput.value,
+      categoria: categoriaInput.value || "",
       portadaUrl: portadaLibro.src,
       creadoPor: usuarioActual.uid,
       fecha: new Date()
