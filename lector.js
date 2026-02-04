@@ -348,20 +348,19 @@ btnAsignarAdmin.addEventListener("click", async () => {
   selectAdmin.innerHTML = "";
   selectAdmin.style.display = "inline-block";
 
+  // ✅ Traer usuarios
   const snapshot = await getDocs(collection(db, "users"));
 
   snapshot.forEach(docSnap => {
     if (docSnap.id === usuarioActual.uid) return;
 
     const u = docSnap.data();
-
     const nombreReal = u.nombreReal ?? "Sin nombre";
     const personaje = u.nombrePersonaje ?? "Sin personaje";
 
     const option = document.createElement("option");
     option.value = docSnap.id;
     option.textContent = `${nombreReal} (${personaje})`;
-
     selectAdmin.appendChild(option);
   });
 
@@ -369,10 +368,6 @@ btnAsignarAdmin.addEventListener("click", async () => {
     alert("⚠️ No hay usuarios disponibles para asignar");
   }
 });
-
-
-
-
 
 //selectAdmin.addEventListener("change", asignarAdmin);
 
@@ -896,7 +891,7 @@ async function cargarUsuarios() {
   const select = document.getElementById("selectAdmin");
   select.innerHTML = ""; // limpiar
 
-  const snapshot = await db.collection("usuarios").get();
+  const snapshot = await getDocs(collection(db, "users")); // ¡users, no usuarios!
   snapshot.forEach(doc => {
     const data = doc.data();
 
