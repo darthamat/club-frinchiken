@@ -884,23 +884,11 @@ function generarRecompensas(paginas) {
 
   return { monedas, objeto };
 }
-/*function comprobarNivel() {
-  while (usuarioData.experiencia >= usuarioData.experienciaNecesario) {
-    usuarioData.experiencia -= usuarioData.experienciaNecesario;
-    usuarioData.nivel += 1;
-    usuarioData.experienciaNecesario = xpNecesariaParaNivel(usuarioData.nivel);
-    //usuarioData.experienciaNecesario = Math.floor(usuarioData.experienciaNecesario * 1.5);
-  }
-
-  nivelEl.textContent = usuarioData.nivel;
-  actualizarXP();
-
-  updateDoc(doc(db, "users", usuarioActual.uid), {
-    nivel: usuarioData.nivel,
-    experiencia: usuarioData.experiencia,
-    experienciaNecesario: usuarioData.experienciaNecesario
-  });
-}*/
+btnBuscar.addEventListener("click", () => {
+  const texto = busquedaLibro.value.trim();
+  if (!texto) return alert("Escribe algo para buscar");
+  buscarLibros(texto);
+});
 
 function xpNecesariaParaNivel(nivel) {
   if (nivel <= 5) return 400 + (nivel - 1) * 150;
