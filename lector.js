@@ -236,18 +236,23 @@ let lecturasCache = [];
 let retoCache = null;
 let mostrarTerminados = false;
 
-// ---------------- SESIÓN ----------------
+
 onAuthStateChanged(auth, async (user) => {
-  if (!user) return window.location.href == "login.html";
-  
-  //usuarioActual = user;
+  if (!user) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  // 🔑 ESTA LÍNEA ES LA CLAVE
+  usuarioActual.uid = user.uid;
 
   await cargarPerfilUsuario();
-  await cargarLecturas(); // ⬅️ UNA SOLA VEZ
-
-   pintarLogros();
-
+  await cargarLecturas();
+  pintarLogros();
 });
+
+
+
 
 // ---------------- LOGOUT ----------------
 btnLogout.addEventListener("click", async () => {
