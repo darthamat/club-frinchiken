@@ -41,8 +41,8 @@ async function cargarRetoActual(){
     const snap = await getDoc(retoRef);
     if(snap.exists()){
       const reto = snap.data();
-      titulo.textContent = reto.Titulo || "Título desconocido";
-      autor.textContent = "Autor: " + (reto.Autor || "Desconocido");
+      titulo.textContent = reto.titulo || "Título desconocido";
+      autor.textContent = "Autor: " + (reto.autor || "Desconocido");
       portada.src = reto.portadaUrl || "";
     } else {
       titulo.textContent = "No hay reto activo";
