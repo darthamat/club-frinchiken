@@ -397,8 +397,8 @@ button.gold {
 .emoji-legendario::before { content: "🏆 "; }
 
 .panel-comunidad {
-  width: 360px;
-  max-height: 200px;
+  width: 500px;
+  max-height: 300px;
   overflow: hidden;
   background: #111;
   color: #fff;
@@ -490,6 +490,7 @@ button.gold {
     justify-content: center;
   }
 }
+
 
 
 
