@@ -649,9 +649,6 @@ btnRegistrar.addEventListener("click", async () => {
 });
 
 
-btnNuevoReto.addEventListener("click", () => {
-  modoCrearReto = true;
-
   // Cambiar texto del botón
   btnRegistrar.textContent = "Registrar nuevo reto";
 
@@ -670,7 +667,7 @@ btnNuevoReto.addEventListener("click", () => {
     behavior: "smooth",
     block: "center"
   });
-});
+
 
 // ---------------- CARGAR LECTURAS ----------------
 async function cargarLecturas() {
