@@ -1,7 +1,7 @@
 // ================== CONFIGURACIÓN DEL JUEGO ==================
 
 // 🎖️ Recompensas base
-const RECOMPENSAS = {
+export const RECOMPENSAS = {
   lecturaNormal: {
     xp: 20,
     monedas: 5
@@ -14,7 +14,7 @@ const RECOMPENSAS = {
 };
 
 // 🟣 Objetos raros
-const OBJETOS_RAROS = [
+export const OBJETOS_RAROS = [
   {
     id: "pluma_fenix",
     nombre: "Pluma de Fénix",
@@ -40,7 +40,7 @@ const OBJETOS_RAROS = [
 ];
 
 // 🟡 Objetos legendarios
-const OBJETOS_LEGENDARIOS = [
+export const OBJETOS_LEGENDARIOS = [
   {
     id: "grimorio_eterno",
     nombre: "Grimorio Eterno",
@@ -73,7 +73,7 @@ const OBJETOS_LEGENDARIOS = [
 ];
 
 // 🏆 Logros posibles
-const LOGROS = [
+export const LOGROS = [
   {
     id: "primer_libro",
     nombre: "Primer capítulo",
