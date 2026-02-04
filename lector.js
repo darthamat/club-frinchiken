@@ -52,7 +52,7 @@ const btnLogout = document.getElementById("btnLogout");
 
 const tituloInput = document.getElementById("titulo");
 const autorInput = document.getElementById("autor");
-const paginasInput = document.getElementById("Paginas");
+const paginasInput = document.getElementById("paginas");
 const categoriaInput = document.getElementById("categoria");
 const portadaLibro = document.getElementById("portadaLibro");
 
@@ -499,7 +499,7 @@ function rellenarFormularioLectura(libro) {
   portadaLibro.src = libro.portadaUrl || "https://via.placeholder.com/120x180";
 
   // Categoría solo si existe
-  categoriaInput.value = libro.categoria || "";
+  categoriaInput.value = libro.categoria;
 }
 
 // ------------------ FUNCIÓN ORIGINAL REGISTRAR LECTURA ------------------
@@ -577,9 +577,9 @@ btnReto.addEventListener("click", async () => {
   const reto = await cargarReto();
   if (!reto) return;
 
-  tituloInput.value = reto.Titulo || "";
-  autorInput.value = reto.Autor || "";
-  paginasInput.value = reto.Paginas || "";
+  tituloInput.value = reto.titulo || "";
+  autorInput.value = reto.autor || "";
+  paginasInput.value = reto.paginas || "";
   categoriaInput.value = reto.categoria || "";
   portadaLibro.src = reto.portadaUrl || "";
 });
@@ -689,10 +689,10 @@ async function cargarLecturas() {
     const ref = await addDoc(
       collection(db, "users", usuarioActual.uid, "lecturas"),
       {
-        titulo: reto.Titulo,
-        autor: reto.Autor,
+        titulo: reto.titulo,
+        autor: reto.autor,
         categoria: reto.categoria,
-        paginas: reto.Paginas,
+        paginas: reto.paginas,
         activa: true,
         progreso: 0,
         esReto: true,
@@ -701,10 +701,10 @@ async function cargarLecturas() {
     );
     lecturasCache.unshift({
   id: ref.id,
-  titulo: reto.Titulo,
-  autor: reto.Autor,
+  titulo: reto.titulo,
+  autor: reto.autor,
   categoria: reto.categoria,
-  paginas: reto.Paginas,
+  paginas: reto.paginas,
   activa: true,
   progreso: 0,
   esReto: true,
