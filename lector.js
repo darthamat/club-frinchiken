@@ -793,24 +793,10 @@ async function buscarLibros(texto) {
   data.items.forEach(libro => {
     const info = libro.volumeInfo;
     const li = document.createElement("li");
-    li.className = "resultado-libro";
-    li.style.display = "flex";
-    li.style.alignItems = "center";
     li.style.cursor = "pointer";
-    li.style.marginBottom = "10px";
+    li.style.marginBottom = "6px";
 
-    const img = document.createElement("img");
-    img.src = info.imageLinks?.thumbnail || "https://via.placeholder.com/60x90";
-    img.style.width = "60px";
-    img.style.height = "90px";
-    img.style.objectFit = "cover";
-    img.style.marginRight = "10px";
-
-    const div = document.createElement("div");
-    div.innerHTML = `<strong>${info.title}</strong><br>${info.authors?.[0] || "Desconocido"}`;
-
-    li.appendChild(img);
-    li.appendChild(div);
+    li.textContent = `${info.title} — ${info.authors?.[0] || "Desconocido"}`;
 
     li.onclick = () => seleccionarLibro({
       titulo: info.title,
@@ -823,7 +809,7 @@ async function buscarLibros(texto) {
     resultados.appendChild(li);
   });
 
-  // Añadir scroll si hay muchos resultados
+  // Scroll si hay muchos resultados
   resultados.style.maxHeight = "400px";
   resultados.style.overflowY = "auto";
 }
