@@ -577,8 +577,8 @@ btnReto.addEventListener("click", async () => {
   const reto = await cargarReto();
   if (!reto) return;
 
-  tituloInput.value = reto.titulo || "";
-  autorInput.value = reto.autor || "";
+  tituloInput.value = reto.Titulo || "";
+  autorInput.value = reto.Autor || "";
   paginasInput.value = reto.Paginas || "";
   categoriaInput.value = reto.categoria || "";
   portadaLibro.src = reto.portadaUrl || "";
@@ -689,8 +689,8 @@ async function cargarLecturas() {
     const ref = await addDoc(
       collection(db, "users", usuarioActual.uid, "lecturas"),
       {
-        titulo: reto.titulo,
-        autor: reto.autor,
+        titulo: reto.Titulo,
+        autor: reto.Autor,
         categoria: reto.categoria,
         paginas: reto.Paginas,
         activa: true,
@@ -701,8 +701,8 @@ async function cargarLecturas() {
     );
     lecturasCache.unshift({
   id: ref.id,
-  titulo: reto.titulo,
-  autor: reto.autor,
+  titulo: reto.Titulo,
+  autor: reto.Autor,
   categoria: reto.categoria,
   paginas: reto.Paginas,
   activa: true,
