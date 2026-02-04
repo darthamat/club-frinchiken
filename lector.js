@@ -873,7 +873,7 @@ async function buscarLibros(texto) {
   resultados.classList.remove("hidden");
 
   const res = await fetch(
-    `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(texto)}&maxResults=20key=AIzaSyDcEUoGcKs6vwoNUF0ok1W-d8F2vVjCqP0`
+    `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(texto)}&maxResults=5key=AIzaSyDcEUoGcKs6vwoNUF0ok1W-d8F2vVjCqP0`
   );
   const data = await res.json();
   if (!data.items) return;
