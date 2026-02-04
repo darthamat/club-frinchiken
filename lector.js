@@ -577,8 +577,8 @@ btnReto.addEventListener("click", async () => {
   const reto = await cargarReto();
   if (!reto) return;
 
-  tituloInput.value = reto.Titulo || "";
-  autorInput.value = reto.Autor || "";
+  tituloInput.value = reto.titulo || "";
+  autorInput.value = reto.autor || "";
   paginasInput.value = reto.Paginas || "";
   categoriaInput.value = reto.categoria || "";
   portadaLibro.src = reto.portadaUrl || "";
@@ -590,7 +590,7 @@ btnRegistrar.addEventListener("click", async () => {
 
   if (modoCrearReto) {
     // Crear reto en Firestore
-    await setDoc(doc(db, "retos", "2026"), {
+    await setDoc(doc(db, "retos", "reto-actual"), {
       titulo: tituloInput.value,
       autor: autorInput.value,
       paginas: Number(paginasInput.value),
@@ -689,8 +689,8 @@ async function cargarLecturas() {
     const ref = await addDoc(
       collection(db, "users", usuarioActual.uid, "lecturas"),
       {
-        titulo: reto.Titulo,
-        autor: reto.Autor,
+        titulo: reto.titulo,
+        autor: reto.autor,
         categoria: reto.categoria,
         paginas: reto.Paginas,
         activa: true,
@@ -701,8 +701,8 @@ async function cargarLecturas() {
     );
     lecturasCache.unshift({
   id: ref.id,
-  titulo: reto.Titulo,
-  autor: reto.Autor,
+  titulo: reto.titulo,
+  autor: reto.autor,
   categoria: reto.categoria,
   paginas: reto.Paginas,
   activa: true,
