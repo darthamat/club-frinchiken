@@ -440,18 +440,76 @@ async function crearRetoConLibro(libro) {
   }, 2000);
 }
 
+// ------------------ SELECCIONAR LIBRO ------------------
 function seleccionarLibro(libro) {
-  // Rellenar campos
+  // Rellenar el formulario con los datos del libro
+  rellenarFormularioLectura(libro);
+
+  if (modoCrearReto) {
+    // Cambiar botón de registrar a "Registrar nuevo reto"
+    btnRegistrar.textContent = "Registrar nuevo reto";
+
+    // Cuando se haga click, crear el reto en Firestore
+    btnRegistrar.onclick = async () => {
+      await crearRetoConLibro(libro);
+
+      // Volver el botón a su estado normal
+      btnRegistrar.textContent = "Registrar lectura";
+      btnRegistrar.onclick = registrarLecturaNormal; // función original de registrar lectura
+    };
+  } else {
+    // Si no estamos creando un reto, aseguramos que el botón funcione normalmente
+    btnRegistrar.textContent = "Registrar lectura";
+    btnRegistrar.onclick = registrarLecturaNormal;
+  }
+}
+
+// ------------------ RELLENAR FORMULARIO ------------------
+function rellenarFormularioLectura(libro) {
   tituloInput.value = libro.titulo || "";
   autorInput.value = libro.autor || "";
   paginasInput.value = libro.paginas || 0;
-  categoriaInput.value = libro.categoria || "";
   portadaLibro.src = libro.portada || "https://via.placeholder.com/120x180";
 
-  // Si estamos en modo reto, solo mostrar info visual, no crear todavía
-  if (modoCrearReto) {
-    mostrarMensajeReto(`✅ Has seleccionado: ${libro.titulo}`);
-  }
+  // Categoría solo si existe
+  categoriaInput.value = libro.categoria || "";
+}
+
+// ------------------ FUNCIÓN ORIGINAL REGISTRAR LECTURA ------------------
+async function registrarLecturaNormal() {
+  if (!usuarioActual) return;
+
+  const lectura = {
+    titulo: tituloInput.value.trim(),
+    autor: autorInput.value.trim(),
+    paginas: Number(paginasInput.value),
+    categoria: categoriaInput.value,
+    activa: true,
+    progreso: 0,
+    esReto: false,
+    fechaInicio: new Date()
+  };
+
+  if (!lectura.titulo || !lectura.autor) return alert("Faltan datos");
+
+  const ref = await addDoc(
+    collection(db, "users", usuarioActual.uid, "lecturas"),
+    lectura
+  );
+
+  lecturasCache.unshift({ id: ref.id, ...lectura });
+  pintarLecturas();
+
+  // Limpiar inputs
+  tituloInput.value = "";
+  autorInput.value = "";
+  paginasInput.value = "";
+  categoriaInput.value = "";
+  portadaLibro.src = "https://via.placeholder.com/120x180";
+
+  busquedaLibro.value = "";
+  resultados.innerHTML = "";
+  resultados.classList.add("hidden");
 }
 
 function actualizarXP(mostrarAlert = false) {
