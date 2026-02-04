@@ -80,11 +80,11 @@ let usuarioActual = {
 
 let timeoutBusqueda;
 
-inputBusqueda.addEventListener("input", () => {
+busquedaLibro.addEventListener("input", () => {
   clearTimeout(timeoutBusqueda);
 
   timeoutBusqueda = setTimeout(() => {
-    buscarLibros(inputBusqueda.value);
+    buscarLibros(busquedaLibro.value);
   }, 500);
 });
 
