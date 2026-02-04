@@ -351,6 +351,8 @@ btnAsignarAdmin.addEventListener("click", async () => {
   // ✅ Traer usuarios
   const snapshot = await getDocs(collection(db, "users"));
 
+   await cargarUsuarios();
+
 snapshot.forEach(docSnap => {
   const data = docSnap.data();
   if (docSnap.id === usuarioActual.uid) return; // omitirte a ti
