@@ -872,7 +872,7 @@ async function buscarLibros(texto) {
   resultados.classList.remove("hidden");
 
   const res = await fetch(
-    `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(texto)}&maxResults=20`
+    `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(texto)}&maxResults=20key=AIzaSyDcEUoGcKs6vwoNUF0ok1W-d8F2vVjCqP0`
   );
   const data = await res.json();
   if (!data.items) return;
@@ -913,10 +913,22 @@ function generarRecompensas(paginas) {
 
   return { monedas, objeto };
 }
-btnBuscar.addEventListener("click", () => {
+btnBuscar.addEventListener("click", async () => {
   const texto = busquedaLibro.value.trim();
-  if (!texto) return alert("Escribe algo para buscar");
-  buscarLibros(texto);
+  if (!texto) {
+    alert("Escribe algo para buscar");
+    return;
+  }
+
+  btnBuscar.disabled = true;
+  btnBuscar.textContent = "Buscando...";
+
+  try {
+    await buscarLibros(texto);
+  } finally {
+    btnBuscar.disabled = false;
+    btnBuscar.textContent = "Buscar";
+  }
 });
 
 function xpNecesariaParaNivel(nivel) {
