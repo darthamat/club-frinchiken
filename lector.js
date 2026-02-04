@@ -613,7 +613,7 @@ async function terminarLectura(l) {
 
   alert(`🎉 ¡Reto completado! +${l.paginas} XP`);
 
-//comprobarNivel();
+
     
   } else {
     await updateDoc(userRef, { prestigio: increment(l.paginas) });
@@ -623,7 +623,7 @@ async function terminarLectura(l) {
     alert(`⭐ Lectura completada. Prestigio + ${l.paginas}`);
   }
 
-  // Recompensas
+
   const recompensa = generarRecompensas(l.paginas);
 
   if (recompensa.monedas) {
@@ -775,6 +775,7 @@ function generarRecompensas(paginas) {
 
   return { monedas, objeto };
 }
+
 btnBuscar.addEventListener("click", async () => {
   const texto = busquedaLibro.value.trim();
   if (!texto) {
