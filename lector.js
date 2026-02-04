@@ -78,15 +78,6 @@ let usuarioActual = {
   tipoAdmin: null
 };
 
-let timeoutBusqueda;
-
-busquedaLibro.addEventListener("input", () => {
-  clearTimeout(timeoutBusqueda);
-
-  timeoutBusqueda = setTimeout(() => {
-    buscarLibros(busquedaLibro.value);
-  }, 500);
-});
 
 // Lista de usuarios (ejemplo, en tu proyecto la traes de Firestore)
 let usuarios = [];
