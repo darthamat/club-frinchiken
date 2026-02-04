@@ -510,7 +510,7 @@ async function registrarLecturaNormal() {
   const lectura = {
     titulo: tituloInput.value.trim(),
     autor: autorInput.value.trim(),
-    paginas: Number(paginasInput.value),
+    paginas: Number(paginasInput.value) || 0,
     categoria: categoriaInput?.value ?? "",
     activa: true,
     progreso: 0,
@@ -621,8 +621,8 @@ btnRegistrar.addEventListener("click", async () => {
     const lectura = {
       titulo: tituloInput.value.trim(),
       autor: autorInput.value.trim(),
-      paginas: Number(paginasInput.value),
-      categoria: categoriaInput.value || "",
+      ppaginas: Number(paginasInput.value) || 0,
+      categoria: categoriaInput?.value ?? "",
       activa: true,
       progreso: 0,
       esReto: false,
