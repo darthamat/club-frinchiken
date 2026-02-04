@@ -68,6 +68,8 @@ const btnAsignarAdmin = document.getElementById("btn-asignar-admin");
 const btnNuevoReto = document.getElementById("btn-nuevo-reto");
 const selectAdmin = document.getElementById("selectAdmin");
 
+let modoCrearReto = false;
+
 let usuarioActual = {
   uid: null,       // se llenará al cargar el usuario
   role: null,
@@ -315,9 +317,57 @@ async function mostrarSelectAdmin() {
 btnAsignarAdmin.addEventListener("click", mostrarSelectAdmin);
 selectAdmin.addEventListener("change", asignarAdmin);
 
-btnNuevoReto.addEventListener("click", () => {
-  crearRetoDesdePlantilla("reto-06");
-});
+btnNuevoReto.addEventListener("click", activarModoCrearReto);
+
+function activarModoCrearReto() {
+  modoCrearReto = true;
+
+  const panel = document.querySelector(".registro-lectura");
+
+  panel.scrollIntoView({ behavior: "smooth", block: "center" });
+
+  panel.classList.add("modo-reto");
+
+  mostrarMensajeReto("📖 Selecciona el libro para el nuevo reto");
+}
+
+function mostrarMensajeReto(texto) {
+  const msg = document.getElementById("mensajeReto");
+  msg.textContent = texto;
+  msg.classList.remove("hidden");
+}
+
+async function crearRetoConLibro(libro) {
+  await setDoc(doc(db, "retos", "reto-actual"), {
+    titulo: libro.titulo,
+    autor: libro.autor,
+    portada: libro.portada,
+    paginas: libro.paginas ?? 0,
+    creadoPor: usuarioActual.uid,
+    fecha: new Date()
+  });
+
+  modoCrearReto = false;
+
+  document
+    .querySelector(".registro-lectura")
+    .classList.remove("modo-reto");
+
+  document.getElementById("mensajeReto").textContent =
+    "✅ Nuevo reto creado";
+
+  setTimeout(() => {
+    document.getElementById("mensajeReto").classList.add("hidden");
+  }, 2000);
+}
+
+function seleccionarLibro(libro) {
+  if (modoCrearReto) {
+    crearRetoConLibro(libro);
+  } else {
+    rellenarFormularioLectura(libro);
+  }
+}
 
 function actualizarXP(mostrarAlert = false) {
   if (!usuarioData.experienciaNecesario || usuarioData.experienciaNecesario <= 0) {
