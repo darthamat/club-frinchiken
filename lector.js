@@ -78,6 +78,16 @@ let usuarioActual = {
   tipoAdmin: null
 };
 
+let timeoutBusqueda;
+
+inputBusqueda.addEventListener("input", () => {
+  clearTimeout(timeoutBusqueda);
+
+  timeoutBusqueda = setTimeout(() => {
+    buscarLibros(inputBusqueda.value);
+  }, 500);
+});
+
 // Lista de usuarios (ejemplo, en tu proyecto la traes de Firestore)
 let usuarios = [];
 
@@ -510,7 +520,7 @@ async function registrarLecturaNormal() {
     titulo: tituloInput.value.trim(),
     autor: autorInput.value.trim(),
     paginas: Number(paginasInput.value),
-    categoria: categoriaInput.value,
+    categoria: categoriaInput.value || "",
     activa: true,
     progreso: 0,
     esReto: false,
@@ -621,7 +631,7 @@ btnRegistrar.addEventListener("click", async () => {
       titulo: tituloInput.value.trim(),
       autor: autorInput.value.trim(),
       paginas: Number(paginasInput.value),
-      categoria: categoriaInput.value,
+      categoria: categoriaInput.value || "",
       activa: true,
       progreso: 0,
       esReto: false,
