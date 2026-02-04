@@ -351,18 +351,16 @@ btnAsignarAdmin.addEventListener("click", async () => {
   // ✅ Traer usuarios
   const snapshot = await getDocs(collection(db, "users"));
 
-  snapshot.forEach(docSnap => {
-    if (docSnap.id === usuarioActual.uid) return;
-
-    const u = docSnap.data();
-    const nombreReal = u.nombreReal ?? "Sin nombre";
-    const personaje = u.nombrePersonaje ?? "Sin personaje";
-
-    const option = document.createElement("option");
-    option.value = docSnap.id;
-    option.textContent = `${nombreReal} (${personaje})`;
-    selectAdmin.appendChild(option);
-  });
+snapshot.forEach(docSnap => {
+  const data = docSnap.data();
+  if (docSnap.id === usuarioActual.uid) return; // omitirte a ti
+  const option = document.createElement("option");
+  option.value = docSnap.id;
+  const nombreReal = data.nombreReal ?? "Sin nombre";
+  const personaje = data.nombrePersonaje ?? "Sin personaje";
+  option.textContent = `${nombreReal} (${personaje})`;
+  selectAdmin.appendChild(option);
+});
 
   if (selectAdmin.children.length === 0) {
     alert("⚠️ No hay usuarios disponibles para asignar");
