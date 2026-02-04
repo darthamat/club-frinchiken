@@ -417,27 +417,54 @@ function mostrarMensajeReto(texto) {
 }
 
 async function crearRetoConLibro(libro) {
-  await setDoc(doc(db, "retos", "reto-actual"), {
+  const retoData = {
     titulo: libro.titulo,
     autor: libro.autor,
     portada: libro.portada,
     paginas: libro.paginas ?? 0,
     creadoPor: usuarioActual.uid,
     fecha: new Date()
-  });
+  };
+
+  // 1️⃣ Guardar reto "actual"
+  await setDoc(doc(db, "retos", "reto-actual"), retoData);
+
+  // 2️⃣ Crear documento histórico
+  // Obtenemos el año y mes para generar algo tipo "actual2601", "actual2602", ...
+  const ahora = new Date();
+  const idHistorico = await generarIdRetoHistorico();
+
+  await setDoc(doc(db, "retos", idHistorico), retoData);
 
   modoCrearReto = false;
 
-  document
-    .querySelector(".registro-lectura")
-    .classList.remove("modo-reto");
-
-  document.getElementById("mensajeReto").textContent =
-    "✅ Nuevo reto creado";
+  // Mensaje de éxito
+  document.querySelector(".registro-lectura").classList.remove("modo-reto");
+  document.getElementById("mensajeReto").textContent = "✅ Nuevo reto creado";
 
   setTimeout(() => {
     document.getElementById("mensajeReto").classList.add("hidden");
   }, 2000);
+}
+
+// Función para generar un ID histórico secuencial
+async function generarIdRetoHistorico() {
+  // Buscamos todos los documentos de retos cuyo ID empieza con "actual"
+  const snap = await getDocs(collection(db, "retos"));
+  let maxNumero = 0;
+
+  snap.forEach(docSnap => {
+    const id = docSnap.id;
+    const match = id.match(/^actual(\d+)$/);
+    if (match) {
+      const num = parseInt(match[1]);
+      if (num > maxNumero) maxNumero = num;
+    }
+  });
+
+  // Siguiente número
+  const nuevoNumero = maxNumero + 1;
+  return `actual${nuevoNumero}`;
 }
 
 // ------------------ SELECCIONAR LIBRO ------------------
