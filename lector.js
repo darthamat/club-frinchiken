@@ -501,6 +501,7 @@ function rellenarFormularioLectura(libro) {
 
   // Categoría solo si existe
   categoriaInput.value = libro.categoria || "";
+
 }
 
 // ------------------ FUNCIÓN ORIGINAL REGISTRAR LECTURA ------------------
@@ -888,7 +889,7 @@ async function buscarLibros(texto) {
     li.onclick = () => seleccionarLibro({
       titulo: info.title,
       autor: info.authors?.[0],
-      paginas: info.pageCount,
+      paginas: info.pageCount || 0,
       categoria: info.categories?.join(", ") || "",
       portadaUrl: info.imageLinks?.thumbnail
     });
