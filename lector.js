@@ -420,7 +420,7 @@ async function crearRetoConLibro(libro) {
   const retoData = {
     titulo: libro.titulo,
     autor: libro.autor,
-    portada: libro.portadaUrl,
+    portadaUrl: libro.portadaUrl,
     paginas: libro.paginas ?? 0,
     creadoPor: usuarioActual.uid,
     fecha: new Date()
@@ -496,7 +496,7 @@ function rellenarFormularioLectura(libro) {
   tituloInput.value = libro.titulo || "";
   autorInput.value = libro.autor || "";
   paginasInput.value = libro.paginas || 0;
-  portadaLibro.src = libro.portada || "https://via.placeholder.com/120x180";
+  portadaLibro.src = libro.portadaUrl || "https://via.placeholder.com/120x180";
 
   // Categoría solo si existe
   categoriaInput.value = libro.categoria || "";
@@ -595,7 +595,7 @@ btnRegistrar.addEventListener("click", async () => {
       autor: autorInput.value,
       paginas: Number(paginasInput.value),
       categoria: categoriaInput.value,
-      portada: portadaLibro.src,
+      portadaUrl: portadaLibro.src,
       creadoPor: usuarioActual.uid,
       fecha: new Date()
     });
@@ -888,7 +888,7 @@ async function buscarLibros(texto) {
       autor: info.authors?.[0],
       paginas: info.pageCount,
       categoria: info.categories?.join(", ") || "",
-      portada: info.imageLinks?.thumbnail
+      portadaUrl: info.imageLinks?.thumbnail
     });
 
     resultados.appendChild(li);
