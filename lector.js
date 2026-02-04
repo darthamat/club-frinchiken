@@ -243,6 +243,9 @@ onAuthStateChanged(auth, async (user) => {
   usuarioActual = user;
   await cargarPerfilUsuario();
   await cargarLecturas(); // ⬅️ UNA SOLA VEZ
+
+   pintarLogros();
+
 });
 
 // ---------------- LOGOUT ----------------
@@ -283,7 +286,8 @@ actualizarBotonesAdmin();
   usuarioMonedas.textContent = usuarioData.monedas;
 
   actualizarXP(false); // ⛔ sin alert al cargar
-  pintarLogros();
+
+  //pintarLogros();
 }
 
 function actualizarBotonesAdmin() {
@@ -497,6 +501,15 @@ async function cargarLecturas() {
   }
 
   pintarLecturas();
+  await comprobarLogrosGlobales();
+pintarLogros();
+
+}
+
+async function comprobarLogrosGlobales() {
+  for (const l of lecturasCache) {
+    await comprobarLogros(l);
+  }
 }
 
 // ---------------- TERMINAR LECTURA ----------------
