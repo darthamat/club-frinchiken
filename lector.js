@@ -64,6 +64,10 @@ const usuarioXP = document.getElementById("xpUsuario");
 const usuarioPrestigio = document.getElementById("usuarioPrestigio");
 const usuarioMonedas = document.getElementById("usuarioMonedas");
 
+const btnAsignarAdmin = document.getElementById("btn-asignar-admin");
+const btnNuevoReto = document.getElementById("btn-nuevo-reto");
+const selectAdmin = document.getElementById("selectAdmin");
+
 let usuarioActual = {
   uid: null,       // se llenará al cargar el usuario
   role: null,
@@ -262,6 +266,12 @@ async function cargarPerfilUsuario() {
     clase: data.clase
   };
 
+  usuarioActual.uid = user.uid;
+usuarioActual.role = data.role ?? "user";
+usuarioActual.tipoAdmin = data.tipoAdmin ?? null;
+
+actualizarBotonesAdmin();
+
 
   nombrePersonajeEl.textContent = usuarioData.nombrePersonaje || "Sin nombre";
   claseEl.textContent = usuarioData.clase || "Aventurero";
@@ -272,7 +282,42 @@ async function cargarPerfilUsuario() {
   actualizarXP(false); // ⛔ sin alert al cargar
   pintarLogros();
 }
+function actualizarBotonesAdmin() {
+  // Botón asignar admin: SOLO admin global (tú)
+  btnAsignarAdmin.style.display =
+    (usuarioActual.role === "admin") ? "inline-block" : "none";
 
+  // Botón nuevo reto: admin global o admin temporal
+  btnNuevoReto.style.display =
+    (usuarioActual.role === "admin" || usuarioActual.tipoAdmin === "crear")
+      ? "inline-block"
+      : "none";
+}
+
+async function mostrarSelectAdmin() {
+  selectAdmin.innerHTML = "";
+
+  const snapshot = await getDocs(collection(db, "users"));
+
+  snapshot.forEach(docSnap => {
+    if (docSnap.id !== usuarioActual.uid) {
+      const u = docSnap.data();
+      const option = document.createElement("option");
+      option.value = docSnap.id;
+      option.textContent = `${u.nombreReal} (${u.nombrePersonaje})`;
+      selectAdmin.appendChild(option);
+    }
+  });
+
+  selectAdmin.style.display = "inline-block";
+}
+
+btnAsignarAdmin.addEventListener("click", mostrarSelectAdmin);
+selectAdmin.addEventListener("change", asignarAdmin);
+
+btnNuevoReto.addEventListener("click", () => {
+  crearRetoDesdePlantilla("reto-06");
+});
 
 function actualizarXP(mostrarAlert = false) {
   if (!usuarioData.experienciaNecesario || usuarioData.experienciaNecesario <= 0) {
@@ -683,19 +728,27 @@ async function cargarUsuarios() {
   });
 }
 async function asignarAdmin() {
-  const select = document.getElementById("selectAdmin");
-  const uidNuevoAdmin = select.value;
-
-  const usuariosRef = db.collection("usuarios");
+  const uidNuevoAdmin = selectAdmin.value;
+  if (!uidNuevoAdmin) return;
 
   // Quitar admin temporal anterior
-  const snapshot = await usuariosRef.where("tipoAdmin", "==", "crear").get();
-  snapshot.forEach(async doc => {
-    await usuariosRef.doc(doc.id).update({ tipoAdmin: null });
+  const q = query(
+    collection(db, "users"),
+    where("tipoAdmin", "==", "crear")
+  );
+
+  const snap = await getDocs(q);
+
+  for (const d of snap.docs) {
+    await updateDoc(d.ref, { tipoAdmin: null });
+  }
+
+  // Asignar nuevo admin
+  await updateDoc(doc(db, "users", uidNuevoAdmin), {
+    tipoAdmin: "crear"
   });
 
-  // Dar admin temporal al usuario seleccionado
-  await usuariosRef.doc(uidNuevoAdmin).update({ tipoAdmin: "crear" });
+  alert("👑 El poder ha sido transferido");
 
-  alert("¡Admin temporal asignado!");
+  selectAdmin.style.display = "none";
 }
