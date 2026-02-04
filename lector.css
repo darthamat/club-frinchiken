@@ -218,3 +218,74 @@ button.gold {
   align-items: center;
   gap: 8px;
 }
+.lectura-card {
+  background: #1e1e1e;
+  border: 2px solid #333;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* 🔥 RETO ACTUAL */
+.reto-card {
+  border: 3px solid gold;
+  background: linear-gradient(145deg, #2a2300, #1a1600);
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+}
+
+/* Progreso */
+.lectura-progreso {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.barra {
+  flex: 1;
+  height: 10px;
+  background: #333;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.barra .fill {
+  height: 100%;
+  background: #00aaff;
+}
+
+.reto-card .barra .fill {
+  background: gold;
+}
+
+/* Acciones */
+.lectura-acciones {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-terminar {
+  background: #444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.reto-card .btn-terminar {
+  background: gold;
+  color: #000;
+  font-weight: bold;
+}
+
+.reto-card::before {
+  content: "🏆 RETO ACTUAL";
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: gold;
+  font-weight: bold;
+}

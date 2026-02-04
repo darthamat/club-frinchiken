@@ -796,62 +796,66 @@ function pintarLecturas() {
     ? lecturasCache
     : lecturasCache.filter(l => l.activa);
 
-  lista.forEach((l, index) => {
-    const li = document.createElement("li");
-    li.textContent = `${l.titulo} — ${l.autor}`;
+  lista.forEach((l) => {
+    const card = document.createElement("div");
+    card.className = "lectura-card";
 
-    // Barra de progreso
-    const barra = document.createElement("div");
-    barra.style.width = "150px";
-    barra.style.height = "10px";
-    barra.style.background = "#ddd";
-    barra.style.display = "inline-block";
-    barra.style.marginLeft = "10px";
+    if (l.esReto) {
+      card.classList.add("reto-card");
+    }
 
-    const fill = document.createElement("div");
-    fill.style.width = `${l.progreso || 0}%`;
-    fill.style.height = "100%";
-    fill.style.background = l.esReto ? "#FFD700" : "#00aaff";
-    barra.appendChild(fill);
-    li.appendChild(barra);
+    card.innerHTML = `
+      <div class="lectura-info">
+        <strong>${l.titulo}</strong><br>
+        <small>${l.autor}</small>
+      </div>
 
-    // Botones de progreso
-    const cambiarProgreso = async (delta) => {
-      l.progreso = Math.min(100, Math.max(0, (l.progreso || 0) + delta));
-      if (l.id) {
-        await updateDoc(
-          doc(db, "users", usuarioActual.uid, "lecturas", l.id),
-          { progreso: l.progreso }
-        );
-      }
-      pintarLecturas();
-    };
+      <div class="lectura-progreso">
+        <div class="barra">
+          <div class="fill" style="width:${l.progreso || 0}%"></div>
+        </div>
+        <span>${l.progreso || 0}%</span>
+      </div>
 
-    ["-10%", "+10%"].forEach((txt, i) => {
-      const b = document.createElement("button");
-      b.textContent = txt;
-      b.onclick = () => cambiarProgreso(i ? 10 : -10);
-      li.appendChild(b);
+  <div class="lectura-acciones">
+  <button class="btn-progreso" data-delta="-10">-10%</button>
+  <button class="btn-progreso" data-delta="10">+10%</button>
+
+  <button class="btn-terminar">
+    ${l.esReto ? "🏆 Terminar reto" : "📗 Terminar libro"}
+  </button>
+
+  <button class="btn-eliminar" title="Eliminar lectura">❌</button>
+</div>
+    `;
+
+    // Eventos
+    card.querySelectorAll(".btn-progreso").forEach(btn => {
+      btn.onclick = () => cambiarProgreso(l, Number(btn.dataset.delta));
     });
 
-    // Botón Terminar
-    const btnTerminar = document.createElement("button");
-    btnTerminar.textContent = "📗 Terminar";
-    btnTerminar.onclick = () => terminarLectura(l);
-    li.appendChild(btnTerminar);
+    card.querySelector(".btn-terminar").onclick = () => terminarLectura(l);
 
-    // Botón Eliminar
-    const btnEliminar = document.createElement("button");
-    btnEliminar.textContent = "❌";
-    btnEliminar.onclick = async () => {
-      if (!confirm("¿Eliminar lectura?")) return;
-      if (l.id) await deleteDoc(doc(db, "users", usuarioActual.uid, "lecturas", l.id));
-      lecturasCache.splice(index, 1);
-      pintarLecturas();
-    };
-    li.appendChild(btnEliminar);
+    listaLecturasEl.appendChild(card);
 
-    listaLecturasEl.appendChild(li);
+    card.querySelector(".btn-eliminar").onclick = async () => {
+  const texto = l.esReto
+    ? "⚠️ ¿Eliminar el reto actual?"
+    : "⚠️ ¿Eliminar esta lectura?";
+
+  if (!confirm(texto)) return;
+
+  if (l.id) {
+    await deleteDoc(
+      doc(db, "users", usuarioActual.uid, "lecturas", l.id)
+    );
+  }
+
+  // Eliminar de memoria
+  lecturasCache = lecturasCache.filter(x => x.id !== l.id);
+
+  pintarLecturas();
+};
   });
 }
 
