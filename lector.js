@@ -511,7 +511,7 @@ async function registrarLecturaNormal() {
     titulo: tituloInput.value.trim(),
     autor: autorInput.value.trim(),
     paginas: Number(paginasInput.value),
-    categoria: categoriaInput.value || "",
+    categoria: categoriaInput?.value ?? "",
     activa: true,
     progreso: 0,
     esReto: false,
