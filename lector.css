@@ -207,3 +207,14 @@ button.gold {
   50% { box-shadow: 0 0 35px orange; }
   100% { box-shadow: 0 0 20px gold; }
 }
+
+#selectAdmin {
+  min-width: 220px;
+  margin-left: 10px;
+}
+
+.player-card .botones-admin {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
