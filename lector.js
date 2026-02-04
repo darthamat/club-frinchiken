@@ -420,7 +420,7 @@ async function crearRetoConLibro(libro) {
   const retoData = {
     titulo: libro.titulo,
     autor: libro.autor,
-    portada: libro.portada,
+    portada: libro.portadaUrl,
     paginas: libro.paginas ?? 0,
     creadoPor: usuarioActual.uid,
     fecha: new Date()
@@ -566,7 +566,7 @@ function actualizarXP(mostrarAlert = false) {
 async function cargarReto() {
   if (retoCache) return retoCache;
 
-  const snap = await getDoc(doc(db, "retos", "2026_01"));
+  const snap = await getDoc(doc(db, "retos", "reto-actual"));
   if (!snap.exists()) return null;
 
   retoCache = snap.data();
