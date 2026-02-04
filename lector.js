@@ -421,6 +421,7 @@ async function crearRetoConLibro(libro) {
   const retoData = {
     titulo: libro.titulo,
     autor: libro.autor,
+    categoria: libro.categoria ?? "",
     portadaUrl: libro.portadaUrl,
     paginas: libro.paginas ?? 0,
     creadoPor: usuarioActual.uid,
