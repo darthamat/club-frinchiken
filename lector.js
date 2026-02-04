@@ -872,20 +872,6 @@ async function buscarLibros(texto) {
   resultados.style.overflowY = "auto";
 }
 
-    function rellenarFormularioLectura(libro) {
-  tituloInput.value = libro.titulo || "";
-  autorInput.value = libro.autor || "";
-  paginasInput.value = libro.paginas || 0;
-  portadaLibro.src = libro.portada || portadaLibro.src;
-}
-
-
-function rellenarFormularioLectura(libro) {
-  tituloInput.value = libro.titulo || "";
-  autorInput.value = libro.autor || "";
-  paginasInput.value = libro.paginas || 0;
-  portadaLibro.src = libro.portada || portadaLibro.src;
-}
 
 // ---------------- RECOMPENSAS ----------------
 function generarRecompensas(paginas) {
