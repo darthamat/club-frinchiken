@@ -1,3 +1,4 @@
+
 // ---------------- IMPORTS ----------------
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
@@ -16,6 +17,13 @@ import {
   increment 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+import {
+  RECOMPENSAS,
+  OBJETOS_RAROS,
+  OBJETOS_LEGENDARIOS,
+  LOGROS
+} from "./gameConfig.js";
 
 // ---------------- FIREBASE ----------------
 const firebaseConfig = {
@@ -81,154 +89,6 @@ let usuarioActual = {
 
 // Lista de usuarios (ejemplo, en tu proyecto la traes de Firestore)
 let usuarios = [];
-
-const objetosRaros = [
-  "Marcapáginas de dragón",
-  "Lupa de detective",
-  "Pluma encantada",
-  "Taza de café mágico",
-  "Capa de invisibilidad de biblioteca"
-];
-
-const objetosLegendarios = [
-  "El Anillo Único",
-  "Un huevo de dragon de Daenerys",
-  "La dragonlance",
-  "La segunda bola de dragon",
-  "Sombrero de Terry Pratchett",
-  "Tercer libro de El nombre del Viento",
-  "La granada de Antioquia",
-  "Chapines de rubies",
-  "La pipa de Bilbo",
-  "Tiara de Donut",
-  "eBook de Mithril",
-  "Gafas de lectura Jhony N5",
-  "Espada de Gandalf",
-  "Armadura de páginas de la primera Biblia"
-];
-
-const LOGROS = [
-  // 🧩 RETOS
-  {
-    id: "reto_enero",
-    titulo: "Reto de Enero superado",
-    descripcion: "Completaste el reto mensual",
-    tipo: "reto",
-    condicion: (l) => l.esReto === true
-  },
-
-  // 📚 PÁGINAS
-  {
-    id: "tocho_1000",
-    titulo: "Lector/a de tochos",
-    descripcion: "Leíste un libro de 1000 páginas o más",
-    condicion: (l) => l.paginas >= 1000
-  },
-
-  // 📦 GÉNEROS
-  {
-    id: "romantico",
-    titulo: "Corazón de tinta",
-    descripcion: "Leíste un libro romántico",
-    condicion: (l) => l.categoria?.toLowerCase().includes("romance")
-  },
-  {
-    id: "erotico",
-    titulo: "Lector/a cachondo/a 😏",
-    descripcion: "Leíste literatura erótica",
-    condicion: (l) => l.categoria?.toLowerCase().includes("erótico")
-  },
-   {
-    id: "fantasia",
-    titulo: "Soñador/a empedernido, un solo mundo no es suficiente",
-    descripcion: "Leíste literatura fantástica",
-    condicion: (l) => l.categoria?.toLowerCase().includes("fantasia")
-  },
-   {
-    id: "terror",
-    titulo: "Mal  rollito por leer libros de miedo por la noche",
-    descripcion: "Leíste un libro de terror",
-    condicion: (l) => l.categoria?.toLowerCase().includes("terror")
-  },
-
-  // 🌙 HÁBITOS
-  {
-    id: "nocturno",
-    titulo: "Lector/a nocturno",
-    descripcion: "Terminaste un libro entre las 00:00 y las 06:00",
-    condicion: () => {
-      const h = new Date().getHours();
-      return h >= 0 && h < 6;
-    }
-  },
-{
-  id: "mes_10_libros",
-  titulo: "Devorador/a de libros",
-  condicion: () => {
-    const ahora = new Date();
-    const mes = ahora.getMonth();
-    const año = ahora.getFullYear();
-
-    const librosMes = lecturasCache.filter(l => {
-      if (!l.fechaFin) return false;
-      const f = l.fechaFin.toDate();
-      return f.getMonth() === mes && f.getFullYear() === año;
-    });
-
-    return librosMes.length >= 10;
-  }
-},
-{
-  id: "mes_5_libros",
-  titulo: "Super lector/a",
-  condicion: () => {
-    const ahora = new Date();
-    const mes = ahora.getMonth();
-    const año = ahora.getFullYear();
-
-    const librosMes = lecturasCache.filter(l => {
-      if (!l.fechaFin) return false;
-      const f = l.fechaFin.toDate();
-      return f.getMonth() === mes && f.getFullYear() === año;
-    });
-
-    return librosMes.length >= 5;
-  }
-},
-
-{
-  id: "anio_20_libros",
-  titulo: "Devorador/a de libros",
-  condicion: () => {
-    const añoActual = new Date().getFullYear();
-
-    const librosAnio = lecturasCache.filter(l => {
-      if (!l.fechaFin) return false;
-      const f = l.fechaFin.toDate();
-      return f.getFullYear() === añoActual;
-    });
-
-    return librosAnio.length >= 20;
-  }
-},
-
-{
-  id: "anio_30_libros",
-  titulo: "Devorador/a de bibliotecas",
-  condicion: () => {
-    const añoActual = new Date().getFullYear();
-
-    const librosAnio = lecturasCache.filter(l => {
-      if (!l.fechaFin) return false;
-      const f = l.fechaFin.toDate();
-      return f.getFullYear() === añoActual;
-    });
-
-    return librosAnio.length >= 30;
-  }
-}
-  
-];
 
 // ---------------- ESTADO ----------------
 //let usuarioActual = null;
@@ -623,7 +483,7 @@ btnRegistrar.addEventListener("click", async () => {
     const lectura = {
       titulo: tituloInput.value.trim(),
       autor: autorInput.value.trim(),
-      ppaginas: Number(paginasInput.value) || 0,
+      paginas: Number(paginasInput.value) || 0,
       categoria: categoriaInput?.value ?? "",
       activa: true,
       progreso: 0,
@@ -874,7 +734,7 @@ async function buscarLibros(texto) {
   resultados.classList.remove("hidden");
 
   const res = await fetch(
-    `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(texto)}&maxResults=5key=AIzaSyDcEUoGcKs6vwoNUF0ok1W-d8F2vVjCqP0`
+    `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(texto)}&maxResults=5&key=AIzaSyDcEUoGcKs6vwoNUF0ok1W-d8F2vVjCqP0`
   );
   const data = await res.json();
   if (!data.items) return;
