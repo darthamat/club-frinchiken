@@ -737,7 +737,7 @@ async function buscarLibros(texto) {
   resultados.classList.remove("hidden");
 
   const res = await fetch(
-    `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(texto)}&maxResults=5`
+    `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(texto)}&maxResults=20`
   );
   const data = await res.json();
   if (!data.items) return;
