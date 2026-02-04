@@ -441,10 +441,15 @@ async function crearRetoConLibro(libro) {
 }
 
 function seleccionarLibro(libro) {
+  // Siempre rellenar el formulario visual
+  tituloInput.value = libro.titulo || "";
+  autorInput.value = libro.autor || "";
+  paginasInput.value = libro.paginas || 0;
+  portadaLibro.src = libro.portada || "https://via.placeholder.com/120x180";
+
+  // Solo crear reto si estamos en modo reto
   if (modoCrearReto) {
     crearRetoConLibro(libro);
-  } else {
-    rellenarFormularioLectura(libro);
   }
 }
 
