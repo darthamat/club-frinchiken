@@ -77,7 +77,9 @@ btnRegister.addEventListener("click", async () => {
       imagen_avatar: "",
       clase: claseAleatoria,
       experiencia: 0,
-      experienciaNecesario: 0,
+      role: "user",          // tú serías "admin" global
+      tipoAdmin: null,         // "crear" solo para el elegido
+      experienciaNecesario: xpNecesariaParaNivel(1)
 
     });
 

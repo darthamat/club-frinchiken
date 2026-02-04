@@ -12,20 +12,27 @@
   <!-- ==================== PLAYER CARD ==================== -->
   <section class="player-card">
    <label class="avatar-wrapper">
-  <img id="avatarImg" src="avatar.png" class="avatar" alt="Avatar">
+  <img id="avatarImg" src="./assets/avatar.png" class="avatar" alt="Avatar">
   <input type="file" id="avatarInput" accept="image/*" hidden>
 </label>
     <div>
       <h2 id="nombrePersonaje">Cargando...</h2>
-     <!-- <input id="nombrePersonaje"
-       class="nombre-personaje"
-       placeholder="Nombre del personaje">-->
+     <div class="botones-admin">
+      <!-- Combobox solo visible para admin global -->
+      <select id="selectAdmin" style="display:none;"></select>
+      <button id="btn-asignar-admin" onclick="mostrarSelectAdmin()">Asignar nuevo admin</button>
+
+      <!-- Botón de crear reto -->
+      <button id="btn-nuevo-reto" onclick="crearRetoDesdePlantilla('reto-06')">Nuevo reto</button>
+    </div>
       <p>Clase: <span id="clasePersonaje">---</span></p>
       <p>Nivel <span id="nivelUsuario">1</span></p>
       <div class="xp-bar">
         <div class="xp-fill" id="barraXP"></div>
       </div>
       <small id="xpUsuario">0 / 100 XP</small>
+       <p>⭐ Prestigio: <span id="usuarioPrestigio">0</span><br></p>
+ <p> 💰 Marcapáginas bonitos: <span id="usuarioMonedas">0</span></p>
     </div>
   </section>
 
