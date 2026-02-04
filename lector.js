@@ -590,7 +590,7 @@ btnRegistrar.addEventListener("click", async () => {
 
   if (modoCrearReto) {
     // Crear reto en Firestore
-    await setDoc(doc(db, "retos", "actual"), {
+    await setDoc(doc(db, "retos", "2026"), {
       titulo: tituloInput.value,
       autor: autorInput.value,
       paginas: Number(paginasInput.value),
