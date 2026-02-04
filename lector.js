@@ -441,15 +441,16 @@ async function crearRetoConLibro(libro) {
 }
 
 function seleccionarLibro(libro) {
-  // Siempre rellenar el formulario visual
+  // Rellenar campos
   tituloInput.value = libro.titulo || "";
   autorInput.value = libro.autor || "";
   paginasInput.value = libro.paginas || 0;
+  categoriaInput.value = libro.categoria || "";
   portadaLibro.src = libro.portada || "https://via.placeholder.com/120x180";
 
-  // Solo crear reto si estamos en modo reto
+  // Si estamos en modo reto, solo mostrar info visual, no crear todavía
   if (modoCrearReto) {
-    crearRetoConLibro(libro);
+    mostrarMensajeReto(`✅ Has seleccionado: ${libro.titulo}`);
   }
 }
 
@@ -500,39 +501,90 @@ btnReto.addEventListener("click", async () => {
 
 // ---------------- REGISTRAR LECTURA ----------------
 btnRegistrar.addEventListener("click", async () => {
-  if (!usuarioActual) return;
+  if (!tituloInput.value || !autorInput.value) return alert("Faltan datos");
 
-  const lectura = {
-    titulo: tituloInput.value.trim(),
-    autor: autorInput.value.trim(),
-    paginas: Number(paginasInput.value),
-    categoria: categoriaInput.value,
-    activa: true,
-    progreso: 0,
-    esReto: false,
-    fechaInicio: new Date()
-  };
+  if (modoCrearReto) {
+    // Crear reto en Firestore
+    await setDoc(doc(db, "retos", "reto-actual"), {
+      titulo: tituloInput.value,
+      autor: autorInput.value,
+      paginas: Number(paginasInput.value),
+      categoria: categoriaInput.value,
+      portada: portadaLibro.src,
+      creadoPor: usuarioActual.uid,
+      fecha: new Date()
+    });
 
-  if (!lectura.titulo || !lectura.autor) return alert("Faltan datos");
+    alert("📚 Nuevo reto creado con éxito!");
 
-  const ref = await addDoc(
-    collection(db, "users", usuarioActual.uid, "lecturas"),
-    lectura
-  );
+    modoCrearReto = false;
+    btnRegistrar.textContent = "Registrar lectura";
+    mostrarMensajeReto("Selecciona un libro para registrar una lectura");
 
-  lecturasCache.unshift({ id: ref.id, ...lectura });
-  pintarLecturas();
+    // Limpiar campos si quieres
+    tituloInput.value = "";
+    autorInput.value = "";
+    paginasInput.value = "";
+    categoriaInput.value = "";
+    portadaLibro.src = "https://via.placeholder.com/120x180";
 
-  // Limpiar inputs
+    resultados.innerHTML = "";
+    resultados.classList.add("hidden");
+  } else {
+    // Código normal de registrar lectura
+    const lectura = {
+      titulo: tituloInput.value.trim(),
+      autor: autorInput.value.trim(),
+      paginas: Number(paginasInput.value),
+      categoria: categoriaInput.value,
+      activa: true,
+      progreso: 0,
+      esReto: false,
+      fechaInicio: new Date()
+    };
+
+    const ref = await addDoc(
+      collection(db, "users", usuarioActual.uid, "lecturas"),
+      lectura
+    );
+
+    lecturasCache.unshift({ id: ref.id, ...lectura });
+    pintarLecturas();
+
+    // Limpiar inputs
+    tituloInput.value = "";
+    autorInput.value = "";
+    paginasInput.value = "";
+    categoriaInput.value = "";
+    portadaLibro.src = "https://via.placeholder.com/120x180";
+
+    resultados.innerHTML = "";
+    resultados.classList.add("hidden");
+  }
+});
+
+
+btnNuevoReto.addEventListener("click", () => {
+  modoCrearReto = true;
+
+  // Cambiar texto del botón
+  btnRegistrar.textContent = "Registrar nuevo reto";
+
+  // Limpiar campos
   tituloInput.value = "";
   autorInput.value = "";
   paginasInput.value = "";
   categoriaInput.value = "";
   portadaLibro.src = "https://via.placeholder.com/120x180";
 
-  busquedaLibro.value = "";
-  resultados.innerHTML = "";
-  resultados.classList.add("hidden");
+  // Mostrar mensaje
+  mostrarMensajeReto("📖 Selecciona el libro para el nuevo reto");
+
+  // Hacer scroll al panel
+  document.querySelector(".registro-lectura").scrollIntoView({
+    behavior: "smooth",
+    block: "center"
+  });
 });
 
 // ---------------- CARGAR LECTURAS ----------------
@@ -728,15 +780,6 @@ btnToggleTerminadas.addEventListener("click", () => {
 });
 
 // ---------------- BÚSQUEDA LIBROS ----------------
-btnBuscar.addEventListener("click", () => {
-  const texto = busquedaLibro.value.trim();
-  if (texto.length < 3) {
-    resultados.classList.add("hidden");
-    return;
-  }
-  buscarLibros(texto);
-});
-
 async function buscarLibros(texto) {
   resultados.innerHTML = "";
   resultados.classList.remove("hidden");
@@ -750,31 +793,40 @@ async function buscarLibros(texto) {
   data.items.forEach(libro => {
     const info = libro.volumeInfo;
     const li = document.createElement("li");
-    li.textContent = `${info.title} — ${info.authors?.[0] || "Desconocido"}`;
+    li.className = "resultado-libro";
+    li.style.display = "flex";
+    li.style.alignItems = "center";
+    li.style.cursor = "pointer";
+    li.style.marginBottom = "10px";
 
-   /*
-    *
-    * li.onclick = () => {
-      tituloInput.value = info.title || "";
-      autorInput.value = info.authors?.[0] || "";
-      paginasInput.value = info.pageCount || 0;
-      categoriaInput.value = info.categories ? info.categories.join(", ") : "Sin categoría";
-      portadaLibro.src = info.imageLinks?.thumbnail || portadaLibro.src;
-      resultados.classList.add("hidden");
-    };
+    const img = document.createElement("img");
+    img.src = info.imageLinks?.thumbnail || "https://via.placeholder.com/60x90";
+    img.style.width = "60px";
+    img.style.height = "90px";
+    img.style.objectFit = "cover";
+    img.style.marginRight = "10px";
 
+    const div = document.createElement("div");
+    div.innerHTML = `<strong>${info.title}</strong><br>${info.authors?.[0] || "Desconocido"}`;
 
-    */
+    li.appendChild(img);
+    li.appendChild(div);
 
+    li.onclick = () => seleccionarLibro({
+      titulo: info.title,
+      autor: info.authors?.[0],
+      paginas: info.pageCount,
+      categoria: info.categories?.join(", ") || "",
+      portada: info.imageLinks?.thumbnail
+    });
 
-    li.onclick = () => {
-  seleccionarLibro({
-    titulo: info.title,
-    autor: info.authors?.[0],
-    paginas: info.pageCount,
-    portada: info.imageLinks?.thumbnail
+    resultados.appendChild(li);
   });
-};
+
+  // Añadir scroll si hay muchos resultados
+  resultados.style.maxHeight = "400px";
+  resultados.style.overflowY = "auto";
+}
 
     function rellenarFormularioLectura(libro) {
   tituloInput.value = libro.titulo || "";
@@ -784,25 +836,12 @@ async function buscarLibros(texto) {
 }
 
 
-
-    resultados.appendChild(li);
-  });
-}
-
-
 function rellenarFormularioLectura(libro) {
   tituloInput.value = libro.titulo || "";
   autorInput.value = libro.autor || "";
   paginasInput.value = libro.paginas || 0;
   portadaLibro.src = libro.portada || portadaLibro.src;
 }
-
-
-
-
-
-
-
 
 // ---------------- RECOMPENSAS ----------------
 function generarRecompensas(paginas) {
