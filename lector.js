@@ -4,6 +4,8 @@ import {
   getFirestore,
   doc,
   getDoc,
+  setDoc,
+  where,
   collection,
   addDoc,
   updateDoc,
@@ -268,7 +270,6 @@ async function cargarPerfilUsuario() {
     clase: data.clase
   };
 
-  usuarioActual.uid = user.uid;
 usuarioActual.role = data.role ?? "user";
 usuarioActual.tipoAdmin = data.tipoAdmin ?? null;
 
@@ -284,12 +285,16 @@ actualizarBotonesAdmin();
   actualizarXP(false); // ⛔ sin alert al cargar
   pintarLogros();
 }
-function actualizarBotonesAdmin() {
-  // Botón asignar admin: SOLO admin global (tú)
-  btnAsignarAdmin.style.display =
-    (usuarioActual.role === "admin") ? "inline-block" : "none";
 
-  // Botón nuevo reto: admin global o admin temporal
+function actualizarBotonesAdmin() {
+  if (!btnAsignarAdmin || !btnNuevoReto) return;
+
+  console.log("ROL:", usuarioActual.role);
+  console.log("TIPO ADMIN:", usuarioActual.tipoAdmin);
+
+  btnAsignarAdmin.style.display =
+    usuarioActual.role === "admin" ? "inline-block" : "none";
+
   btnNuevoReto.style.display =
     (usuarioActual.role === "admin" || usuarioActual.tipoAdmin === "crear")
       ? "inline-block"
@@ -659,7 +664,9 @@ async function buscarLibros(texto) {
     const li = document.createElement("li");
     li.textContent = `${info.title} — ${info.authors?.[0] || "Desconocido"}`;
 
-    li.onclick = () => {
+   /*
+    *
+    * li.onclick = () => {
       tituloInput.value = info.title || "";
       autorInput.value = info.authors?.[0] || "";
       paginasInput.value = info.pageCount || 0;
@@ -668,9 +675,46 @@ async function buscarLibros(texto) {
       resultados.classList.add("hidden");
     };
 
+
+    */
+
+
+    li.onclick = () => {
+  seleccionarLibro({
+    titulo: info.title,
+    autor: info.authors?.[0],
+    paginas: info.pageCount,
+    portada: info.imageLinks?.thumbnail
+  });
+};
+
+    function rellenarFormularioLectura(libro) {
+  tituloInput.value = libro.titulo || "";
+  autorInput.value = libro.autor || "";
+  paginasInput.value = libro.paginas || 0;
+  portadaLibro.src = libro.portada || portadaLibro.src;
+}
+
+
+
     resultados.appendChild(li);
   });
 }
+
+
+function rellenarFormularioLectura(libro) {
+  tituloInput.value = libro.titulo || "";
+  autorInput.value = libro.autor || "";
+  paginasInput.value = libro.paginas || 0;
+  portadaLibro.src = libro.portada || portadaLibro.src;
+}
+
+
+
+
+
+
+
 
 // ---------------- RECOMPENSAS ----------------
 function generarRecompensas(paginas) {
