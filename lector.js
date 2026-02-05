@@ -733,8 +733,10 @@ async function buscarLibros(texto) {
   resultados.innerHTML = "";
   resultados.classList.remove("hidden");
 
+  // key api = &key=AIzaSyDcEUoGcKs6vwoNUF0ok1W-d8F2vVjCqP0
+
   const res = await fetch(
-    `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(texto)}&maxResults=5&key=AIzaSyDcEUoGcKs6vwoNUF0ok1W-d8F2vVjCqP0`
+    `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(texto)}&maxResults=5`
   );
   const data = await res.json();
   if (!data.items) return;
