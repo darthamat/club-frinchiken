@@ -297,6 +297,8 @@ function mostrarMensajeReto(texto) {
   msg.classList.remove("hidden");
 }
 
+
+/*
 async function crearRetoConLibro(libro) {
   const retoData = {
     titulo: libro.titulo,
@@ -360,25 +362,81 @@ pintarLecturas();
 panelRetos.scrollIntoView({ behavior: "smooth", block: "center" });
 
 }
+*/
+
+async function crearRetoConLibro(libro) {
+  const retoRefActual = doc(db, "retos", "reto-actual");
+  const snapActual = await getDoc(retoRefActual);
+
+  // Guardar el reto anterior en histórico si existe
+  if (snapActual.exists()) {
+    const retoAnterior = snapActual.data();
+    const idHistorico = await generarIdRetoHistorico();
+    await setDoc(doc(db, "retos", idHistorico), retoAnterior);
+  }
+
+  const retoData = {
+    titulo: libro.titulo,
+    autor: libro.autor,
+    categoria: libro.categoria ?? "",
+    portadaUrl: libro.portadaUrl ?? null,
+    paginas: libro.paginas ?? 0,
+    creadoPor: usuarioActual.uid,
+    fecha: new Date(),
+    esReto: true,
+    activa: true,
+    progreso: 0
+  };
+
+  // Sobrescribir reto-actual
+  await setDoc(retoRefActual, retoData);
+
+  // Guardar en lecturas del admin automáticamente
+  const yaExiste = lecturasCache.some(l => l.esReto && l.activa);
+  if (!yaExiste) {
+    const ref = await addDoc(
+      collection(db, "users", usuarioActual.uid, "lecturas"),
+      retoData
+    );
+
+    lecturasCache.unshift({
+      id: ref.id,
+      ...retoData
+    });
+  }
+
+  mostrarTerminados = true;
+  mostrarMensajeReto("✅ Nuevo reto creado");
+  alert("🏆 Nuevo reto creado con éxito");
+
+  pintarLecturas();
+  modoCrearReto = false;
+  btnRegistrar.textContent = "Registrar lectura";
+
+  // Limpiar formulario
+  tituloInput.value = "";
+  autorInput.value = "";
+  paginasInput.value = "";
+  categoriaInput.value = "";
+  portadaLibro.src = "https://via.placeholder.com/120x180";
+}
 
 // Función para generar un ID histórico secuencial
 async function generarIdRetoHistorico() {
-  // Buscamos todos los documentos de retos cuyo ID empieza con "actual"
   const snap = await getDocs(collection(db, "retos"));
-  let maxNumero = 0;
+  const year = new Date().getFullYear();
 
+  let maxNumero = 0;
   snap.forEach(docSnap => {
-    const id = docSnap.id;
-    const match = id.match(/^actual(\d+)$/);
+    const match = docSnap.id.match(new RegExp(`^${year}-(\\d+)$`));
     if (match) {
       const num = parseInt(match[1]);
       if (num > maxNumero) maxNumero = num;
     }
   });
 
-  // Siguiente número
-  const nuevoNumero = maxNumero + 1;
-  return `2026--{nuevoNumero}`;
+  const nuevoNumero = (maxNumero + 1).toString().padStart(2, "0");
+  return `${year}-${nuevoNumero}`;
 }
 
 // ------------------ SELECCIONAR LIBRO ------------------
@@ -509,6 +567,7 @@ btnReto.addEventListener("click", async () => {
 
 
 
+
 // ---------------- CARGAR LECTURAS ----------------
 async function cargarLecturas() {
   if (!usuarioActual) return;
@@ -524,12 +583,16 @@ async function cargarLecturas() {
   if (snapReto.exists()) {
     const retoActual = snapReto.data();
 
-    // Evitar duplicar: comprobar si ya existe un reto activo
-    const existeReto = lecturasCache.some(l => l.esReto && l.activa);
+    // Buscar si el usuario ya tiene este reto registrado en su colección
+    const retoExistente = lecturasCache.find(
+      l => l.esReto && l.idReto === retoActual.idReto
+    );
 
-    if (!existeReto) {
+    if (!retoExistente) {
+      // Solo añadir “virtual” si no tiene el reto
       lecturasCache.unshift({
-        id: "reto-actual",
+        id: "reto-actual",  // id temporal para la UI
+        idReto: retoActual.idReto,
         ...retoActual,
         activa: true,
         progreso: 0,
@@ -538,10 +601,7 @@ async function cargarLecturas() {
     }
   }
 
-  // Pintar los paneles
   pintarLecturas();
-
-  // Comprobar logros globales
   await comprobarLogrosGlobales();
   pintarLogros();
 }
@@ -555,14 +615,15 @@ async function comprobarLogrosGlobales() {
 
 // ---------------- TERMINAR LECTURA ----------------
 async function terminarLectura(l) {
-  if (!usuarioActual || !l?.id) {
-    console.error("Lectura inválida:", l);
+  if (!usuarioActual || !l?.id) return;
+
+  // Ignorar reto virtual
+  if (l.id === "reto-actual") {
+    alert("⚠️ Debes registrar el reto antes de terminarlo");
     return;
   }
 
-  const userRef = doc(db, "users", usuarioActual.uid);
   const lecturaRef = doc(db, "users", usuarioActual.uid, "lecturas", l.id);
-
   await updateDoc(lecturaRef, {
     activa: false,
     progreso: 100,
@@ -572,46 +633,27 @@ async function terminarLectura(l) {
   l.activa = false;
 
   if (l.esReto) {
-    usuarioData.xp += Number(l.paginas);
+    usuarioData.experiencia += Number(l.paginas);
     actualizarXP();
 
-    await updateDoc(userRef, {
-      xp: usuarioData.xp,
+    await updateDoc(doc(db, "users", usuarioActual.uid), {
+      experiencia: usuarioData.experiencia,
       nivel: usuarioData.nivel,
-      experienciaNecesaria: usuarioData.experienciaNecesaria
+      experienciaNecesario: usuarioData.experienciaNecesario
     });
 
     alert(`🏆 Reto completado (+${l.paginas} XP)`);
   } else {
+    // Lectura libre
     usuarioData.prestigio += Number(l.paginas);
-
-    await updateDoc(userRef, {
+    await updateDoc(doc(db, "users", usuarioActual.uid), {
       prestigio: usuarioData.prestigio
     });
-
     usuarioPrestigio.textContent = usuarioData.prestigio;
     alert(`⭐ Lectura completada (+${l.paginas} prestigio)`);
   }
 
-  const recompensa = generarRecompensas(l.paginas);
-
-  if (recompensa.monedas) {
-    usuarioData.monedas += recompensa.monedas;
-
-    await updateDoc(userRef, {
-      monedas: usuarioData.monedas
-    });
-
-    usuarioMonedas.textContent = usuarioData.monedas;
-    alert(`💰 Has conseguido ${recompensa.monedas} marcapáginas`);
-  }
-
-  if (recompensa.objeto) {
-    alert(`🎁 Objeto mágico: ${recompensa.objeto}`);
-  }
-
   pintarLecturas();
-  await comprobarLogros(l);
 }
 
 
