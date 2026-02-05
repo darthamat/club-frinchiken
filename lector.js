@@ -64,10 +64,14 @@ const paginasInput = document.getElementById("paginas");
 const categoriaInput = document.getElementById("categoria");
 const portadaLibro = document.getElementById("portadaLibro");
 
-const listaLecturasEl = document.getElementById("listaLecturas");
+// const listaLecturasEl = document.getElementById("listaLecturas");
 const btnToggleTerminadas = document.createElement("button");
+const btnToggleTerminadasLibres = document.createElement("button");
+
 btnToggleTerminadas.textContent = "Mostrar lecturas terminadas";
-listaLecturasEl.parentNode.insertBefore(btnToggleTerminadas, listaLecturasEl.nextSibling);
+btnToggleTerminadasLibres.textContent = "Mostrar lecturas terminadas";
+
+// listaLecturasEl.parentNode.insertBefore(btnToggleTerminadas, listaLecturasEl.nextSibling);
 const btnBuscar = document.getElementById("btnBuscar");
 
 const usuarioXP = document.getElementById("xpUsuario");
@@ -77,6 +81,14 @@ const usuarioMonedas = document.getElementById("usuarioMonedas");
 const btnAsignarAdmin = document.getElementById("btn-asignar-admin");
 const btnNuevoReto = document.getElementById("btn-nuevo-reto");
 const selectAdmin = document.getElementById("selectAdmin");
+
+const listaRetosEl = document.getElementById("listaRetos");
+btnToggleTerminadas.textContent = "Mostrar lecturas terminadas";
+listaRetosEl.parentNode.insertBefore(btnToggleTerminadas, listaRetosEl.nextSibling);
+
+const listaLibresEl = document.getElementById("listaLibres");
+btnToggleTerminadas.textContent = "Mostrar lecturas terminadas";
+listaLibresEl.parentNode.insertBefore(btnToggleTerminadasLibres, listaLibresEl.nextSibling);
 
 let modoCrearReto = false;
 
@@ -96,6 +108,7 @@ let usuarioData = null;
 let lecturasCache = [];
 let retoCache = null;
 let mostrarTerminados = false;
+let mostrarTerminadosLibres = false;
 
 
 onAuthStateChanged(auth, async (user) => {
@@ -654,6 +667,88 @@ usuarioData.monedas += recompensa.monedas;
 
 // ---------------- PINTAR LECTURAS ----------------
 function pintarLecturas() {
+  listaRetosEl.innerHTML = "";
+  listaLibresEl.innerHTML = "";
+
+  const lista = mostrarTerminados
+    ? lecturasCache
+    : lecturasCache.filter(l => l.activa);
+
+  lista.forEach((l) => {
+   const card = document.createElement("div");
+card.className = "lectura-card";
+card.dataset.id = l.id; // ✅ Esto es clave
+
+    if (l.esReto) {
+      card.classList.add("reto");
+    } else {
+      card.classList.add("libre");
+    }
+
+    card.innerHTML = `
+      <span class="badge ${l.esReto ? "reto" : "libre"}">
+        ${l.esReto ? "🏆 Reto mensual" : "📚 Lectura libre"}
+      </span>
+
+      <div class="lectura-info">
+        <strong>${l.titulo}</strong><br>
+        <small>${l.autor}</small>
+      </div>
+
+      <div class="lectura-progreso">
+        <div class="barra">
+          <div class="fill" style="width:${l.progreso || 0}%"></div>
+        </div>
+        <span>${l.progreso || 0}%</span>
+      </div>
+
+      <div class="lectura-acciones">
+        <button class="btn-progreso" data-delta="-10">-10%</button>
+        <button class="btn-progreso" data-delta="10">+10%</button>
+
+        <button class="btn-terminar">
+          ${l.esReto ? "🏆 Terminar reto" : "📗 Terminar libro"}
+        </button>
+
+        <button class="btn-eliminar">❌</button>
+      </div>
+    `;
+
+    // Eventos progreso
+    card.querySelectorAll(".btn-progreso").forEach(btn => {
+      btn.onclick = () => cambiarProgreso(l, Number(btn.dataset.delta));
+    });
+
+    // Terminar
+    card.querySelector(".btn-terminar").onclick = () => terminarLectura(l);
+
+    // Eliminar
+    card.querySelector(".btn-eliminar").onclick = async () => {
+      const texto = l.esReto
+        ? "⚠️ ¿Eliminar este reto?"
+        : "⚠️ ¿Eliminar esta lectura?";
+
+      if (!confirm(texto)) return;
+
+      await deleteDoc(
+        doc(db, "users", usuarioActual.uid, "lecturas", l.id)
+      );
+
+      lecturasCache = lecturasCache.filter(x => x.id !== l.id);
+      pintarLecturas();
+    };
+
+    // 👉 AQUÍ está la separación REAL
+    if (l.esReto) {
+      listaRetosEl.appendChild(card);
+    } else {
+      listaLibresEl.appendChild(card);
+    }
+  });
+}
+
+/*
+function pintarLecturas() {
   listaLecturasEl.innerHTML = "";
 
   const lista = mostrarTerminados
@@ -722,6 +817,9 @@ function pintarLecturas() {
 };
   });
 }
+*/
+
+
 
 // ---------------- TOGGLE TERMINADAS ----------------
 btnToggleTerminadas.addEventListener("click", () => {
@@ -731,6 +829,17 @@ btnToggleTerminadas.addEventListener("click", () => {
     : "Mostrar lecturas terminadas";
   pintarLecturas();
 });
+
+// ---------------- TOGGLE TERMINADAS ----------------
+btnToggleTerminadasLibres.addEventListener("click", () => {
+  mostrarTerminadosLibres = !mostrarTerminadosLibres;
+  btnToggleTerminadasLibres.textContent = mostrarTerminadosLibres
+    ? "Ocultar lecturas terminadas"
+    : "Mostrar lecturas terminadas";
+  pintarLecturas();
+});
+
+
 
 // ---------------- BÚSQUEDA LIBROS ----------------
 async function buscarLibros(texto) {
@@ -930,4 +1039,30 @@ function asegurarCategoriaEnSelect(categoria) {
   }
 
   categoriaInput.value = categoria;
+}
+async function cambiarProgreso(lectura, delta) {
+  // Ajustar el progreso localmente
+  lectura.progreso = Math.min(100, Math.max(0, (lectura.progreso || 0) + delta));
+
+  // Actualizar la barra visual
+  const cardReto = [...listaRetosEl.children].find(c => c.dataset.id === lectura.id);
+  const cardLibre = [...listaLibresEl.children].find(c => c.dataset.id === lectura.id);
+
+  [cardReto, cardLibre].forEach(card => {
+    if (card) {
+      const fill = card.querySelector(".fill");
+      const span = card.querySelector(".lectura-progreso span");
+
+      fill.style.width = lectura.progreso + "%";
+      span.textContent = lectura.progreso + "%";
+    }
+  });
+
+  // Guardar progreso en Firestore
+  try {
+    const lecturaRef = doc(db, "users", usuarioActual.uid, "lecturas", lectura.id);
+    await updateDoc(lecturaRef, { progreso: lectura.progreso });
+  } catch (error) {
+    console.error("Error guardando progreso:", error);
+  }
 }
