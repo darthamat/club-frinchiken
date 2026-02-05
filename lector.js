@@ -168,7 +168,16 @@ actualizarBotonesAdmin();
 
   actualizarXP(false); // ⛔ sin alert al cargar
 
-  //pintarLogros();
+ usuarioData.objetos = data.objetos ?? [];
+  aplicarEfectosObjetos();
+  pintarObjetos();  // <--- aquí
+
+  usuarioData.objetos.push(recompensa.objeto.nombre);
+await updateDoc(doc(db, "users", usuarioActual.uid), {
+  objetos: arrayUnion(recompensa.objeto.nombre)
+});
+aplicarEfectosObjetos();
+pintarObjetos();  // <--- actualizar UI
 }
 
 function actualizarBotonesAdmin() {
@@ -650,15 +659,35 @@ async function buscarLibros(texto) {
 
 
 // ---------------- RECOMPENSAS ----------------
-function generarRecompensas(paginas) {
+async function generarRecompensas(paginas) {
   const maxMonedas = Math.max(1, Math.floor(paginas * 0.4));
   const monedas = Math.floor(Math.random() * maxMonedas) + 1;
 
   const rand = Math.random() * 100;
   let objeto = null;
 
-  if (rand > 95) objeto = OBJETOS_LEGENDARIOS[Math.floor(Math.random() * OBJETOS_LEGENDARIOS.length)];
+  // Elegir objeto legendario aleatorio
+  if (rand > 95) {
+    // Filtrar solo los que nadie tiene
+    const disponibles = [];
+    for (const obj of OBJETOS_LEGENDARIOS) {
+      const q = query(
+        collection(db, "users"),
+        where("objetos", "array-contains", obj.nombre)
+      );
+      const snap = await getDocs(q);
+      if (snap.empty) disponibles.push(obj);
+    }
+
+    if (disponibles.length > 0) {
+      objeto = disponibles[Math.floor(Math.random() * disponibles.length)];
+    }
+  }
+  // ... efecto raro
   else if (rand > 85) objeto = OBJETOS_RAROS[Math.floor(Math.random() * OBJETOS_RAROS.length)];
+
+  //...magicos
+   else if (rand > 90) objeto = OBJETOS_MAGICOS[Math.floor(Math.random() * OBJETOS_MAGICOS.length)];
 
   return { monedas, objeto };
 }
@@ -989,26 +1018,44 @@ async function cargarUsuariosParaAdmin() {
   }
 }
 
-//function actualizarUIAdmin(usuario) {
-//  const puedeAsignar =
-//    usuario.role === "admin" || usuario.tipoAdmin === "retador";
-//
-//  document.querySelector(".botones-admin").style.display =
-//    puedeAsignar ? "block" : "none";
-//}
-//
-//async function transferirRetador(nuevoUid) {
-//  const batch = writeBatch(db);
-//
-//  // Quitar poder al actual
-//  batch.update(doc(db, "users", auth.currentUser.uid), {
-//    tipoAdmin: deleteField()
-//  });
-//
-//  // Dar poder al nuevo
-//  batch.update(doc(db, "users", nuevoUid), {
-//    tipoAdmin: "retador"
-//  });
-//
-//  await batch.commit();
-//}
+function pintarObjetos() {
+  const cont = document.getElementById("listaObjetos");
+  cont.innerHTML = "";
+
+  if (!usuarioData.objetos || usuarioData.objetos.length === 0) {
+    cont.textContent = "No tienes objetos legendarios";
+    return;
+  }
+
+  usuarioData.objetos.forEach(obj => {
+    // Icono de ejemplo según objeto
+    let icono = "💠";
+    if (obj.includes("Anillo")) icono = "💍";
+    if (obj.includes("dragon")) icono = "🐉";
+    if (obj.includes("Espada")) icono = "🗡️";
+    if (obj.includes("Gafas")) icono = "👓";
+    if (obj.includes("Tiara")) icono = "👑";
+    if (obj.includes("Libro")) icono = "📚";
+    if (obj.includes("Armadura")) icono = "🛡️";
+    if (obj.includes("Pipa")) icono = "🚬";
+    if (obj.includes("Granada")) icono = "🍎";
+
+    // Efecto asociado
+    let efecto = "";
+    switch(obj) {
+      case "El Anillo Único": efecto = "+5 nivel"; break;
+      case "Tiara de Donut": efecto = "+25 nivel épico"; break;
+      case "Espada de Gandalf": efecto = "+50 prestigio"; break;
+      default: efecto = "+XP extra"; break;
+    }
+
+    const card = document.createElement("div");
+    card.className = "objeto-card";
+    card.innerHTML = `
+      <span class="icono">${icono}</span>
+      <strong>${obj}</strong>
+      <small>${efecto}</small>
+    `;
+    cont.appendChild(card);
+  });
+}

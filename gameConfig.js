@@ -40,37 +40,41 @@ export const OBJETOS_RAROS = [
 ];
 
 // 🟡 Objetos legendarios
-export const OBJETOS_LEGENDARIOS = [
+export const OBJETOS_MAGICOS = [
   {
     id: "grimorio_eterno",
     nombre: "Grimorio Eterno",
     descripcion: "Duplica la XP de los retos completados",
     multiplicadorXP: 2,
-    rareza: "legendario"
+    rareza: "epico"
   },
   {
     id: "biblioteca_ancestral",
     nombre: "Biblioteca Ancestral",
     descripcion: "Otorga prestigio adicional por cada reto",
-    bonusPrestigio: 1,
-    rareza: "legendario"
+    bonusPrestigio: 100,
+    rareza: "epico"
   },
-   "El Anillo Único",
-  "Un huevo de dragon de Daenerys",
-  "La dragonlance",
-  "La segunda bola de dragon",
-  "Sombrero de Terry Pratchett",
-  "Tercer libro de El nombre del Viento",
-  "La granada de Antioquia",
-  "Chapines de rubies",
-  "La pipa de Bilbo",
-  "Tiara de Donut",
-  "eBook de Mithril",
-  "Gafas de lectura Jhony N5",
-  "Espada de Gandalf",
-  "Armadura de páginas de la primera Biblia"
+  ];
 
+export const OBJETOS_LEGENDARIOS = [
+  { nombre: "El Anillo Único", unico: true },
+  { nombre: "Un huevo de dragon de Daenerys", unico: true },
+  { nombre: "La dragonlance", unico: true },
+  { nombre: "La segunda bola de dragon", unico: true },
+  { nombre: "Sombrero de Terry Pratchett", unico: true },
+  { nombre: "Tercer libro de El nombre del Viento", unico: true },
+  { nombre: "La granada de Antioquia", unico: true },
+  { nombre: "Chapines de rubies", unico: true },
+  { nombre: "La pipa de Bilbo", unico: true },
+  { nombre: "Tiara de Donut", unico: true },
+  { nombre: "eBook de Mithril", unico: true },
+  { nombre: "Gafas de lectura Jhony N5", unico: true },
+  { nombre: "Espada de Gandalf", unico: true },
+  { nombre: "Armadura de páginas de la primera Biblia", unico: true }
 ];
+
+
 
 // 🏆 Logros posibles
 export const LOGROS = [
@@ -89,7 +93,7 @@ export const LOGROS = [
   {
     id: "heroe_del_reto",
     nombre: "Héroe del reto",
-    descripcion: "Completa un reto mensual"
+    descripcion: "Termina el primero el reto mensual"
   },
     // 🧩 RETOS
 
