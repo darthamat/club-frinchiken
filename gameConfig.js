@@ -127,7 +127,7 @@ export const LOGROS = [
   },
    {
     id: "terror",
-    titulo: "Mal  rollito por leer libros de miedo por la noche",
+    titulo: "Mal  rollito por leer libros de miedo de noche",
     descripcion: "Leíste un libro de terror",
     condicion: (l) => l.categoria?.toLowerCase().includes("terror")
   },
@@ -137,7 +137,7 @@ export const LOGROS = [
     id: "nocturno",
     titulo: "Lector/a nocturno",
     descripcion: "Terminaste un libro entre las 00:00 y las 06:00",
-    condicion: () => {
+    condicion: (lecturasCache) => {
       const h = new Date().getHours();
       return h >= 0 && h < 6;
     }
@@ -145,7 +145,7 @@ export const LOGROS = [
 {
   id: "mes_10_libros",
   titulo: "Devorador/a de libros",
-  condicion: () => {
+  condicion: (lecturasCache) => {
     const ahora = new Date();
     const mes = ahora.getMonth();
     const año = ahora.getFullYear();
@@ -162,7 +162,7 @@ export const LOGROS = [
 {
   id: "mes_5_libros",
   titulo: "Super lector/a",
-  condicion: () => {
+ condicion: (lecturasCache) => {
     const ahora = new Date();
     const mes = ahora.getMonth();
     const año = ahora.getFullYear();
@@ -180,7 +180,7 @@ export const LOGROS = [
 {
   id: "anio_20_libros",
   titulo: "Devorador/a de libros",
-  condicion: () => {
+condicion: (lecturasCache) => {
     const añoActual = new Date().getFullYear();
 
     const librosAnio = lecturasCache.filter(l => {
@@ -196,7 +196,7 @@ export const LOGROS = [
 {
   id: "anio_30_libros",
   titulo: "Devorador/a de bibliotecas",
-  condicion: () => {
+ condicion: (lecturasCache) => {
     const añoActual = new Date().getFullYear();
 
     const librosAnio = lecturasCache.filter(l => {
