@@ -80,26 +80,8 @@
 
   </section>
 
- <!-- <section class="panel reto">
 
-  <h3>🏆 Reto mensual</h3>
-
-  <img id="retoPortada">
-  <p id="retoTitulo"></p>
-  <p id="retoAutor"></p>
-
-  <div class="progress-bar gold">
-    <div id="retoProgreso"></div>
-  </div>
-
-  <button class="btn-gold" id="btnTerminarReto">
-    🏆 Completar reto
-  </button>
-</section>
-
--->
-
-<section class="panel registro-lectura2">
+<section class="panel lectura retos">
   <h3>🏆 Retos activos</h3>
   <div id="listaRetos"></div>
 </section>
@@ -173,26 +155,22 @@
 
 </section>
 
-    <!-- ==================== LECTURA ACTUAL ====================
-  <section class="panel lectura">
-    <h3>📖 Leyendo actualmente</h3>
-    <p id="tituloReto">Cargando libro del reto...</p>
-    <ul id="listaLecturas"></ul>
-
-    <div class="progress-bar">
-      <div class="progress-fill" id="progresoReto"></div>
-    </div>
-
-    <button id="btnActualizarProgreso">Actualizar progreso</button>
-    <button class="gold" id="btnTerminarLibro">Libro terminado</button>
-  </section>
--->
 
 </div>
 
+  <div id="terminadasModal" class="modal hidden">
+  <h3>Lecturas terminadas</h3>
+  <ul id="listaTerminadas"></ul>
+  <button id="cerrarTerminadas">✖ Cerrar</button>
+</div>
+
+
+
 <script type="module" src="lector.js"></script>
 </body>
+
 </html>
+
 
 
 

@@ -229,6 +229,23 @@ button.gold {
   gap: 10px;
 }
 
+.lectura {
+  background: #1e1e1e;
+  border: 3px solid #333;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+ }
+
+.reto {
+    border: 2px solid #333;
+  border-color: gold;
+}
+
+
 /* 🔥 RETO ACTUAL */
 .reto-card {
   border: 3px solid gold;
@@ -295,3 +312,20 @@ button.gold {
   max-width: 700px;
   margin: 20px auto;
 }
+.modal {
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #444;
+  border: 1px solid #ccc;
+  padding: 16px;
+  z-index: 1000;
+  max-height: 60%;
+  overflow-y: auto;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+.modal.hidden { display: none; }
+.modal ul { list-style: none; padding: 0; }
+.modal li { display: flex; justify-content: space-between; margin-bottom: 4px; }
+.modal li button { background: transparent; border: none; color: red; cursor: pointer; }

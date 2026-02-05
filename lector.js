@@ -90,6 +90,10 @@ const listaLibresEl = document.getElementById("listaLibres");
 btnToggleTerminadas.textContent = "Mostrar lecturas terminadas";
 listaLibresEl.parentNode.insertBefore(btnToggleTerminadasLibres, listaLibresEl.nextSibling);
 
+const terminadasModal = document.getElementById("terminadasModal");
+const listaTerminadasEl = document.getElementById("listaTerminadas");
+const cerrarTerminadasBtn = document.getElementById("cerrarTerminadas");
+
 let modoCrearReto = false;
 
 let usuarioActual = {
@@ -146,8 +150,8 @@ async function cargarPerfilUsuario() {
     nivel: data.nivel ?? 1,
     experienciaNecesario:
       data.experienciaNecesario ?? xpNecesariaParaNivel(data.nivel ?? 1),
-    prestigio: data.prestigio ?? 0,
-    monedas: data.monedas ?? 0,
+   prestigio: Number(data.prestigio) || 0,
+    monedas: Number(data.monedas) || 0,
     logros: data.logros ?? {},
     nombrePersonaje: data.nombrePersonaje,
     clase: data.clase
@@ -272,6 +276,8 @@ selectAdmin.addEventListener("change", async () => {
 
 btnNuevoReto.addEventListener("click", activarModoCrearReto);
 
+
+/*
 function activarModoCrearReto() {
   modoCrearReto = true;
 
@@ -283,6 +289,7 @@ function activarModoCrearReto() {
 
   mostrarMensajeReto("📖 Selecciona el libro para el nuevo reto");
 }
+*/
 
 function mostrarMensajeReto(texto) {
   const msg = document.getElementById("mensajeReto");
@@ -298,28 +305,60 @@ async function crearRetoConLibro(libro) {
     portadaUrl: libro.portadaUrl ?? null,
     paginas: libro.paginas ?? 0,
     creadoPor: usuarioActual.uid,
-    fecha: new Date()
+    fecha: new Date(),
+    esReto: true,
+    activa: true,
+    progreso: 0
   };
 
-  // 1️⃣ Guardar reto "actual"
+  // 1️⃣ Guardar reto "actual" en Firestore (colección general de retos)
   await setDoc(doc(db, "retos", "reto-actual"), retoData);
 
-  // 2️⃣ Crear documento histórico
-  // Obtenemos el año y mes para generar algo tipo "actual2601", "actual2602", ...
-  const ahora = new Date();
-  const idHistorico = await generarIdRetoHistorico();
+  // 2️⃣ Guardar reto en lecturas del usuario **solo si no hay uno activo**
+  const yaExiste = lecturasCache.some(l => l.esReto && l.activa);
+  if (!yaExiste) {
+    const ref = await addDoc(
+      collection(db, "users", usuarioActual.uid, "lecturas"),
+      retoData
+    );
 
-  await setDoc(doc(db, "retos", idHistorico), retoData);
+    // Añadir al cache con el ID de Firestore
+   lecturasCache.unshift({
+  id: ref.id,
+  ...retoData,
+  esReto: true,
+  activa: true,
+  progreso: 0
+});
+  } else {
+    alert("⚠️ Ya tienes un reto activo. Termínalo antes de crear uno nuevo.");
+    return;
+  }
+mostrarTerminados = true;
+   mostrarMensajeReto("✅ Nuevo reto creado");
+alert("🏆 Nuevo reto creado con éxito");
+pintarLecturas();
+  // 3️⃣ Reset modo reto y actualizar UI
 
-  modoCrearReto = false;
+   modoCrearReto = false;
+  btnRegistrar.textContent = "Registrar lectura";
 
-  // Mensaje de éxito
-  document.querySelector(".registro-lectura").classList.remove("modo-reto");
-  document.getElementById("mensajeReto").textContent = "✅ Nuevo reto creado";
 
-  setTimeout(() => {
-    document.getElementById("mensajeReto").classList.add("hidden");
-  }, 2000);
+
+
+  // Limpiar formulario
+  tituloInput.value = "";
+  autorInput.value = "";
+  paginasInput.value = "";
+  categoriaInput.value = "";
+  portadaLibro.src = "https://via.placeholder.com/120x180";
+
+  // Pintar lecturas
+  pintarLecturas();
+
+  const panelRetos = document.querySelector(".retos");
+panelRetos.scrollIntoView({ behavior: "smooth", block: "center" });
+
 }
 
 // Función para generar un ID histórico secuencial
@@ -339,7 +378,7 @@ async function generarIdRetoHistorico() {
 
   // Siguiente número
   const nuevoNumero = maxNumero + 1;
-  return `actual${nuevoNumero}`;
+  return `2026--{nuevoNumero}`;
 }
 
 // ------------------ SELECCIONAR LIBRO ------------------
@@ -347,23 +386,17 @@ function seleccionarLibro(libro) {
   // Rellenar el formulario con los datos del libro
   rellenarFormularioLectura(libro);
 
+  // Cambiar comportamiento del botón según modo
   if (modoCrearReto) {
-    // Cambiar botón de registrar a "Registrar nuevo reto"
     btnRegistrar.textContent = "Registrar nuevo reto";
 
-    // Cuando se haga click, crear el reto en Firestore
-    btnRegistrar.onclick = async () => {
-      await crearRetoConLibro(libro);
 
-      // Volver el botón a su estado normal
-      btnRegistrar.textContent = "Registrar lectura";
-      btnRegistrar.onclick = registrarLecturaNormal; // función original de registrar lectura
-    };
   } else {
-    // Si no estamos creando un reto, aseguramos que el botón funcione normalmente
+    // Lectura normal
     btnRegistrar.textContent = "Registrar lectura";
-    btnRegistrar.onclick = registrarLecturaNormal;
+
   }
+  pintarLecturas();
 }
 
 // ------------------ RELLENAR FORMULARIO ------------------
@@ -397,32 +430,34 @@ async function registrarLecturaNormal() {
     fechaInicio: new Date()
   };
 
-  if (!lectura.titulo || !lectura.autor) return alert("Faltan datos");
+  if (!lectura.titulo || !lectura.autor) {
+    return alert("Faltan datos");
+  }
 
+  // Guardar en Firestore
   const ref = await addDoc(
     collection(db, "users", usuarioActual.uid, "lecturas"),
     lectura
   );
 
+  // Guardar en cache local y pintar
   lecturasCache.unshift({ id: ref.id, ...lectura });
   pintarLecturas();
 
-  // Limpiar inputs
+  // Limpiar formulario y resultados
   tituloInput.value = "";
   autorInput.value = "";
   paginasInput.value = "";
   categoriaInput.value = "";
   portadaLibro.src = "https://via.placeholder.com/120x180";
-
   busquedaLibro.value = "";
   resultados.innerHTML = "";
   resultados.classList.add("hidden");
 }
 
 function actualizarXP(mostrarAlert = false) {
-  if (!usuarioData.experienciaNecesario || usuarioData.experienciaNecesario <= 0) {
-    usuarioData.experienciaNecesario = xpNecesariaParaNivel(usuarioData.nivel);
-  }
+usuarioData.experienciaNecesario =
+  xpNecesariaParaNivel(usuarioData.nivel);
 
   while (usuarioData.experiencia >= usuarioData.experienciaNecesario) {
     usuarioData.experiencia -= usuarioData.experienciaNecesario;
@@ -454,146 +489,63 @@ async function cargarReto() {
 }
 
 btnReto.addEventListener("click", async () => {
-  const reto = await cargarReto();
-  if (!reto) return;
+  const snap = await getDoc(doc(db, "retos", "reto-actual"));
+  if (!snap.exists()) {
+    alert("No hay un reto activo");
+    return;
+  }
 
+  const reto = snap.data();
+
+  // Solo rellenar formulario (visual)
   tituloInput.value = reto.titulo || "";
   autorInput.value = reto.autor || "";
   paginasInput.value = reto.paginas || "";
   categoriaInput.value = reto.categoria || "";
-  portadaLibro.src = reto.portadaUrl || "";
-});
+  portadaLibro.src = reto.portadaUrl || "https://via.placeholder.com/120x180";
 
-// ---------------- REGISTRAR LECTURA ----------------
-btnRegistrar.addEventListener("click", async () => {
-  if (!tituloInput.value || !autorInput.value) return alert("Faltan datos");
-
-  if (modoCrearReto) {
-    // Crear reto en Firestore
-    await setDoc(doc(db, "retos", "reto-actual"), {
-      titulo: tituloInput.value,
-      autor: autorInput.value,
-      paginas: Number(paginasInput.value),
-      categoria: categoriaInput.value || "",
-      portadaUrl: portadaLibro.src,
-      creadoPor: usuarioActual.uid,
-      fecha: new Date()
-    });
-
-    alert("📚 Nuevo reto creado con éxito!");
-
-    modoCrearReto = false;
-    btnRegistrar.textContent = "Registrar lectura";
-    mostrarMensajeReto("Selecciona un libro para registrar una lectura");
-
-    // Limpiar campos si quieres
-    tituloInput.value = "";
-    autorInput.value = "";
-    paginasInput.value = "";
-    categoriaInput.value = "";
-    portadaLibro.src = "https://via.placeholder.com/120x180";
-
-    resultados.innerHTML = "";
-    resultados.classList.add("hidden");
-  } else {
-    // Código normal de registrar lectura
-    const lectura = {
-      titulo: tituloInput.value.trim(),
-      autor: autorInput.value.trim(),
-      paginas: Number(paginasInput.value) || 0,
-      categoria: categoriaInput?.value ?? "",
-      activa: true,
-      progreso: 0,
-      esReto: false,
-      fechaInicio: new Date()
-    };
-
-    const ref = await addDoc(
-      collection(db, "users", usuarioActual.uid, "lecturas"),
-      lectura
-    );
-
-    lecturasCache.unshift({ id: ref.id, ...lectura });
-    pintarLecturas();
-
-    // Limpiar inputs
-    tituloInput.value = "";
-    autorInput.value = "";
-    paginasInput.value = "";
-    categoriaInput.value = "";
-    portadaLibro.src = "https://via.placeholder.com/120x180";
-
-    resultados.innerHTML = "";
-    resultados.classList.add("hidden");
-  }
 });
 
 
-  // Cambiar texto del botón
-  btnRegistrar.textContent = "Registrar nuevo reto";
-
-  // Limpiar campos
-  tituloInput.value = "";
-  autorInput.value = "";
-  paginasInput.value = "";
-  categoriaInput.value = "";
-  portadaLibro.src = "https://via.placeholder.com/120x180";
-
-  // Mostrar mensaje
-  mostrarMensajeReto("📖 Selecciona el libro para el nuevo reto");
-
-  // Hacer scroll al panel
-  document.querySelector(".registro-lectura").scrollIntoView({
-    behavior: "smooth",
-    block: "center"
-  });
 
 
 // ---------------- CARGAR LECTURAS ----------------
 async function cargarLecturas() {
+  if (!usuarioActual) return;
+
   const snap = await getDocs(
-    query(collection(db, "users", usuarioActual.uid, "lecturas"))
+    collection(db, "users", usuarioActual.uid, "lecturas")
   );
 
-  lecturasCache = [];
-  snap.forEach(d => lecturasCache.push({ id: d.id, ...d.data() }));
+  lecturasCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-  // Añadir reto si no existe en Firestore
-  const reto = await cargarReto();
-  const retoEnFirestore = lecturasCache.find(l => l.esReto);
+  // Traer reto actual
+  const snapReto = await getDoc(doc(db, "retos", "reto-actual"));
+  if (snapReto.exists()) {
+    const retoActual = snapReto.data();
 
-  if (reto && !retoEnFirestore) {
-    const ref = await addDoc(
-      collection(db, "users", usuarioActual.uid, "lecturas"),
-      {
-        titulo: reto.titulo,
-        autor: reto.autor,
-        categoria: reto.categoria ?? "",
-        paginas: reto.paginas ?? 0,
+    // Evitar duplicar: comprobar si ya existe un reto activo
+    const existeReto = lecturasCache.some(l => l.esReto && l.activa);
+
+    if (!existeReto) {
+      lecturasCache.unshift({
+        id: "reto-actual",
+        ...retoActual,
         activa: true,
         progreso: 0,
-        esReto: true,
-        fechaInicio: new Date()
-      }
-    );
-    lecturasCache.unshift({
-  id: ref.id,
-  titulo: reto.titulo,
-  autor: reto.autor,
-  categoria: reto.categoria,
-  paginas: reto.paginas,
-  activa: true,
-  progreso: 0,
-  esReto: true,
-  fechaInicio: new Date()
-});
+        esReto: true
+      });
+    }
   }
 
+  // Pintar los paneles
   pintarLecturas();
-  await comprobarLogrosGlobales();
-pintarLogros();
 
+  // Comprobar logros globales
+  await comprobarLogrosGlobales();
+  pintarLogros();
 }
+
 
 async function comprobarLogrosGlobales() {
   for (const l of lecturasCache) {
@@ -603,240 +555,96 @@ async function comprobarLogrosGlobales() {
 
 // ---------------- TERMINAR LECTURA ----------------
 async function terminarLectura(l) {
-  if (!usuarioActual) return;
+  if (!usuarioActual || !l?.id) {
+    console.error("Lectura inválida:", l);
+    return;
+  }
 
   const userRef = doc(db, "users", usuarioActual.uid);
   const lecturaRef = doc(db, "users", usuarioActual.uid, "lecturas", l.id);
 
-  // Marcar lectura como inactiva
   await updateDoc(lecturaRef, {
     activa: false,
+    progreso: 100,
     fechaFin: new Date()
   });
 
   l.activa = false;
 
-  // RPG logic
   if (l.esReto) {
-  usuarioData.experiencia += l.paginas;
+    usuarioData.xp += Number(l.paginas);
+    actualizarXP();
 
-  actualizarXP();
+    await updateDoc(userRef, {
+      xp: usuarioData.xp,
+      nivel: usuarioData.nivel,
+      experienciaNecesaria: usuarioData.experienciaNecesaria
+    });
 
-  await updateDoc(userRef, {
-    experiencia: usuarioData.experiencia,
-    nivel: usuarioData.nivel,
-    experienciaNecesario: usuarioData.experienciaNecesario
-  });
-
-  alert(`🎉 ¡Reto completado! +${l.paginas} XP`);
-
-
-    
+    alert(`🏆 Reto completado (+${l.paginas} XP)`);
   } else {
-    await updateDoc(userRef, { prestigio: increment(l.paginas) });
-    
-    usuarioPrestigio.textContent = Number(usuarioPrestigio.textContent) + l.paginas;
-    
-    alert(`⭐ Lectura completada. Prestigio + ${l.paginas}`);
-  }
+    usuarioData.prestigio += Number(l.paginas);
 
+    await updateDoc(userRef, {
+      prestigio: usuarioData.prestigio
+    });
+
+    usuarioPrestigio.textContent = usuarioData.prestigio;
+    alert(`⭐ Lectura completada (+${l.paginas} prestigio)`);
+  }
 
   const recompensa = generarRecompensas(l.paginas);
 
   if (recompensa.monedas) {
-    await updateDoc(userRef, { monedas: increment(recompensa.monedas) });
-   
-    usuarioMonedas.textContent =
-    Number(usuarioMonedas.textContent) + recompensa.monedas;
+    usuarioData.monedas += recompensa.monedas;
 
-usuarioData.monedas += recompensa.monedas;
-  usuarioMonedas.textContent = usuarioData.monedas;
-    
-    alert(`💰 Has conseguido ${recompensa.monedas} marcapáginas!`);
+    await updateDoc(userRef, {
+      monedas: usuarioData.monedas
+    });
+
+    usuarioMonedas.textContent = usuarioData.monedas;
+    alert(`💰 Has conseguido ${recompensa.monedas} marcapáginas`);
   }
 
   if (recompensa.objeto) {
-    alert(`🎁 Has encontrado un objeto mágico: ${recompensa.objeto}`);
+    alert(`🎁 Objeto mágico: ${recompensa.objeto}`);
   }
 
   pintarLecturas();
   await comprobarLogros(l);
-  
-  
 }
 
-// ---------------- PINTAR LECTURAS ----------------
+
 function pintarLecturas() {
+  // Limpiar paneles
   listaRetosEl.innerHTML = "";
   listaLibresEl.innerHTML = "";
 
-  const lista = mostrarTerminados
-    ? lecturasCache
-    : lecturasCache.filter(l => l.activa);
+  // Filtrar listas
+  const listaRetos = lecturasCache.filter(l => l.esReto).filter(l => mostrarTerminados || l.activa);
+  const listaLibres = lecturasCache.filter(l => !l.esReto).filter(l => mostrarTerminadosLibres || l.activa);
 
-  lista.forEach((l) => {
-   const card = document.createElement("div");
-card.className = "lectura-card";
-card.dataset.id = l.id; // ✅ Esto es clave
+  // Pintar panel de retos
+  listaRetos.forEach(l => {
+    const card = crearCardLectura(l);
+    listaRetosEl.appendChild(card);
+  });
 
-    if (l.esReto) {
-      card.classList.add("reto");
-    } else {
-      card.classList.add("libre");
-    }
-
-    card.innerHTML = `
-      <span class="badge ${l.esReto ? "reto" : "libre"}">
-        ${l.esReto ? "🏆 Reto mensual" : "📚 Lectura libre"}
-      </span>
-
-      <div class="lectura-info">
-        <strong>${l.titulo}</strong><br>
-        <small>${l.autor}</small>
-      </div>
-
-      <div class="lectura-progreso">
-        <div class="barra">
-          <div class="fill" style="width:${l.progreso || 0}%"></div>
-        </div>
-        <span>${l.progreso || 0}%</span>
-      </div>
-
-      <div class="lectura-acciones">
-        <button class="btn-progreso" data-delta="-10">-10%</button>
-        <button class="btn-progreso" data-delta="10">+10%</button>
-
-        <button class="btn-terminar">
-          ${l.esReto ? "🏆 Terminar reto" : "📗 Terminar libro"}
-        </button>
-
-        <button class="btn-eliminar">❌</button>
-      </div>
-    `;
-
-    // Eventos progreso
-    card.querySelectorAll(".btn-progreso").forEach(btn => {
-      btn.onclick = () => cambiarProgreso(l, Number(btn.dataset.delta));
-    });
-
-    // Terminar
-    card.querySelector(".btn-terminar").onclick = () => terminarLectura(l);
-
-    // Eliminar
-    card.querySelector(".btn-eliminar").onclick = async () => {
-      const texto = l.esReto
-        ? "⚠️ ¿Eliminar este reto?"
-        : "⚠️ ¿Eliminar esta lectura?";
-
-      if (!confirm(texto)) return;
-
-      await deleteDoc(
-        doc(db, "users", usuarioActual.uid, "lecturas", l.id)
-      );
-
-      lecturasCache = lecturasCache.filter(x => x.id !== l.id);
-      pintarLecturas();
-    };
-
-    // 👉 AQUÍ está la separación REAL
-    if (l.esReto) {
-      listaRetosEl.appendChild(card);
-    } else {
-      listaLibresEl.appendChild(card);
-    }
+  // Pintar panel de libres
+  listaLibres.forEach(l => {
+    const card = crearCardLectura(l);
+    listaLibresEl.appendChild(card);
   });
 }
-
-/*
-function pintarLecturas() {
-  listaLecturasEl.innerHTML = "";
-
-  const lista = mostrarTerminados
-    ? lecturasCache
-    : lecturasCache.filter(l => l.activa);
-
-  lista.forEach((l) => {
-    const card = document.createElement("div");
-    card.className = "lectura-card";
-
-    if (l.esReto) {
-      card.classList.add("reto-card");
-    }
-
-    card.innerHTML = `
-      <div class="lectura-info">
-        <strong>${l.titulo}</strong><br>
-        <small>${l.autor}</small>
-      </div>
-
-      <div class="lectura-progreso">
-        <div class="barra">
-          <div class="fill" style="width:${l.progreso || 0}%"></div>
-        </div>
-        <span>${l.progreso || 0}%</span>
-      </div>
-
-  <div class="lectura-acciones">
-  <button class="btn-progreso" data-delta="-10">-10%</button>
-  <button class="btn-progreso" data-delta="10">+10%</button>
-
-  <button class="btn-terminar">
-    ${l.esReto ? "🏆 Terminar reto" : "📗 Terminar libro"}
-  </button>
-
-  <button class="btn-eliminar" title="Eliminar lectura">❌</button>
-</div>
-    `;
-
-    // Eventos
-    card.querySelectorAll(".btn-progreso").forEach(btn => {
-      btn.onclick = () => cambiarProgreso(l, Number(btn.dataset.delta));
-    });
-
-    card.querySelector(".btn-terminar").onclick = () => terminarLectura(l);
-
-    listaLecturasEl.appendChild(card);
-
-    card.querySelector(".btn-eliminar").onclick = async () => {
-  const texto = l.esReto
-    ? "⚠️ ¿Eliminar el reto actual?"
-    : "⚠️ ¿Eliminar esta lectura?";
-
-  if (!confirm(texto)) return;
-
-  if (l.id) {
-    await deleteDoc(
-      doc(db, "users", usuarioActual.uid, "lecturas", l.id)
-    );
-  }
-
-  // Eliminar de memoria
-  lecturasCache = lecturasCache.filter(x => x.id !== l.id);
-
-  pintarLecturas();
-};
-  });
-}
-*/
-
 
 
 // ---------------- TOGGLE TERMINADAS ----------------
 btnToggleTerminadas.addEventListener("click", () => {
-  mostrarTerminados = !mostrarTerminados;
-  btnToggleTerminadas.textContent = mostrarTerminados
-    ? "Ocultar lecturas terminadas"
-    : "Mostrar lecturas terminadas";
-  pintarLecturas();
+  mostrarTerminadas("reto");
 });
 
-// ---------------- TOGGLE TERMINADAS ----------------
 btnToggleTerminadasLibres.addEventListener("click", () => {
-  mostrarTerminadosLibres = !mostrarTerminadosLibres;
-  btnToggleTerminadasLibres.textContent = mostrarTerminadosLibres
-    ? "Ocultar lecturas terminadas"
-    : "Mostrar lecturas terminadas";
-  pintarLecturas();
+  mostrarTerminadas("libre");
 });
 
 
@@ -881,12 +689,14 @@ async function buscarLibros(texto) {
 
 // ---------------- RECOMPENSAS ----------------
 function generarRecompensas(paginas) {
-  const monedas = Math.floor(Math.random() * (paginas * 1)) + 1;
+  const maxMonedas = Math.max(1, Math.floor(paginas * 0.4));
+  const monedas = Math.floor(Math.random() * maxMonedas) + 1;
+
   const rand = Math.random() * 100;
   let objeto = null;
 
-  if (rand > 95) objeto = objetosLegendarios[Math.floor(Math.random() * objetosLegendarios.length)];
-  else if (rand > 85) objeto = objetosRaros[Math.floor(Math.random() * objetosRaros.length)];
+  if (rand > 95) objeto = OBJETOS_LEGENDARIOS[Math.floor(Math.random() * OBJETOS_LEGENDARIOS.length)];
+  else if (rand > 85) objeto = OBJETOS_RAROS[Math.floor(Math.random() * OBJETOS_RAROS.length)];
 
   return { monedas, objeto };
 }
@@ -910,9 +720,7 @@ btnBuscar.addEventListener("click", async () => {
 });
 
 function xpNecesariaParaNivel(nivel) {
-  if (nivel <= 5) return 400 + (nivel - 1) * 150;
-  if (nivel <= 10) return 1300 + (nivel - 6) * 350;
-  return 3600 + (nivel - 11) * 1000;
+  return Math.floor(300 + Math.pow(nivel, 1.5) * 120);
 }
 
 //logros
@@ -1066,3 +874,138 @@ async function cambiarProgreso(lectura, delta) {
     console.error("Error guardando progreso:", error);
   }
 }
+
+// Función auxiliar para crear una card
+function crearCardLectura(l) {
+  const card = document.createElement("div");
+  card.className = "lectura-card";
+  card.dataset.id = l.id;
+
+  if (l.esReto) card.classList.add("reto");
+  else card.classList.add("libre");
+
+  card.innerHTML = `
+    <span class="badge ${l.esReto ? "re2to" : "libre"}">
+      ${l.esReto ? "🏆 Reto mensual" : "📚 Lectura libre"}
+    </span>
+
+    <div class="lectura-info">
+      <strong>${l.titulo}</strong><br>
+      <small>${l.autor}</small>
+    </div>
+
+    <div class="lectura-progreso">
+      <div class="barra">
+        <div class="fill" style="width:${l.progreso || 0}%"></div>
+      </div>
+      <span>${l.progreso || 0}%</span>
+    </div>
+
+    <div class="lectura-acciones">
+      <button class="btn-progreso" data-delta="-10">-10%</button>
+      <button class="btn-progreso" data-delta="10">+10%</button>
+      <button class="btn-terminar">${l.esReto ? "🏆 Terminar reto" : "📗 Terminar libro"}</button>
+      <button class="btn-eliminar">❌</button>
+    </div>
+  `;
+
+  // Eventos
+  card.querySelectorAll(".btn-progreso").forEach(btn => {
+    btn.onclick = () => cambiarProgreso(l, Number(btn.dataset.delta));
+  });
+
+  card.querySelector(".btn-terminar").onclick = () => terminarLectura(l);
+
+  card.querySelector(".btn-eliminar").onclick = async () => {
+    if (!confirm(l.esReto ? "⚠️ ¿Eliminar este reto?" : "⚠️ ¿Eliminar esta lectura?")) return;
+    await deleteDoc(doc(db, "users", usuarioActual.uid, "lecturas", l.id));
+    lecturasCache = lecturasCache.filter(x => x.id !== l.id);
+
+    pintarLecturas();
+  };
+
+  return card;
+}
+// Abrir modal de terminadas (puedes usarlo para retos o libres)
+function mostrarTerminadas(panel) {
+  // panel = "reto" o "libre"
+  listaTerminadasEl.innerHTML = "";
+
+  const terminadas = lecturasCache.filter(l => !l.activa && ((panel === "reto") ? l.esReto : !l.esReto));
+
+  if (terminadas.length === 0) {
+    listaTerminadasEl.innerHTML = "<li>No hay lecturas terminadas</li>";
+  } else {
+    terminadas.forEach(l => {
+      const li = document.createElement("li");
+      li.textContent = l.titulo;
+
+      const btnEliminar = document.createElement("button");
+      btnEliminar.textContent = "❌";
+      btnEliminar.onclick = async () => {
+        if (!confirm("¿Eliminar este registro?")) return;
+        await deleteDoc(doc(db, "users", usuarioActual.uid, "lecturas", l.id));
+        lecturasCache = lecturasCache.filter(x => x.id !== l.id);
+        li.remove();
+      };
+
+      li.appendChild(btnEliminar);
+      listaTerminadasEl.appendChild(li);
+    });
+  }
+
+  terminadasModal.classList.remove("hidden");
+}
+
+// Cerrar modal
+cerrarTerminadasBtn.addEventListener("click", () => {
+  terminadasModal.classList.add("hidden");
+});
+
+function activarModoCrearReto() {
+  modoCrearReto = true;
+
+  const panel = document.querySelector(".registro-lectura");
+
+
+
+  // Cambiar el botón a “Registrar nuevo reto”
+  btnRegistrar.textContent = "Registrar nuevo reto";
+
+  // Limpiar formulario para seleccionar libro
+  tituloInput.value = "";
+  autorInput.value = "";
+  paginasInput.value = "";
+  categoriaInput.value = "";
+  portadaLibro.src = "https://via.placeholder.com/120x180";
+
+  // Mostrar mensaje instructivo
+  mostrarMensajeReto("📖 Selecciona el libro para el nuevo reto");
+
+  // Hacer scroll al panel
+  panel.scrollIntoView({ behavior: "smooth", block: "center" });
+
+  // Agregar clase visual
+  panel.classList.add("modo-reto");
+
+}
+
+
+btnRegistrar.addEventListener("click", async () => {
+  if (!tituloInput.value || !autorInput.value) {
+    alert("Faltan datos");
+    return;
+  }
+
+  if (modoCrearReto) {
+    await crearRetoConLibro({
+      titulo: tituloInput.value,
+      autor: autorInput.value,
+      paginas: paginasInput.value,
+      categoria: categoriaInput.value,
+      portadaUrl: portadaLibro.src
+    });
+  } else {
+    await registrarLecturaNormal();
+  }
+});
