@@ -248,14 +248,14 @@ async function crearRetoConLibro(libro) {
   const retoRefActual = doc(db, "retos", "reto-actual");
   const snapActual = await getDoc(retoRefActual);
 
-  // Guardar el reto anterior como pendiente si existía
+  // 1️⃣ Guardar reto anterior como pendiente si existía
   if (snapActual.exists()) {
     const retoAnterior = snapActual.data();
-    retoAnterior.esActual = false; // ⬅️ marcar como pendiente
-    lecturasCache.unshift({ ...retoAnterior, activa: true, esReto: true });
+    const lecturaAnterior = lecturasCache.find(l => l.idReto === retoAnterior.idReto);
+    if (lecturaAnterior) lecturaAnterior.esActual = false;
   }
 
-  // Crear nuevo reto actual
+  // 2️⃣ Crear nuevo reto actual
   const retoData = {
     titulo: libro.titulo,
     autor: libro.autor,
@@ -272,10 +272,14 @@ async function crearRetoConLibro(libro) {
 
   await setDoc(retoRefActual, retoData);
 
-  // Añadir al cache
-  lecturasCache.unshift({ ...retoData, id: "reto-actual" });
+  // 3️⃣ Añadir al cache
+  lecturasCache.unshift({ ...retoData, idReto: "reto-actual" });
 
-  pintarRetos(); // pintar panel actualizado
+  // 4️⃣ Pintar paneles
+  pintarRetos();
+  pintarRetosPendientes();
+  pintarRetosHistoricos();
+
   alert("🏆 Nuevo reto creado con éxito");
 }
 
@@ -440,29 +444,31 @@ async function cargarLecturas() {
   const snapReto = await getDoc(doc(db, "retos", "reto-actual"));
   if (snapReto.exists()) {
     const retoActual = snapReto.data();
+    retoActual.idReto = "reto-actual";
 
     // Revisar si el usuario ya tiene este reto
-    const retoExistente = lecturasCache.find(
+    let retoExistente = lecturasCache.find(
       l => l.esReto && l.idReto === retoActual.idReto
     );
 
     if (!retoExistente) {
-      // Crear “virtual” para mostrar en panel
+      // Crear reto “virtual” para mostrar en el panel de retos actuales
       lecturasCache.unshift({
-        id: "reto-actual",
-        idReto: retoActual.idReto,
         ...retoActual,
         activa: true,
         esReto: true,
         esActual: true
       });
+    } else {
+      // marcar como actual para el panel
+      retoExistente.esActual = true;
     }
   }
 
-  // 3️⃣ Pintar paneles
-  pintarRetos(); // panel de retos actuales
-  pintarRetosPendientes(); // panel de retos pendientes
-  pintarRetosHistoricos(); // panel histórico de retos completados
+  // 3️⃣ Separar y pintar paneles
+  pintarRetos();          // solo el reto actual
+  pintarRetosPendientes(); // retos activos pero no actuales
+  pintarRetosHistoricos(); // retos completados
 }
 
 
@@ -797,9 +803,9 @@ function crearCardLectura(l) {
   card.className = "lectura-card";
   card.dataset.id = l.id;
 
-  const tipoBadge = l.esReto
-    ? l.retoActual ? "🏆 Reto mensual" : "📚 Reto antiguo"
-    : "📚 Lectura libre";
+  //const tipoBadge = l.esReto
+   // ? l.retoActual ? "🏆 Reto mensual" : "📚 Reto antiguo"
+  //  : "📚 Lectura libre";
 
   if (l.esReto) card.classList.add("reto");
   else card.classList.add("libre");
@@ -981,7 +987,7 @@ function pintarObjetos() {
   cont.innerHTML = "";
 
   if (!usuarioData.objetos || usuarioData.objetos.length === 0) {
-    cont.textContent = "No tienes objetos legendarios";
+    cont.textContent = "No tienes objetos";
     return;
   }
 
@@ -1050,33 +1056,28 @@ function pintarRetos() {
   const panelActual = document.getElementById("listaRetos");
   panelActual.innerHTML = "";
 
+  // solo el reto actual activo
   lecturasCache
     .filter(l => l.esReto && l.esActual && l.activa)
-    .forEach(l => {
-      panelActual.appendChild(crearCardLectura(l));
-    });
+    .forEach(l => panelActual.appendChild(crearCardLectura(l)));
 }
 
 function pintarRetosPendientes() {
   const panelPendientes = document.getElementById("listaRetosPendientes");
-  if (!panelPendientes) return;
   panelPendientes.innerHTML = "";
 
+  // retos activos que NO son el actual
   lecturasCache
     .filter(l => l.esReto && !l.esActual && l.activa)
-    .forEach(l => {
-      panelPendientes.appendChild(crearCardLectura(l));
-    });
+    .forEach(l => panelPendientes.appendChild(crearCardLectura(l)));
 }
 
 function pintarRetosHistoricos() {
   const panelHistorico = document.getElementById("listaRetosHistorico");
-  if (!panelHistorico) return;
   panelHistorico.innerHTML = "";
 
+  // retos completados
   lecturasCache
     .filter(l => l.esReto && !l.activa)
-    .forEach(l => {
-      panelHistorico.appendChild(crearCardLectura(l));
-    });
+    .forEach(l => panelHistorico.appendChild(crearCardLectura(l)));
 }
