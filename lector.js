@@ -446,29 +446,28 @@ async function cargarLecturas() {
     const retoActual = snapReto.data();
     retoActual.idReto = "reto-actual";
 
-    // Revisar si el usuario ya tiene este reto
     let retoExistente = lecturasCache.find(
       l => l.esReto && l.idReto === retoActual.idReto
     );
 
     if (!retoExistente) {
-      // Crear reto “virtual” para mostrar en el panel de retos actuales
       lecturasCache.unshift({
         ...retoActual,
-        activa: true,
         esReto: true,
-        esActual: true
+        esActual: true,
+        activa: true
       });
     } else {
-      // marcar como actual para el panel
       retoExistente.esActual = true;
+      retoExistente.activa = true;
     }
   }
 
-  // 3️⃣ Separar y pintar paneles
-  pintarRetos();          // solo el reto actual
-  pintarRetosPendientes(); // retos activos pero no actuales
-  pintarRetosHistoricos(); // retos completados
+  // 3️⃣ Pintar paneles
+  pintarRetos();           // Reto actual
+  pintarRetosPendientes(); // Retos activos restantes
+  pintarRetosHistoricos(); // Retos completados
+  pintarLecturas();        // Solo lecturas libres
 }
 
 
@@ -536,28 +535,16 @@ async function terminarLectura(l) {
 
 
 function pintarLecturas() {
-  // Limpiar paneles
-  listaRetosEl.innerHTML = "";
   listaLibresEl.innerHTML = "";
 
-  // Filtrar listas
-  const listaRetos = lecturasCache.filter(l => l.esReto).filter(l => mostrarTerminados || l.activa);
-  const listaLibres = lecturasCache.filter(l => !l.esReto).filter(l => mostrarTerminadosLibres || l.activa);
+  const listaLibres = lecturasCache
+    .filter(l => !l.esReto)
+    .filter(l => mostrarTerminadosLibres || l.activa);
 
-  // Pintar panel de retos
-  listaRetos.forEach(l => {
-    const card = crearCardLectura(l);
-    listaRetosEl.appendChild(card);
-  });
-
-  // Pintar panel de libres
   listaLibres.forEach(l => {
     const card = crearCardLectura(l);
     listaLibresEl.appendChild(card);
   });
-
-
-
 }
 
 
@@ -803,9 +790,9 @@ function crearCardLectura(l) {
   card.className = "lectura-card";
   card.dataset.id = l.id;
 
-  //const tipoBadge = l.esReto
-   // ? l.retoActual ? "🏆 Reto mensual" : "📚 Reto antiguo"
-  //  : "📚 Lectura libre";
+const tipoBadge = l.esReto
+  ? l.esActual ? "🏆 Reto actual" : "📚 Reto pendiente"
+  : "📗 Lectura libre";
 
   if (l.esReto) card.classList.add("reto");
   else card.classList.add("libre");
