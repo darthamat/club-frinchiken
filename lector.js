@@ -248,13 +248,14 @@ async function crearRetoConLibro(libro) {
   const retoRefActual = doc(db, "retos", "reto-actual");
   const snapActual = await getDoc(retoRefActual);
 
-  // Guardar el reto anterior en histórico si existe
+  // Guardar el reto anterior como pendiente si existía
   if (snapActual.exists()) {
     const retoAnterior = snapActual.data();
-    const idHistorico = await generarIdRetoHistorico();
-    await setDoc(doc(db, "retos", idHistorico), retoAnterior);
+    retoAnterior.esActual = false; // ⬅️ marcar como pendiente
+    lecturasCache.unshift({ ...retoAnterior, activa: true, esReto: true });
   }
 
+  // Crear nuevo reto actual
   const retoData = {
     titulo: libro.titulo,
     autor: libro.autor,
@@ -264,41 +265,18 @@ async function crearRetoConLibro(libro) {
     creadoPor: usuarioActual.uid,
     fecha: new Date(),
     esReto: true,
+    esActual: true,
     activa: true,
     progreso: 0
   };
 
-  // Sobrescribir reto-actual
   await setDoc(retoRefActual, retoData);
 
-  // Guardar en lecturas del admin automáticamente
-  const yaExiste = lecturasCache.some(l => l.esReto && l.activa);
-  if (!yaExiste) {
-    const ref = await addDoc(
-      collection(db, "users", usuarioActual.uid, "lecturas"),
-      retoData
-    );
+  // Añadir al cache
+  lecturasCache.unshift({ ...retoData, id: "reto-actual" });
 
-    lecturasCache.unshift({
-      id: ref.id,
-      ...retoData
-    });
-  }
-
-  mostrarTerminados = true;
-  mostrarMensajeReto("✅ Nuevo reto creado");
+  pintarRetos(); // pintar panel actualizado
   alert("🏆 Nuevo reto creado con éxito");
-
-  pintarLecturas();
-  modoCrearReto = false;
-  btnRegistrar.textContent = "Registrar lectura";
-
-  // Limpiar formulario
-  tituloInput.value = "";
-  autorInput.value = "";
-  paginasInput.value = "";
-  categoriaInput.value = "";
-  portadaLibro.src = "https://via.placeholder.com/120x180";
 }
 
 // Función para generar un ID histórico secuencial
@@ -456,43 +434,35 @@ async function cargarLecturas() {
   const snap = await getDocs(
     collection(db, "users", usuarioActual.uid, "lecturas")
   );
-
   lecturasCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-  // 2️⃣ Traer reto actual
+  // 2️⃣ Traer reto actual desde colección general de retos
   const snapReto = await getDoc(doc(db, "retos", "reto-actual"));
   if (snapReto.exists()) {
     const retoActual = snapReto.data();
 
-    // Comprobar si el usuario ya tiene este reto
+    // Revisar si el usuario ya tiene este reto
     const retoExistente = lecturasCache.find(
       l => l.esReto && l.idReto === retoActual.idReto
     );
 
     if (!retoExistente) {
-      // Añadir “virtual” del reto actual
+      // Crear “virtual” para mostrar en panel
       lecturasCache.unshift({
         id: "reto-actual",
         idReto: retoActual.idReto,
         ...retoActual,
-        esReto: true,
-        retoActual: true,
         activa: true,
-        progreso: 0
+        esReto: true,
+        esActual: true
       });
     }
   }
 
-  // 3️⃣ Marcar retos antiguos activos
-  lecturasCache.forEach(l => {
-    if (l.esReto && l.id !== "reto-actual" && l.activa) {
-      l.retoActual = false;
-    }
-  });
-
-  pintarLecturas();
-  await comprobarLogrosGlobales();
-  pintarLogros();
+  // 3️⃣ Pintar paneles
+  pintarRetos(); // panel de retos actuales
+  pintarRetosPendientes(); // panel de retos pendientes
+  pintarRetosHistoricos(); // panel histórico de retos completados
 }
 
 
@@ -873,6 +843,11 @@ function crearCardLectura(l) {
     pintarLecturas();
   };
 
+  if (!l.activa && l.id !== "reto-actual") {
+  const acciones = card.querySelector(".lectura-acciones");
+  if (acciones) acciones.style.display = "none";
+}
+
   return card;
 }
 
@@ -916,16 +891,13 @@ cerrarTerminadasBtn.addEventListener("click", () => {
 });
 
 function activarModoCrearReto() {
-  modoCrearReto = true;
-
+  modoCrearReto = true; // ⬅️ Muy importante
   const panel = document.querySelector(".registro-lectura");
 
-
-
-  // Cambiar el botón a “Registrar nuevo reto”
+  // Cambiar el botón de registrar lectura a “Registrar nuevo reto”
   btnRegistrar.textContent = "Registrar nuevo reto";
 
-  // Limpiar formulario para seleccionar libro
+  // Limpiar formulario
   tituloInput.value = "";
   autorInput.value = "";
   paginasInput.value = "";
@@ -940,7 +912,6 @@ function activarModoCrearReto() {
 
   // Agregar clase visual
   panel.classList.add("modo-reto");
-
 }
 
 
@@ -951,6 +922,7 @@ btnRegistrar.addEventListener("click", async () => {
   }
 
   if (modoCrearReto) {
+    // ✅ Crear el nuevo reto
     await crearRetoConLibro({
       titulo: tituloInput.value,
       autor: autorInput.value,
@@ -958,6 +930,16 @@ btnRegistrar.addEventListener("click", async () => {
       categoria: categoriaInput.value,
       portadaUrl: portadaLibro.src
     });
+
+    // Reset de modo
+    modoCrearReto = false;
+    btnRegistrar.textContent = "Registrar lectura";
+
+    // Ocultar mensaje
+    const panel = document.querySelector(".registro-lectura");
+    panel.classList.remove("modo-reto");
+    mostrarMensajeReto("");
+
   } else {
     await registrarLecturaNormal();
   }
@@ -1063,3 +1045,38 @@ function aplicarEfectosObjetos() {
   nivelEl.textContent = usuarioData.nivel + (usuarioData.nivelBonus || 0);
   usuarioPrestigio.textContent = usuarioData.prestigio + (usuarioData.prestigioBonus || 0);
   }
+
+function pintarRetos() {
+  const panelActual = document.getElementById("listaRetos");
+  panelActual.innerHTML = "";
+
+  lecturasCache
+    .filter(l => l.esReto && l.esActual && l.activa)
+    .forEach(l => {
+      panelActual.appendChild(crearCardLectura(l));
+    });
+}
+
+function pintarRetosPendientes() {
+  const panelPendientes = document.getElementById("listaRetosPendientes");
+  if (!panelPendientes) return;
+  panelPendientes.innerHTML = "";
+
+  lecturasCache
+    .filter(l => l.esReto && !l.esActual && l.activa)
+    .forEach(l => {
+      panelPendientes.appendChild(crearCardLectura(l));
+    });
+}
+
+function pintarRetosHistoricos() {
+  const panelHistorico = document.getElementById("listaRetosHistorico");
+  if (!panelHistorico) return;
+  panelHistorico.innerHTML = "";
+
+  lecturasCache
+    .filter(l => l.esReto && !l.activa)
+    .forEach(l => {
+      panelHistorico.appendChild(crearCardLectura(l));
+    });
+}
