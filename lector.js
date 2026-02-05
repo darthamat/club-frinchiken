@@ -361,7 +361,10 @@ function rellenarFormularioLectura(libro) {
   portadaLibro.src = libro.portadaUrl || "https://via.placeholder.com/120x180";
 
   // Categoría solo si existe
-  categoriaInput.value = libro.categoria || "";
+  // categoriaInput.value = libro.categoria || "";
+  if (libro.categoria) {
+  asegurarCategoriaEnSelect(libro.categoria);
+}
 
 }
 
@@ -737,7 +740,7 @@ async function buscarLibros(texto) {
   // key api = &key=AIzaSyDcEUoGcKs6vwoNUF0ok1W-d8F2vVjCqP0
 
   const res = await fetch(
-    `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(texto)}&maxResults=5&key=AIzaSyDcEUoGcKs6vwoNUF0ok1W-d8F2vVjCqP0`
+    `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(texto)}&maxResults=20&key=AIzaSyDcEUoGcKs6vwoNUF0ok1W-d8F2vVjCqP0`
   );
   const data = await res.json();
   if (!data.items) return;
@@ -754,7 +757,7 @@ async function buscarLibros(texto) {
       titulo: info.title,
       autor: info.authors?.[0],
       paginas: info.pageCount || 0,
-      categoria: info.categories?.join(", ") || "",
+      categoria: info.categories?.[0] || "",
       portadaUrl: info.imageLinks?.thumbnail
     });
 
@@ -898,4 +901,33 @@ async function asignarAdmin() {
   alert("👑 El poder ha sido transferido");
 
   selectAdmin.style.display = "none";
+}
+
+function normalizarCategoria(cat) {
+  return cat
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim();
+}
+
+function asegurarCategoriaEnSelect(categoria) {
+  if (!categoria) return;
+
+  const valor = normalizarCategoria(categoria);
+
+  // ¿Ya existe?
+  const existe = [...categoriaInput.options].some(
+    o => o.dataset.norm === valor
+  );
+
+  if (!existe) {
+    const option = document.createElement("option");
+    option.value = categoria;
+    option.textContent = categoria;
+    option.dataset.norm = valor;
+    categoriaInput.appendChild(option);
+  }
+
+  categoriaInput.value = categoria;
 }
