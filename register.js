@@ -27,7 +27,7 @@ const errorMsg = document.getElementById("errorMsg");
 // ---------------- CLASES ALEATORIAS ----------------
 const clasesPersonaje = [
 "Mago/a Sabe-lo-Todo", "Bardo/a Cuentacuentos", "Caballero de las Palabras",
-  "Pícaro/a de los Post-it", "Druida Romantasy", "Inventor/a de Tramas",
+  "Pícaro/a de los Post-it", "Druida Hippy Romantasy", "Inventor/a de Tramas",
   "Explorador/a de Bibliotecas", "Alquimista de Historias", "Guardabibliotecas",
   "Adivinador/a de tramas", "Hechicero/a de Tochos Imposibles", "Viajero/a de Mundos Paralelos",
   "Señor/a de las Comillas", "Monje de los Ensayos",
@@ -79,7 +79,7 @@ btnRegister.addEventListener("click", async () => {
       experiencia: 0,
       role: "user",          // tú serías "admin" global
       tipoAdmin: null,         // "crear" solo para el elegido
-      experienciaNecesario: xpNecesariaParaNivel(1)
+      experienciaNecesario: 300
 
     });
 
