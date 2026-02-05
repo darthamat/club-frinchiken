@@ -2,6 +2,10 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
+import {
+xpNecesariaParaNivel(1)
+} from "./lector.js";
+
 // ---------------- CONFIG FIREBASE ----------------
 const firebaseConfig = {
   apiKey: "AIzaSyDcEUoGcKs6vwoNUF0ok1W-d8F2vVjCqP0",
@@ -79,7 +83,7 @@ btnRegister.addEventListener("click", async () => {
       experiencia: 0,
       role: "user",          // tú serías "admin" global
       tipoAdmin: null,         // "crear" solo para el elegido
-      experienciaNecesario: 300
+      experienciaNecesario: xpNecesariaParaNivel(1)
 
     });
 

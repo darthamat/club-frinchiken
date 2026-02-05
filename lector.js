@@ -103,9 +103,6 @@ let usuarioActual = {
 };
 
 
-// Lista de usuarios (ejemplo, en tu proyecto la traes de Firestore)
-let usuarios = [];
-
 // ---------------- ESTADO ----------------
 //let usuarioActual = null;
 let usuarioData = null;
@@ -189,65 +186,45 @@ function actualizarBotonesAdmin() {
       : "none";
 }
 
-async function mostrarSelectAdmin() {
-  selectAdmin.innerHTML = "";
-
-  const snapshot = await getDocs(collection(db, "users"));
-
-  snapshot.forEach(docSnap => {
-    if (docSnap.id !== usuarioActual.uid) {
-      const u = docSnap.data();
-      const option = document.createElement("option");
-      option.value = docSnap.id;
-
-
-      const nombreReal = u.nombreReal ?? "Sin nombre";
-const personaje = u.nombrePersonaje ?? "Sin personaje";
-
-option.textContent = `${nombreReal} (${personaje})`;
-
-
-
-     // option.textContent = `${u.nombreReal} (${u.nombrePersonaje})`;
-      selectAdmin.appendChild(option);
-    }
-  });
-
-  selectAdmin.style.display = "inline-block";
-}
-
-//btnAsignarAdmin.addEventListener("click", mostrarSelectAdmin);
-
 btnAsignarAdmin.addEventListener("click", async () => {
   if (usuarioActual.role !== "admin") return;
 
-  console.log("Mostrando selector de admin");
-
-  selectAdmin.innerHTML = "";
   selectAdmin.style.display = "inline-block";
-
-  // ✅ Traer usuarios
-  const snapshot = await getDocs(collection(db, "users"));
-
-   await cargarUsuarios();
-
-snapshot.forEach(docSnap => {
-  const data = docSnap.data();
-  if (docSnap.id === usuarioActual.uid) return; // omitirte a ti
-  const option = document.createElement("option");
-  option.value = docSnap.id;
-  const nombreReal = data.nombreReal ?? "Sin nombre";
-  const personaje = data.nombrePersonaje ?? "Sin personaje";
-  option.textContent = `${nombreReal} (${personaje})`;
-  selectAdmin.appendChild(option);
+  await cargarUsuariosParaAdmin();
 });
 
-  if (selectAdmin.children.length === 0) {
-    alert("⚠️ No hay usuarios disponibles para asignar");
-  }
-});
 
-//selectAdmin.addEventListener("change", asignarAdmin);
+//btnAsignarAdmin.addEventListener("click", async () => {
+//  if (usuarioActual.role !== "admin") return;
+//
+//  selectAdmin.innerHTML = '<option value="">— Selecciona usuario —</option>';
+//  selectAdmin.style.display = "inline-block";
+//
+//  const snapshot = await getDocs(collection(db, "users"));
+//
+//  snapshot.forEach(docSnap => {
+//    if (docSnap.id === usuarioActual.uid) return;
+//
+//    const data = docSnap.data();
+//
+//    // ❗ Evitar admins fijos
+//    if (data.role === "admin") return;
+//
+//    const option = document.createElement("option");
+//    option.value = docSnap.id;
+//
+//    const nombreReal = data.nombreReal ?? "Sin nombre";
+//    const personaje = data.nombrePersonaje ?? "Sin personaje";
+//    option.textContent = `${nombreReal} (${personaje})`;
+//
+//    selectAdmin.appendChild(option);
+//  });
+//
+//  if (selectAdmin.options.length === 1) {
+//    alert("⚠️ No hay usuarios disponibles");
+//    selectAdmin.style.display = "none";
+//  }
+//});
 
 selectAdmin.addEventListener("change", async () => {
   const uidNuevoAdmin = selectAdmin.value;
@@ -272,6 +249,7 @@ selectAdmin.addEventListener("change", async () => {
   alert("👑 El poder ha sido transferido");
 
   selectAdmin.style.display = "none";
+  selectAdmin.value = "";
 });
 
 btnNuevoReto.addEventListener("click", activarModoCrearReto);
@@ -836,31 +814,7 @@ async function cargarUsuarios() {
     }
   });
 }
-async function asignarAdmin() {
-  const uidNuevoAdmin = selectAdmin.value;
-  if (!uidNuevoAdmin) return;
 
-  // Quitar admin temporal anterior
-  const q = query(
-    collection(db, "users"),
-    where("tipoAdmin", "==", "crear")
-  );
-
-  const snap = await getDocs(q);
-
-  for (const d of snap.docs) {
-    await updateDoc(d.ref, { tipoAdmin: null });
-  }
-
-  // Asignar nuevo admin
-  await updateDoc(doc(db, "users", uidNuevoAdmin), {
-    tipoAdmin: "crear"
-  });
-
-  alert("👑 El poder ha sido transferido");
-
-  selectAdmin.style.display = "none";
-}
 
 function normalizarCategoria(cat) {
   return cat
@@ -1051,3 +1005,58 @@ btnRegistrar.addEventListener("click", async () => {
     await registrarLecturaNormal();
   }
 });
+
+async function cargarUsuariosParaAdmin() {
+  selectAdmin.innerHTML = '<option value="">— Selecciona usuario —</option>';
+
+  const snapshot = await getDocs(collection(db, "users"));
+
+  snapshot.forEach(docSnap => {
+    // No incluirte a ti
+    if (docSnap.id === usuarioActual.uid) return;
+
+    const data = docSnap.data();
+
+    // No incluir admins fijos
+    if (data.role === "admin") return;
+
+    const option = document.createElement("option");
+    option.value = docSnap.id;
+
+    const nombreReal = data.nombreReal ?? "Sin nombre";
+    const personaje = data.nombrePersonaje ?? "Sin personaje";
+
+    option.textContent = `${nombreReal} (${personaje})`;
+
+    selectAdmin.appendChild(option);
+  });
+
+  if (selectAdmin.options.length <= 1) {
+    alert("⚠️ No hay usuarios disponibles");
+    selectAdmin.style.display = "none";
+  }
+}
+
+function actualizarUIAdmin(usuario) {
+  const puedeAsignar =
+    usuario.role === "admin" || usuario.tipoAdmin === "retador";
+
+  document.querySelector(".botones-admin").style.display =
+    puedeAsignar ? "block" : "none";
+}
+
+async function transferirRetador(nuevoUid) {
+  const batch = writeBatch(db);
+
+  // Quitar poder al actual
+  batch.update(doc(db, "users", auth.currentUser.uid), {
+    tipoAdmin: deleteField()
+  });
+
+  // Dar poder al nuevo
+  batch.update(doc(db, "users", nuevoUid), {
+    tipoAdmin: "retador"
+  });
+
+  await batch.commit();
+}
