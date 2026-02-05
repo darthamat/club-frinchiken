@@ -176,7 +176,11 @@ actualizarBotonesAdmin();
 await updateDoc(doc(db, "users", usuarioActual.uid), {
   objetos: arrayUnion(recompensa.objeto.nombre)
 });
-aplicarEfectosObjetos();
+
+
+   usuarioData.objetos = data.objetos ?? [];
+  aplicarEfectosObjetos();
+
 pintarObjetos();  // <--- actualizar UI
 }
 
@@ -202,38 +206,6 @@ btnAsignarAdmin.addEventListener("click", async () => {
   await cargarUsuariosParaAdmin();
 });
 
-
-//btnAsignarAdmin.addEventListener("click", async () => {
-//  if (usuarioActual.role !== "admin") return;
-//
-//  selectAdmin.innerHTML = '<option value="">— Selecciona usuario —</option>';
-//  selectAdmin.style.display = "inline-block";
-//
-//  const snapshot = await getDocs(collection(db, "users"));
-//
-//  snapshot.forEach(docSnap => {
-//    if (docSnap.id === usuarioActual.uid) return;
-//
-//    const data = docSnap.data();
-//
-//    // ❗ Evitar admins fijos
-//    if (data.role === "admin") return;
-//
-//    const option = document.createElement("option");
-//    option.value = docSnap.id;
-//
-//    const nombreReal = data.nombreReal ?? "Sin nombre";
-//    const personaje = data.nombrePersonaje ?? "Sin personaje";
-//    option.textContent = `${nombreReal} (${personaje})`;
-//
-//    selectAdmin.appendChild(option);
-//  });
-//
-//  if (selectAdmin.options.length === 1) {
-//    alert("⚠️ No hay usuarios disponibles");
-//    selectAdmin.style.display = "none";
-//  }
-//});
 
 selectAdmin.addEventListener("change", async () => {
   const uidNuevoAdmin = selectAdmin.value;
@@ -578,6 +550,10 @@ async function terminarLectura(l) {
     usuarioPrestigio.textContent = usuarioData.prestigio;
     alert(`⭐ Lectura completada (+${l.paginas} prestigio)`);
   }
+
+  await updateDoc(doc(db, "users", usuarioActual.uid), {
+  objetos: arrayUnion(objeto.nombre)
+});
 
   pintarLecturas();
 }
@@ -1059,3 +1035,31 @@ function pintarObjetos() {
     cont.appendChild(card);
   });
 }
+function aplicarEfectosObjetos() {
+  if (!usuarioData.objetos) return;
+
+  // Reset stats base
+  usuarioData.nivelBonus = 0;
+  usuarioData.prestigioBonus = 0;
+
+  usuarioData.objetos.forEach(obj => {
+    switch(obj) {
+      case "El Anillo Único":
+        usuarioData.nivelBonus += 100;
+       // usuarioData.nivelMente -= 100;
+
+        break;
+      case "Tiara de Donut":
+        usuarioData.nivelBonus += 25; // efecto épico
+        break;
+      case "Espada de Gandalf":
+        usuarioData.prestigioBonus += 50;
+        break;
+      // añadir los demás objetos según efectos
+    }
+  });
+
+  // Actualizar stats en la UI
+  nivelEl.textContent = usuarioData.nivel + (usuarioData.nivelBonus || 0);
+  usuarioPrestigio.textContent = usuarioData.prestigio + (usuarioData.prestigioBonus || 0);
+  }
