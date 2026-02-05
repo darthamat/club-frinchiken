@@ -282,7 +282,7 @@ async function crearRetoConLibro(libro) {
     titulo: libro.titulo,
     autor: libro.autor,
     categoria: libro.categoria ?? "",
-    portadaUrl: libro.portadaUrl,
+    portadaUrl: libro.portadaUrl ?? null,
     paginas: libro.paginas ?? 0,
     creadoPor: usuarioActual.uid,
     fecha: new Date()
@@ -374,6 +374,7 @@ async function registrarLecturaNormal() {
     autor: autorInput.value.trim(),
     paginas: Number(paginasInput.value) || 0,
     categoria: categoriaInput?.value ?? "",
+    portadaUrl: portadaLibro.src ?? null,
     activa: true,
     progreso: 0,
     esReto: false,
