@@ -95,7 +95,7 @@ export const LOGROS = [
     titulo: "Reto de Enero superado",
     descripcion: "Completaste el reto mensual",
     tipo: "reto",
-    condicion: (l) => l.esReto === true
+    condicion: (_, l) => l?.esReto === true
   },
 
   // 📚 PÁGINAS
@@ -103,7 +103,7 @@ export const LOGROS = [
     id: "tocho_1000",
     titulo: "Lector/a de tochos",
     descripcion: "Leíste un libro de 1000 páginas o más",
-    condicion: (l) => l.paginas >= 1000
+    condicion: (_, l) => l?.paginas >= 1000
   },
 
   // 📦 GÉNEROS
@@ -111,19 +111,19 @@ export const LOGROS = [
     id: "romantico",
     titulo: "Corazón de tinta",
     descripcion: "Leíste un libro romántico",
-    condicion: (l) => l.categoria?.toLowerCase().includes("romance")
+    condicion: (_, l) => l?.categoria?.toLowerCase().includes("romance")
   },
   {
     id: "erotico",
     titulo: "Lector/a cachondo/a 😏",
     descripcion: "Leíste literatura erótica",
-    condicion: (l) => l.categoria?.toLowerCase().includes("erótico")
+    condicion: (_, l) => l?.categoria?.toLowerCase().includes("erótico")
   },
    {
     id: "fantasia",
     titulo: "Soñador/a empedernido, un solo mundo no es suficiente",
     descripcion: "Leíste literatura fantástica",
-    condicion: (l) => l.categoria?.toLowerCase().includes("fantasia")
+    condicion: (_, l) => l?.categoria?.toLowerCase().includes("fantasia")
   },
    {
     id: "terror",
@@ -145,67 +145,72 @@ export const LOGROS = [
 {
   id: "mes_10_libros",
   titulo: "Devorador/a de libros",
-  condicion: (lecturasCache) => {
-    const ahora = new Date();
-    const mes = ahora.getMonth();
-    const año = ahora.getFullYear();
+  condicion: (lecturas) => {
+  if (!Array.isArray(lecturas)) return false;
 
-    const librosMes = lecturasCache.filter(l => {
-      if (!l.fechaFin) return false;
-      const f = l.fechaFin.toDate();
-      return f.getMonth() === mes && f.getFullYear() === año;
-    });
+  const ahora = new Date();
+  const mes = ahora.getMonth();
+  const año = ahora.getFullYear();
 
-    return librosMes.length >= 10;
-  }
+  return lecturas.filter(l => {
+    if (!l.fechaFin) return false;
+    const f = l.fechaFin.toDate();
+    return f.getMonth() === mes && f.getFullYear() === año;
+  }).length >= 10;
+}
 },
+
 {
   id: "mes_5_libros",
   titulo: "Super lector/a",
- condicion: (lecturasCache) => {
-    const ahora = new Date();
-    const mes = ahora.getMonth();
-    const año = ahora.getFullYear();
+condicion: (lecturas) => {
+  if (!Array.isArray(lecturas)) return false;
 
-    const librosMes = lecturasCache.filter(l => {
-      if (!l.fechaFin) return false;
-      const f = l.fechaFin.toDate();
-      return f.getMonth() === mes && f.getFullYear() === año;
-    });
+  const ahora = new Date();
+  const mes = ahora.getMonth();
+  const año = ahora.getFullYear();
 
-    return librosMes.length >= 5;
-  }
+  return lecturas.filter(l => {
+    if (!l.fechaFin) return false;
+    const f = l.fechaFin.toDate();
+    return f.getMonth() === mes && f.getFullYear() === año;
+  }).length >= 5;
+}
 },
 
 {
   id: "anio_20_libros",
   titulo: "Devorador/a de libros",
-condicion: (lecturasCache) => {
-    const añoActual = new Date().getFullYear();
+condicion: (lecturas) => {
+  if (!Array.isArray(lecturas)) return false;
 
-    const librosAnio = lecturasCache.filter(l => {
-      if (!l.fechaFin) return false;
-      const f = l.fechaFin.toDate();
-      return f.getFullYear() === añoActual;
-    });
+  const ahora = new Date();
+  const mes = ahora.getMonth();
+  const año = ahora.getFullYear();
 
-    return librosAnio.length >= 20;
-  }
+  return lecturas.filter(l => {
+    if (!l.fechaFin) return false;
+    const f = l.fechaFin.toDate();
+    return f.getMonth() === mes && f.getFullYear() === año;
+  }).length >= 20;
+}
 },
 
 {
   id: "anio_30_libros",
-  titulo: "Devorador/a de bibliotecas",
- condicion: (lecturasCache) => {
-    const añoActual = new Date().getFullYear();
+  titulo: "Terror de las bibliotecas",
+ condicion: (lecturas) => {
+  if (!Array.isArray(lecturas)) return false;
 
-    const librosAnio = lecturasCache.filter(l => {
-      if (!l.fechaFin) return false;
-      const f = l.fechaFin.toDate();
-      return f.getFullYear() === añoActual;
-    });
+  const ahora = new Date();
+  const mes = ahora.getMonth();
+  const año = ahora.getFullYear();
 
-    return librosAnio.length >= 30;
-  }
+  return lecturas.filter(l => {
+    if (!l.fechaFin) return false;
+    const f = l.fechaFin.toDate();
+    return f.getMonth() === mes && f.getFullYear() === año;
+  }).length >= 30;
+}
 }
 ];

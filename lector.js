@@ -805,28 +805,29 @@ function xpNecesariaParaNivel(nivel) {
 
 //logros
 
-async function comprobarLogros(lectura) {
+async function comprobarLogros(lecturaActual = null) {
   const userRef = doc(db, "users", usuarioActual.uid);
   usuarioData.logros ??= {};
 
   for (const logro of LOGROS) {
     if (usuarioData.logros[logro.id]) continue;
 
-    if (logro.condicion?.(lectura)) {
-      usuarioData.logros[logro.id] = {
+    const cumple = logro.condicion?.(lecturasCache, lecturaActual);
+    if (!cumple) continue;
+
+    usuarioData.logros[logro.id] = {
+      fecha: new Date(),
+      titulo: logro.titulo
+    };
+
+    await updateDoc(userRef, {
+      [`logros.${logro.id}`]: {
         fecha: new Date(),
         titulo: logro.titulo
-      };
+      }
+    });
 
-      await updateDoc(userRef, {
-        [`logros.${logro.id}`]: {
-          fecha: new Date(),
-          titulo: logro.titulo
-        }
-      });
-
-      mostrarNotificacionLogro(logro);
-    }
+    mostrarNotificacionLogro(logro);
   }
 }
 
