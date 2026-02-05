@@ -552,8 +552,8 @@ async function cargarLecturas() {
       {
         titulo: reto.titulo,
         autor: reto.autor,
-        categoria: reto.categoria,
-        paginas: reto.paginas,
+        categoria: reto.categoria ?? "",
+        paginas: reto.paginas ?? 0,
         activa: true,
         progreso: 0,
         esReto: true,
