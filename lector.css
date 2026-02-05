@@ -329,3 +329,10 @@ button.gold {
 .modal ul { list-style: none; padding: 0; }
 .modal li { display: flex; justify-content: space-between; margin-bottom: 4px; }
 .modal li button { background: transparent; border: none; color: red; cursor: pointer; }
+
+.panel.logros-panel {
+  max-height: 300px;      /* Ajusta según quieras que se vea */
+  overflow-y: auto;       /* Activa scroll vertical cuando sea necesario */
+  padding-right: 8px;     /* Para que no se pegue la barra de scroll */
+  box-sizing: border-box;
+}

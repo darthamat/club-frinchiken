@@ -77,8 +77,10 @@ export const LOGROS = [
   {
     id: "primer_libro",
     nombre: "Primer capítulo",
-    descripcion: "Completa tu primera lectura"
+    descripcion: "Completa tu primera lectura",
+    condicion: (lecturasCache) => lecturasCache.some(l => !l.esReto && !l.activa)
   },
+
   {
     id: "lector_incansable",
     nombre: "Lector incansable",
@@ -90,12 +92,30 @@ export const LOGROS = [
     descripcion: "Completa un reto mensual"
   },
     // 🧩 RETOS
-  {
-    id: "reto_enero",
-    titulo: "Reto de Enero superado",
-    descripcion: "Completaste el reto mensual",
-    tipo: "reto",
-    condicion: (_, l) => l?.esReto === true
+
+   {
+    id: "reto_mensual",
+    titulo: "Reto del mes completado 🎯",
+    descripcion: "Completa el reto mensual antes de que termine el plazo",
+
+    condicion: (lecturasCache, lecturaActual) => {
+      if (!lecturaActual) return false;
+
+      // Solo para el reto actual
+      if (!lecturaActual.esReto || !lecturaActual.retoActual) return false;
+
+      // Solo si está terminado
+      if (!lecturaActual.activa) {
+        const inicio = lecturaActual.fechaInicio.toDate();
+        const fin = lecturaActual.fechaFin.toDate();
+        const terminado = lecturaActual.fechaFinUsuario ? lecturaActual.fechaFinUsuario.toDate() : new Date();
+
+        // Terminado dentro del plazo
+        return terminado >= inicio && terminado <= fin;
+      }
+
+      return false;
+    }
   },
 
   // 📚 PÁGINAS

@@ -255,19 +255,6 @@ selectAdmin.addEventListener("change", async () => {
 btnNuevoReto.addEventListener("click", activarModoCrearReto);
 
 
-/*
-function activarModoCrearReto() {
-  modoCrearReto = true;
-
-  const panel = document.querySelector(".registro-lectura");
-
-  panel.scrollIntoView({ behavior: "smooth", block: "center" });
-
-  panel.classList.add("modo-reto");
-
-  mostrarMensajeReto("📖 Selecciona el libro para el nuevo reto");
-}
-*/
 
 function mostrarMensajeReto(texto) {
   const msg = document.getElementById("mensajeReto");
@@ -275,72 +262,6 @@ function mostrarMensajeReto(texto) {
   msg.classList.remove("hidden");
 }
 
-
-/*
-async function crearRetoConLibro(libro) {
-  const retoData = {
-    titulo: libro.titulo,
-    autor: libro.autor,
-    categoria: libro.categoria ?? "",
-    portadaUrl: libro.portadaUrl ?? null,
-    paginas: libro.paginas ?? 0,
-    creadoPor: usuarioActual.uid,
-    fecha: new Date(),
-    esReto: true,
-    activa: true,
-    progreso: 0
-  };
-
-  // 1️⃣ Guardar reto "actual" en Firestore (colección general de retos)
-  await setDoc(doc(db, "retos", "reto-actual"), retoData);
-
-  // 2️⃣ Guardar reto en lecturas del usuario **solo si no hay uno activo**
-  const yaExiste = lecturasCache.some(l => l.esReto && l.activa);
-  if (!yaExiste) {
-    const ref = await addDoc(
-      collection(db, "users", usuarioActual.uid, "lecturas"),
-      retoData
-    );
-
-    // Añadir al cache con el ID de Firestore
-   lecturasCache.unshift({
-  id: ref.id,
-  ...retoData,
-  esReto: true,
-  activa: true,
-  progreso: 0
-});
-  } else {
-    alert("⚠️ Ya tienes un reto activo. Termínalo antes de crear uno nuevo.");
-    return;
-  }
-mostrarTerminados = true;
-   mostrarMensajeReto("✅ Nuevo reto creado");
-alert("🏆 Nuevo reto creado con éxito");
-pintarLecturas();
-  // 3️⃣ Reset modo reto y actualizar UI
-
-   modoCrearReto = false;
-  btnRegistrar.textContent = "Registrar lectura";
-
-
-
-
-  // Limpiar formulario
-  tituloInput.value = "";
-  autorInput.value = "";
-  paginasInput.value = "";
-  categoriaInput.value = "";
-  portadaLibro.src = "https://via.placeholder.com/120x180";
-
-  // Pintar lecturas
-  pintarLecturas();
-
-  const panelRetos = document.querySelector(".retos");
-panelRetos.scrollIntoView({ behavior: "smooth", block: "center" });
-
-}
-*/
 
 async function crearRetoConLibro(libro) {
   const retoRefActual = doc(db, "retos", "reto-actual");
@@ -550,34 +471,43 @@ btnReto.addEventListener("click", async () => {
 async function cargarLecturas() {
   if (!usuarioActual) return;
 
+  // 1️⃣ Traer lecturas del usuario
   const snap = await getDocs(
     collection(db, "users", usuarioActual.uid, "lecturas")
   );
 
   lecturasCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-  // Traer reto actual
+  // 2️⃣ Traer reto actual
   const snapReto = await getDoc(doc(db, "retos", "reto-actual"));
   if (snapReto.exists()) {
     const retoActual = snapReto.data();
 
-    // Buscar si el usuario ya tiene este reto registrado en su colección
+    // Comprobar si el usuario ya tiene este reto
     const retoExistente = lecturasCache.find(
       l => l.esReto && l.idReto === retoActual.idReto
     );
 
     if (!retoExistente) {
-      // Solo añadir “virtual” si no tiene el reto
+      // Añadir “virtual” del reto actual
       lecturasCache.unshift({
-        id: "reto-actual",  // id temporal para la UI
+        id: "reto-actual",
         idReto: retoActual.idReto,
         ...retoActual,
+        esReto: true,
+        retoActual: true,
         activa: true,
-        progreso: 0,
-        esReto: true
+        progreso: 0
       });
     }
   }
+
+  // 3️⃣ Marcar retos antiguos activos
+  lecturasCache.forEach(l => {
+    if (l.esReto && l.id !== "reto-actual" && l.activa) {
+      l.retoActual = false;
+    }
+  });
 
   pintarLecturas();
   await comprobarLogrosGlobales();
@@ -595,8 +525,8 @@ async function comprobarLogrosGlobales() {
 async function terminarLectura(l) {
   if (!usuarioActual || !l?.id) return;
 
-  // Ignorar reto virtual
-  if (l.id === "reto-actual") {
+  // No dejar terminar reto virtual de la UI (temporal)
+  if (l.id === "reto-actual" && l.retoActual) {
     alert("⚠️ Debes registrar el reto antes de terminarlo");
     return;
   }
@@ -605,7 +535,8 @@ async function terminarLectura(l) {
   await updateDoc(lecturaRef, {
     activa: false,
     progreso: 100,
-    fechaFin: new Date()
+    fechaFin: new Date(),
+     fechaFinUsuario: new Date()
   });
 
   l.activa = false;
@@ -614,13 +545,21 @@ async function terminarLectura(l) {
     usuarioData.experiencia += Number(l.paginas);
     actualizarXP();
 
+    if (l.retoActual) {
+      // solo logros para el reto actual
+      await comprobarLogros(l);
+      alert(`🏆 Reto completado (+${l.paginas} XP)`);
+    } else {
+      // reto antiguo → solo XP, sin logros de tiempo
+      alert(`📚 Reto antiguo completado (+${l.paginas} XP)`);
+    }
+
+    // actualizar Firestore
     await updateDoc(doc(db, "users", usuarioActual.uid), {
       experiencia: usuarioData.experiencia,
       nivel: usuarioData.nivel,
       experienciaNecesario: usuarioData.experienciaNecesario
     });
-
-    alert(`🏆 Reto completado (+${l.paginas} XP)`);
   } else {
     // Lectura libre
     usuarioData.prestigio += Number(l.paginas);
@@ -655,6 +594,9 @@ function pintarLecturas() {
     const card = crearCardLectura(l);
     listaLibresEl.appendChild(card);
   });
+
+
+
 }
 
 
@@ -755,14 +697,17 @@ async function comprobarLogros(lecturaActual = null) {
     const cumple = logro.condicion?.(lecturasCache, lecturaActual);
     if (!cumple) continue;
 
+    const ahora = new Date();
+
+    // Guardar el logro con la fecha exacta
     usuarioData.logros[logro.id] = {
-      fecha: new Date(),
+      fecha: ahora,        // FECHA exacta de obtención
       titulo: logro.titulo
     };
 
     await updateDoc(userRef, {
       [`logros.${logro.id}`]: {
-        fecha: new Date(),
+        fecha: ahora,
         titulo: logro.titulo
       }
     });
@@ -877,12 +822,16 @@ function crearCardLectura(l) {
   card.className = "lectura-card";
   card.dataset.id = l.id;
 
+  const tipoBadge = l.esReto
+    ? l.retoActual ? "🏆 Reto mensual" : "📚 Reto antiguo"
+    : "📚 Lectura libre";
+
   if (l.esReto) card.classList.add("reto");
   else card.classList.add("libre");
 
   card.innerHTML = `
-    <span class="badge ${l.esReto ? "re2to" : "libre"}">
-      ${l.esReto ? "🏆 Reto mensual" : "📚 Lectura libre"}
+    <span class="badge ${l.esReto ? "ret2o" : "libre"}">
+      ${tipoBadge}
     </span>
 
     <div class="lectura-info">
@@ -916,12 +865,15 @@ function crearCardLectura(l) {
     if (!confirm(l.esReto ? "⚠️ ¿Eliminar este reto?" : "⚠️ ¿Eliminar esta lectura?")) return;
     await deleteDoc(doc(db, "users", usuarioActual.uid, "lecturas", l.id));
     lecturasCache = lecturasCache.filter(x => x.id !== l.id);
-
     pintarLecturas();
   };
 
   return card;
 }
+
+
+
+
 // Abrir modal de terminadas (puedes usarlo para retos o libres)
 function mostrarTerminadas(panel) {
   // panel = "reto" o "libre"
@@ -1037,26 +989,26 @@ async function cargarUsuariosParaAdmin() {
   }
 }
 
-function actualizarUIAdmin(usuario) {
-  const puedeAsignar =
-    usuario.role === "admin" || usuario.tipoAdmin === "retador";
-
-  document.querySelector(".botones-admin").style.display =
-    puedeAsignar ? "block" : "none";
-}
-
-async function transferirRetador(nuevoUid) {
-  const batch = writeBatch(db);
-
-  // Quitar poder al actual
-  batch.update(doc(db, "users", auth.currentUser.uid), {
-    tipoAdmin: deleteField()
-  });
-
-  // Dar poder al nuevo
-  batch.update(doc(db, "users", nuevoUid), {
-    tipoAdmin: "retador"
-  });
-
-  await batch.commit();
-}
+//function actualizarUIAdmin(usuario) {
+//  const puedeAsignar =
+//    usuario.role === "admin" || usuario.tipoAdmin === "retador";
+//
+//  document.querySelector(".botones-admin").style.display =
+//    puedeAsignar ? "block" : "none";
+//}
+//
+//async function transferirRetador(nuevoUid) {
+//  const batch = writeBatch(db);
+//
+//  // Quitar poder al actual
+//  batch.update(doc(db, "users", auth.currentUser.uid), {
+//    tipoAdmin: deleteField()
+//  });
+//
+//  // Dar poder al nuevo
+//  batch.update(doc(db, "users", nuevoUid), {
+//    tipoAdmin: "retador"
+//  });
+//
+//  await batch.commit();
+//}
