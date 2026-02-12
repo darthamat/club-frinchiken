@@ -387,8 +387,9 @@ async function registrarLecturaNormal() {
     lectura
   );
 
-  lecturasCache.unshift({ id: ref.id, ...lectura });
-  pintarLecturas();
+  //lecturasCache.unshift({ id: ref.id, ...lectura });
+  //pintarLecturas();
+  await cargarLecturas();
 
   // Limpiar inputs
   tituloInput.value = "";
@@ -496,8 +497,9 @@ btnRegistrar.addEventListener("click", async () => {
       lectura
     );
 
-    lecturasCache.unshift({ id: ref.id, ...lectura });
-    pintarLecturas();
+    //lecturasCache.unshift({ id: ref.id, ...lectura });
+    //pintarLecturas();
+    await cargarLecturas();
 
     // Limpiar inputs
     tituloInput.value = "";
@@ -725,6 +727,11 @@ function pintarLecturas() {
     card.querySelectorAll(".btn-progreso").forEach(btn => {
       btn.onclick = () => cambiarProgreso(l, Number(btn.dataset.delta));
     });
+
+    card.querySelectorAll(".btn-progreso").forEach(btn => {
+  btn.disabled = !l.activa;
+  btn.onclick = () => cambiarProgreso(l, Number(btn.dataset.delta));
+});
 
     card.querySelector(".btn-terminar").onclick = () => terminarLectura(l);
 
