@@ -648,6 +648,38 @@ usuarioData.monedas += recompensa.monedas;
   
 }
 
+async function cambiarProgreso(lectura, delta) {
+  if (!lectura || !lectura.id) return;
+
+  // Nuevo progreso
+  let nuevoProgreso = (lectura.progreso || 0) + delta;
+  nuevoProgreso = Math.max(0, Math.min(100, nuevoProgreso));
+
+  // Guardar en Firestore
+  const lecturaRef = doc(
+    db,
+    "users",
+    usuarioActual.uid,
+    "lecturas",
+    lectura.id
+  );
+
+  await updateDoc(lecturaRef, {
+    progreso: nuevoProgreso
+  });
+
+  // Actualizar en memoria
+  lectura.progreso = nuevoProgreso;
+
+  pintarLecturas();
+
+  // 🎯 Si llega al 100%, terminar lectura automáticamente
+  if (nuevoProgreso === 100 && lectura.activa) {
+    setTimeout(() => terminarLectura(lectura), 300);
+  }
+}
+
+
 // ---------------- PINTAR LECTURAS ----------------
 function pintarLecturas() {
   listaLecturasEl.innerHTML = "";
