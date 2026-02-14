@@ -79,7 +79,7 @@ const btnAsignarAdmin = document.getElementById("btn-asignar-admin");
 const btnNuevoReto = document.getElementById("btn-nuevo-reto");
 const selectAdmin = document.getElementById("selectAdmin");
 
-
+//const fechaFin = l.fechaFin ?? new Date();
 
 let modoCrearReto = false;
 
@@ -677,17 +677,13 @@ async function terminarLectura(l) {
 
   const recompensa = generarRecompensas(l.paginas);
 
-  if (recompensa.monedas) {
-    await updateDoc(userRef, { monedas: increment(recompensa.monedas) });
-   
-    usuarioMonedas.textContent =
-    Number(usuarioMonedas.textContent) + recompensa.monedas;
+if (recompensa.monedas) {
+  usuarioData.monedas += recompensa.monedas;
+  await updateDoc(userRef, { monedas: increment(recompensa.monedas) });
 
-usuarioData.monedas += recompensa.monedas;
   usuarioMonedas.textContent = usuarioData.monedas;
-    
-    alert(`💰 Has conseguido ${recompensa.monedas} marcapáginas!`);
-  }
+  alert(`💰 Has conseguido ${recompensa.monedas} marcapáginas!`);
+}
 
   if (recompensa.objeto) {
     alert(`🎁 Has encontrado un objeto mágico: ${recompensa.objeto}`);
@@ -866,8 +862,8 @@ function generarRecompensas(paginas) {
   const rand = Math.random() * 100;
   let objeto = null;
 
-  if (rand > 95) objeto = objetosLegendarios[Math.floor(Math.random() * objetosLegendarios.length)];
-  else if (rand > 85) objeto = objetosRaros[Math.floor(Math.random() * objetosRaros.length)];
+ if (rand > 95) objeto = OBJETOS_LEGENDARIOS[Math.floor(Math.random() * OBJETOS_LEGENDARIOS.length)];
+ else if (rand > 85) objeto = OBJETOS_RAROS[Math.floor(Math.random() * OBJETOS_RAROS.length)];
 
   return { monedas, objeto };
 }
@@ -1027,3 +1023,13 @@ function formatearFecha(ts) {
     year: "numeric"
   });
 }
+
+Object.values(logros).forEach(l => {
+  const fecha = l.fecha.seconds ? new Date(l.fecha.seconds * 1000) : new Date(l.fecha);
+  div.innerHTML = `
+    <strong>${l.titulo}</strong><br>
+    <small>${fecha.toLocaleDateString()}</small>
+  `;
+});
+
+
