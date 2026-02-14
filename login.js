@@ -54,7 +54,7 @@ async function initUsuario(uid) {
       avatarUrl: "",
       nivel: 1,
       xp: 0,
-      xpNecesaria: 100,
+      xpNecesaria: 420,
       prestigio: 0
     },
     stats: {

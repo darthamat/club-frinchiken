@@ -131,8 +131,8 @@ async function cargarPerfilUsuario() {
   usuarioData = {
     experiencia: data.experiencia ?? 0,
     nivel: data.nivel ?? 1,
-    experienciaNecesario:
-      data.experienciaNecesario ?? xpNecesariaParaNivel(data.nivel ?? 1),
+    experienciaNecesaria:
+      data.experienciaNecesaria ?? xpNecesariaParaNivel(data.nivel ?? 1),
     prestigio: data.prestigio ?? 0,
     monedas: data.monedas ?? 0,
     logros: data.logros ?? {},
@@ -404,14 +404,14 @@ async function registrarLecturaNormal() {
 }
 
 function actualizarXP(mostrarAlert = false) {
-  if (!usuarioData.experienciaNecesario || usuarioData.experienciaNecesario <= 0) {
-    usuarioData.experienciaNecesario = xpNecesariaParaNivel(usuarioData.nivel);
+  if (!usuarioData.experienciaNecesaria || usuarioData.experienciaNecesaria <= 0) {
+    usuarioData.experienciaNecesaria = xpNecesariaParaNivel(usuarioData.nivel);
   }
 
-  while (usuarioData.experiencia >= usuarioData.experienciaNecesario) {
-    usuarioData.experiencia -= usuarioData.experienciaNecesario;
+  while (usuarioData.experiencia >= usuarioData.experienciaNecesaria) {
+    usuarioData.experiencia -= usuarioData.experienciaNecesaria;
     usuarioData.nivel++;
-    usuarioData.experienciaNecesario = xpNecesariaParaNivel(usuarioData.nivel);
+    usuarioData.experienciaNecesaria = xpNecesariaParaNivel(usuarioData.nivel);
 
     if (mostrarAlert) {
       alert(`✨ ¡Has subido al nivel ${usuarioData.nivel}!`);
@@ -420,9 +420,9 @@ function actualizarXP(mostrarAlert = false) {
 
   nivelEl.textContent = usuarioData.nivel;
   xpBarraEl.style.width =
-    `${(usuarioData.experiencia / usuarioData.experienciaNecesario) * 100}%`;
+    `${(usuarioData.experiencia / usuarioData.experienciaNecesaria) * 100}%`;
   xpTextoEl.textContent =
-    `${usuarioData.experiencia} / ${usuarioData.experienciaNecesario} XP`;
+    `${usuarioData.experiencia} / ${usuarioData.experienciaNecesaria} XP`;
 }
 
 
@@ -610,7 +610,7 @@ async function terminarLectura(l) {
   await updateDoc(userRef, {
     experiencia: usuarioData.experiencia,
     nivel: usuarioData.nivel,
-    experienciaNecesario: usuarioData.experienciaNecesario
+    experienciaNecesaria: usuarioData.experienciaNecesaria
   });
 
   alert(`🎉 ¡Reto completado! +${l.paginas} XP`);
