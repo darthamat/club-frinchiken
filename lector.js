@@ -756,7 +756,7 @@ function pintarLecturas() {
       <div class="lectura-info">
         <strong>${l.titulo}</strong><br>
         <small>${l.autor}</small>
-        <small>📅 Leído el ${formatearFecha(lectura.fechaFin)}</small>
+        <small>📅 ${formatearFecha(l.fechaFin)}</small>
       </div>
 
       <div class="lectura-progreso">
