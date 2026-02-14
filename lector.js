@@ -449,69 +449,69 @@ btnReto.addEventListener("click", async () => {
 });
 
 // ---------------- REGISTRAR LECTURA ----------------
-btnRegistrar.addEventListener("click", async () => {
-  if (!tituloInput.value || !autorInput.value) return alert("Faltan datos");
-
-  if (modoCrearReto) {
-    // Crear reto en Firestore
-    await setDoc(doc(db, "retos", "reto-actual"), {
-      titulo: tituloInput.value,
-      autor: autorInput.value,
-      paginas: Number(paginasInput.value),
-      categoria: categoriaInput.value || "",
-      portadaUrl: portadaLibro.src,
-      creadoPor: usuarioActual.uid,
-      fecha: new Date()
-    });
-
-    alert("📚 Nuevo reto creado con éxito!");
-
-    modoCrearReto = false;
-    btnRegistrar.textContent = "Registrar lectura";
-    mostrarMensajeReto("Selecciona un libro para registrar una lectura");
-
-    // Limpiar campos si quieres
-    tituloInput.value = "";
-    autorInput.value = "";
-    paginasInput.value = "";
-    categoriaInput.value = "";
-    portadaLibro.src = "https://via.placeholder.com/120x180";
-
-    resultados.innerHTML = "";
-    resultados.classList.add("hidden");
-  } else {
-    // Código normal de registrar lectura
-    const lectura = {
-      titulo: tituloInput.value.trim(),
-      autor: autorInput.value.trim(),
-      paginas: Number(paginasInput.value) || 0,
-      categoria: categoriaInput?.value ?? "",
-      activa: true,
-      progreso: 0,
-      esReto: false,
-      fechaInicio: new Date()
-    };
-
-    const ref = await addDoc(
-      collection(db, "users", usuarioActual.uid, "lecturas"),
-      lectura
-    );
-
-    //lecturasCache.unshift({ id: ref.id, ...lectura });
-    //pintarLecturas();
-    await cargarLecturas();
-
-    // Limpiar inputs
-    tituloInput.value = "";
-    autorInput.value = "";
-    paginasInput.value = "";
-    categoriaInput.value = "";
-    portadaLibro.src = "https://via.placeholder.com/120x180";
-
-    resultados.innerHTML = "";
-    resultados.classList.add("hidden");
-  }
-});
+//btnRegistrar.addEventListener("click", async () => {
+//  if (!tituloInput.value || !autorInput.value) return alert("Faltan datos");
+//
+//  if (modoCrearReto) {
+//    // Crear reto en Firestore
+//    await setDoc(doc(db, "retos", "reto-actual"), {
+//      titulo: tituloInput.value,
+//      autor: autorInput.value,
+//      paginas: Number(paginasInput.value),
+//      categoria: categoriaInput.value || "",
+//      portadaUrl: portadaLibro.src,
+//      creadoPor: usuarioActual.uid,
+//      fecha: new Date()
+//    });
+//
+//    alert("📚 Nuevo reto creado con éxito!");
+//
+//    modoCrearReto = false;
+//    btnRegistrar.textContent = "Registrar lectura";
+//    mostrarMensajeReto("Selecciona un libro para registrar una lectura");
+//
+//    // Limpiar campos si quieres
+//    tituloInput.value = "";
+//    autorInput.value = "";
+//    paginasInput.value = "";
+//    categoriaInput.value = "";
+//    portadaLibro.src = "https://via.placeholder.com/120x180";
+//
+//    resultados.innerHTML = "";
+//    resultados.classList.add("hidden");
+//  } else {
+//    // Código normal de registrar lectura
+//    const lectura = {
+//      titulo: tituloInput.value.trim(),
+//      autor: autorInput.value.trim(),
+//      paginas: Number(paginasInput.value) || 0,
+//      categoria: categoriaInput?.value ?? "",
+//      activa: true,
+//      progreso: 0,
+//      esReto: false,
+//      fechaInicio: new Date()
+//    };
+//
+//    const ref = await addDoc(
+//      collection(db, "users", usuarioActual.uid, "lecturas"),
+//      lectura
+//    );
+//
+//    //lecturasCache.unshift({ id: ref.id, ...lectura });
+//    //pintarLecturas();
+//    await cargarLecturas();
+//
+//    // Limpiar inputs
+//    tituloInput.value = "";
+//    autorInput.value = "";
+//    paginasInput.value = "";
+//    categoriaInput.value = "";
+//    portadaLibro.src = "https://via.placeholder.com/120x180";
+//
+//    resultados.innerHTML = "";
+//    resultados.classList.add("hidden");
+//  }
+//});
 
 
   // Cambiar texto del botón
@@ -532,6 +532,42 @@ btnRegistrar.addEventListener("click", async () => {
     behavior: "smooth",
     block: "center"
   });
+
+btnRegistrar.onclick = manejarRegistro;
+
+async function manejarRegistro() {
+  if (!tituloInput.value || !autorInput.value) {
+    alert("Faltan datos");
+    return;
+  }
+
+  if (modoCrearReto) {
+    await crearRetoDesdeFormulario();
+  } else {
+    await registrarLecturaNormal();
+  }
+}
+
+async function registrarLecturaNormal() {
+  const lectura = {
+    titulo: tituloInput.value.trim(),
+    autor: autorInput.value.trim(),
+    paginas: Number(paginasInput.value) || 0,
+    categoria: categoriaInput?.value ?? "",
+    activa: true,
+    progreso: 0,
+    esReto: false,
+    fechaInicio: new Date()
+  };
+
+  await addDoc(
+    collection(db, "users", usuarioActual.uid, "lecturas"),
+    lectura
+  );
+
+  await cargarLecturas();
+  limpiarFormulario();
+}
 
 
 // ---------------- CARGAR LECTURAS ----------------
@@ -588,6 +624,7 @@ async function comprobarLogrosGlobales() {
 
 // ---------------- TERMINAR LECTURA ----------------
 async function terminarLectura(l) {
+  if (!l.activa) return;
   if (!usuarioActual) return;
 
   const userRef = doc(db, "users", usuarioActual.uid);
