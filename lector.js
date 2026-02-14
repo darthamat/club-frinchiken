@@ -14,6 +14,7 @@ import {
   query,
   getDocs,
   enableIndexedDbPersistence,
+  serverTimestamp,
   increment 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -108,6 +109,15 @@ onAuthStateChanged(auth, async (user) => {
 
   // 🔑 ESTA LÍNEA ES LA CLAVE
   usuarioActual.uid = user.uid;
+
+  const snap = await getDoc(doc(db, "users", user.uid));
+  const userData = snap.data();
+
+  const avatarImg = document.getElementById("avatarImg");
+
+if (userData.imagen_avatar && userData.imagen_avatar !== "") {
+  avatarImg.src = userData.imagen_avatar;
+}
 
   await cargarPerfilUsuario();
   await cargarLecturas();
@@ -683,6 +693,11 @@ usuarioData.monedas += recompensa.monedas;
     alert(`🎁 Has encontrado un objeto mágico: ${recompensa.objeto}`);
   }
 
+  await updateDoc(docRef, {
+  activa: false,
+  fechaFin: serverTimestamp()
+});
+
   pintarLecturas();
   await comprobarLogros(l);
   
@@ -741,6 +756,7 @@ function pintarLecturas() {
       <div class="lectura-info">
         <strong>${l.titulo}</strong><br>
         <small>${l.autor}</small>
+        <small>📅 Leído el ${formatearFecha(lectura.fechaFin)}</small>
       </div>
 
       <div class="lectura-progreso">
@@ -1001,3 +1017,13 @@ avatarInput.addEventListener("change", async () => {
 
   avatarImg.src = data.secure_url;
 });
+
+function formatearFecha(ts) {
+  if (!ts) return "";
+  const fecha = ts.toDate();
+  return fecha.toLocaleDateString("es-ES", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  });
+}
