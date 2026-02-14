@@ -94,4 +94,9 @@ btnRegister.addEventListener("click", async () => {
     errorMsg.textContent = e.message;
   }
 });
+function xpNecesariaParaNivel(nivel) {
+  if (nivel <= 5) return 400 + (nivel - 1) * 150;
+  if (nivel <= 10) return 1300 + (nivel - 6) * 350;
+  return 3600 + (nivel - 11) * 1000;
+}
 
