@@ -78,6 +78,8 @@ const btnAsignarAdmin = document.getElementById("btn-asignar-admin");
 const btnNuevoReto = document.getElementById("btn-nuevo-reto");
 const selectAdmin = document.getElementById("selectAdmin");
 
+
+
 let modoCrearReto = false;
 
 let usuarioActual = {
@@ -548,26 +550,26 @@ async function manejarRegistro() {
   }
 }
 
-async function registrarLecturaNormal() {
-  const lectura = {
-    titulo: tituloInput.value.trim(),
-    autor: autorInput.value.trim(),
-    paginas: Number(paginasInput.value) || 0,
-    categoria: categoriaInput?.value ?? "",
-    activa: true,
-    progreso: 0,
-    esReto: false,
-    fechaInicio: new Date()
-  };
-
-  await addDoc(
-    collection(db, "users", usuarioActual.uid, "lecturas"),
-    lectura
-  );
-
-  await cargarLecturas();
-  limpiarFormulario();
-}
+//async function registrarLecturaNormal() {
+//  const lectura = {
+//    titulo: tituloInput.value.trim(),
+//    autor: autorInput.value.trim(),
+//    paginas: Number(paginasInput.value) || 0,
+//    categoria: categoriaInput?.value ?? "",
+//    activa: true,
+//    progreso: 0,
+//    esReto: false,
+//    fechaInicio: new Date()
+//  };
+//
+//  await addDoc(
+//    collection(db, "users", usuarioActual.uid, "lecturas"),
+//    lectura
+//  );
+//
+//  await cargarLecturas();
+//  limpiarFormulario();
+//}
 
 
 // ---------------- CARGAR LECTURAS ----------------
@@ -973,3 +975,29 @@ async function asignarAdmin() {
 
   selectAdmin.style.display = "none";
 }
+
+avatarInput.addEventListener("change", async () => {
+  const file = avatarInput.files[0];
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", "avatar_users");
+
+  const res = await fetch(
+    "https://api.cloudinary.com/v1_1/dwuokewzr/image/upload",
+    {
+      method: "POST",
+      body: formData
+    }
+  );
+
+  const data = await res.json();
+
+  // Guardas SOLO la URL
+  await updateDoc(doc(db, "users", auth.currentUser.uid), {
+    imagen_avatar: data.secure_url
+  });
+
+  avatarImg.src = data.secure_url;
+});
