@@ -283,7 +283,7 @@ button.gold {
 }
 
 .reto-card::before {
-  content: "🏆 RETO ACTUAL";
+  content: "🏆 RETO LECTURA MENSUAL";
   font-size: 12px;
   letter-spacing: 1px;
   color: gold;
