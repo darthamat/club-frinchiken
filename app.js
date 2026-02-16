@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 // ---------------- CONFIG FIREBASE ----------------
@@ -152,4 +152,42 @@ document.addEventListener("DOMContentLoaded", () => {
   mostrarLogrosVisuales();
   setInterval(mostrarLogrosVisuales, 15000);
 });*/
+
+
+let indice = 0;
+let logros = [];
+
+function iniciarCicloLogros(lista) {
+  logros = lista;
+  mostrarLogro();
+  setInterval(siguienteLogro, 5000);
+}
+
+function siguienteLogro() {
+  indice = (indice + 1) % logros.length;
+  mostrarLogro();
+}
+
+function mostrarLogro() {
+  const l = logros[indice];
+  document.getElementById("logro-dinamico").innerHTML = `
+    <span class="icono">${l.icono}</span>
+    <strong>${l.nombre}</strong>
+    <small>${tiempoRelativo(l.fecha)}</small>
+  `;
+}
+
+function tiempoRelativo(fecha) {
+  const diff = Date.now() - fecha.toMillis();
+  const min = Math.floor(diff / 60000);
+
+  if (min < 1) return "ahora mismo";
+  if (min < 60) return `hace ${min} min`;
+
+  const h = Math.floor(min / 60);
+  if (h < 24) return `hace ${h} h`;
+
+  return "ayer";
+}
+
 
