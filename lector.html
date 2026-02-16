@@ -77,6 +77,9 @@
         <!-- Aquí se insertarán logros aleatorios -->
       </div>
     </div>
+        <span class="logro-icono">
+  {{ iconoLogro(logro) }}
+</span>
 
   </section>
 
@@ -147,6 +150,7 @@
   <section class="panel lectura">
     <h3>📖 Leyendo actualmente</h3>
     <p id="tituloReto">Cargando libro del reto...</p>
+
     <ul id="listaLecturas"></ul>
 
     <div class="progress-bar">
@@ -158,6 +162,26 @@
   </section>
 
 
+</div>
+  <div id="modalValoracion" class="modal hidden">
+  <div class="modal-content">
+    <h3>📘 ¿Has terminado el libro?</h3>
+
+    <div class="estrellas" id="estrellas"></div>
+
+    <p class="nota">Puntuación: <span id="notaValoracion">0</span> / 10</p>
+
+    <textarea
+      id="comentarioLectura"
+      placeholder="Escribe un comentario (opcional)"
+      rows="3"
+    ></textarea>
+
+    <div class="modal-acciones">
+      <button id="btnCancelarValoracion">Cancelar</button>
+      <button id="btnConfirmarValoracion">Confirmar</button>
+    </div>
+  </div>
 </div>
 
 <script type="module" src="lector.js"></script>

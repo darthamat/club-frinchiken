@@ -83,6 +83,9 @@ const selectAdmin = document.getElementById("selectAdmin");
 
 let modoCrearReto = false;
 
+let lecturaPendiente = null;
+let valoracionActual = 0;
+
 let usuarioActual = {
   uid: null,       // se llenará al cargar el usuario
   role: null,
@@ -156,6 +159,13 @@ usuarioActual.role = data.role ?? "user";
 usuarioActual.tipoAdmin = data.tipoAdmin ?? null;
 
 actualizarBotonesAdmin();
+
+  await addDoc(collection(db, "actividad_logros"), {
+  logroId: logro.id,
+  nombre: logro.nombre,
+  icono: logro.icono,
+  fecha: serverTimestamp()
+});
 
 
   nombrePersonajeEl.textContent = usuarioData.nombrePersonaje || "Sin nombre";
@@ -637,68 +647,221 @@ async function comprobarLogrosGlobales() {
 // ---------------- TERMINAR LECTURA ----------------
 async function terminarLectura(l) {
   if (!l.activa) return;
-  if (!usuarioActual) return;
 
+  lecturaPendiente = l;
+  valoracionActual = 0;
+
+  document.getElementById("comentarioLectura").value = "";
+
+  crearEstrellas();
+  actualizarEstrellas();
+
+  document
+    .getElementById("modalValoracion")
+    .classList.remove("hidden");
+}
+
+document.getElementById("btnCancelarValoracion").onclick = () => {
+  lecturaPendiente = null;
+  document
+    .getElementById("modalValoracion")
+    .classList.add("hidden");
+};
+
+document.getElementById("btnConfirmarValoracion").onclick = async () => {
+  if (!lecturaPendiente) return;
+
+  const comentario =
+    document.getElementById("comentarioLectura").value.trim();
+
+  document
+    .getElementById("modalValoracion")
+    .classList.add("hidden");
+
+  await finalizarLecturaConRecompensas(
+    lecturaPendiente,
+    valoracionActual,
+    comentario
+  );
+
+  lecturaPendiente = null;
+};
+
+async function finalizarLecturaConRecompensas(
+  l,
+  valoracion,
+  comentario
+) {
   const userRef = doc(db, "users", usuarioActual.uid);
-  const lecturaRef = doc(db, "users", usuarioActual.uid, "lecturas", l.id);
+  const lecturaRef = doc(
+    db,
+    "users",
+    usuarioActual.uid,
+    "lecturas",
+    l.id
+  );
 
-  // Marcar lectura como inactiva
+  // Guardar valoración
   await updateDoc(lecturaRef, {
     activa: false,
-    fechaFin: new Date()
+    fechaFin: serverTimestamp(),
+    valoracion,
+    comentario
   });
 
   l.activa = false;
 
-  // RPG logic
+  // 🎮 RPG
   if (l.esReto) {
-  usuarioData.experiencia += l.paginas;
+    usuarioData.experiencia += l.paginas;
 
-  actualizarXP();
+    actualizarXP(true);
 
-  await updateDoc(userRef, {
-    experiencia: usuarioData.experiencia,
-    nivel: usuarioData.nivel,
-    experienciaNecesaria: usuarioData.experienciaNecesaria
-  });
+    await updateDoc(userRef, {
+      experiencia: usuarioData.experiencia,
+      nivel: usuarioData.nivel,
+      experienciaNecesaria: usuarioData.experienciaNecesaria
+    });
 
-  alert(`🎉 ¡Reto completado! +${l.paginas} XP`);
-
-
-    
+    alert(`🏆 Reto completado +${l.paginas} XP`);
   } else {
-    await updateDoc(userRef, { prestigio: increment(l.paginas) });
-    
-    usuarioPrestigio.textContent = Number(usuarioPrestigio.textContent) + l.paginas;
-    
-    alert(`⭐ Lectura completada. Prestigio + ${l.paginas}`);
+    await updateDoc(userRef, {
+      prestigio: increment(l.paginas)
+    });
+
+    usuarioPrestigio.textContent =
+      Number(usuarioPrestigio.textContent) + l.paginas;
+
+    alert(`📚 Lectura completada +${l.paginas} prestigio`);
   }
 
-
+  // 💰 Recompensas
   const recompensa = generarRecompensas(l.paginas);
 
-if (recompensa.monedas) {
-  usuarioData.monedas += recompensa.monedas;
-  await updateDoc(userRef, { monedas: increment(recompensa.monedas) });
+  if (recompensa.monedas) {
+    usuarioData.monedas += recompensa.monedas;
 
-  usuarioMonedas.textContent = usuarioData.monedas;
-  alert(`💰 Has conseguido ${recompensa.monedas} marcapáginas!`);
-}
+    await updateDoc(userRef, {
+      monedas: increment(recompensa.monedas)
+    });
 
-  if (recompensa.objeto) {
-    alert(`🎁 Has encontrado un objeto mágico: ${recompensa.objeto}`);
+    usuarioMonedas.textContent = usuarioData.monedas;
+
+    alert(`💰 +${recompensa.monedas} marcapáginas`);
   }
 
-  await updateDoc(docRef, {
-  activa: false,
-  fechaFin: serverTimestamp()
-});
+  if (recompensa.objeto) {
+    alert(`🎁 Objeto mágico: ${recompensa.objeto}`);
+  }
+
+  // 🧠 BONUS por valoración alta
+  if (valoracion >= 4) {
+    await updateDoc(userRef, {
+      experiencia: increment(50)
+    });
+    alert("✨ Bonus crítico: +50 XP");
+  }
 
   pintarLecturas();
   await comprobarLogros(l);
-  
-  
 }
+
+function renderizarEstrellas(valoracion) {
+  if (!valoracion || valoracion <= 0) {
+    return `<span class="sin-valoracion">Sin valorar</span>`;
+  }
+
+  let html = `<div class="estrellas-card">`;
+  const estrellasCompletas = Math.floor(valoracion);
+  const media = valoracion % 1 >= 0.5;
+
+  for (let i = 0; i < estrellasCompletas; i++) {
+    html += `<span class="estrella activa">★</span>`;
+  }
+
+  if (media) {
+    html += `<span class="estrella media">★</span>`;
+  }
+
+  const restantes = 5 - estrellasCompletas - (media ? 1 : 0);
+  for (let i = 0; i < restantes; i++) {
+    html += `<span class="estrella">★</span>`;
+  }
+
+  html += `</div>`;
+  return html;
+}
+
+
+
+
+//
+//
+//
+//async function terminarLectura(l) {
+//  if (!l.activa) return;
+//  if (!usuarioActual) return;
+//
+//  const userRef = doc(db, "users", usuarioActual.uid);
+//  const lecturaRef = doc(db, "users", usuarioActual.uid, "lecturas", l.id);
+//
+//  // Marcar lectura como inactiva
+//  await updateDoc(lecturaRef, {
+//    activa: false,
+//    fechaFin: new Date()
+//  });
+//
+//  l.activa = false;
+//
+//  // RPG logic
+//  if (l.esReto) {
+//  usuarioData.experiencia += l.paginas;
+//
+//  actualizarXP();
+//
+//  await updateDoc(userRef, {
+//    experiencia: usuarioData.experiencia,
+//    nivel: usuarioData.nivel,
+//    experienciaNecesaria: usuarioData.experienciaNecesaria
+//  });
+//
+//  alert(`🎉 ¡Reto completado! +${l.paginas} XP`);
+//
+//
+//
+//  } else {
+//    await updateDoc(userRef, { prestigio: increment(l.paginas) });
+//
+//    usuarioPrestigio.textContent = Number(usuarioPrestigio.textContent) + l.paginas;
+//
+//    alert(`⭐ Lectura completada. Prestigio + ${l.paginas}`);
+//  }
+//
+//
+//  const recompensa = generarRecompensas(l.paginas);
+//
+//if (recompensa.monedas) {
+//  usuarioData.monedas += recompensa.monedas;
+//  await updateDoc(userRef, { monedas: increment(recompensa.monedas) });
+//
+//  usuarioMonedas.textContent = usuarioData.monedas;
+//  alert(`💰 Has conseguido ${recompensa.monedas} marcapáginas!`);
+//}
+//
+//  if (recompensa.objeto) {
+//    alert(`🎁 Has encontrado un objeto mágico: ${recompensa.objeto}`);
+//  }
+//
+//  await updateDoc(docRef, {
+//  activa: false,
+//  fechaFin: serverTimestamp()
+//});
+//
+//  pintarLecturas();
+//  await comprobarLogros(l);
+//
+//
+//}
 
 async function cambiarProgreso(lectura, delta) {
   if (!lectura || !lectura.id) return;
@@ -749,30 +912,59 @@ function pintarLecturas() {
     }
 
     card.innerHTML = `
-      <div class="lectura-info">
-        <strong>${l.titulo}</strong><br>
-        <small>${l.autor}</small>
-        <small>📅 ${formatearFecha(l.fechaFin)}</small>
-      </div>
+  <div class="lectura-info">
+    <strong>${l.titulo}</strong><br>
+    <small>${l.autor}</small>
 
-      <div class="lectura-progreso">
-        <div class="barra">
-          <div class="fill" style="width:${l.progreso || 0}%"></div>
-        </div>
-        <span>${l.progreso || 0}%</span>
-      </div>
+    ${renderizarEstrellas(l.valoracion)}
+
+    ${l.fechaFin ? `<small>📅 ${formatearFecha(l.fechaFin)}</small>` : ""}
+  </div>
+
+  <div class="lectura-progreso">
+    <div class="barra">
+      <div class="fill" style="width:${l.progreso || 0}%"></div>
+    </div>
+    <span>${l.progreso || 0}%</span>
+  </div>
 
   <div class="lectura-acciones">
-  <button class="btn-progreso" data-delta="-10">-10%</button>
-  <button class="btn-progreso" data-delta="10">+10%</button>
+    <button class="btn-progreso" data-delta="-10">-10%</button>
+    <button class="btn-progreso" data-delta="10">+10%</button>
 
-  <button class="btn-terminar">
-    ${l.esReto ? "🏆 Terminar reto" : "📗 Terminar libro"}
-  </button>
+    <button class="btn-terminar">
+      ${l.esReto ? "🏆 Terminar reto" : "📗 Terminar libro"}
+    </button>
 
-  <button class="btn-eliminar" title="Eliminar lectura">❌</button>
-</div>
-    `;
+    <button class="btn-eliminar">❌</button>
+  </div>
+`;
+//
+//    card.innerHTML = `
+//      <div class="lectura-info">
+//        <strong>${l.titulo}</strong><br>
+//        <small>${l.autor}</small>
+//        <small>📅 ${formatearFecha(l.fechaFin)}</small>
+//      </div>
+//
+//      <div class="lectura-progreso">
+//        <div class="barra">
+//          <div class="fill" style="width:${l.progreso || 0}%"></div>
+//        </div>
+//        <span>${l.progreso || 0}%</span>
+//      </div>
+//
+//  <div class="lectura-acciones">
+//  <button class="btn-progreso" data-delta="-10">-10%</button>
+//  <button class="btn-progreso" data-delta="10">+10%</button>
+//
+//  <button class="btn-terminar">
+//    ${l.esReto ? "🏆 Terminar reto" : "📗 Terminar libro"}
+//  </button>
+//
+//  <button class="btn-eliminar" title="Eliminar lectura">❌</button>
+//</div>
+//    `;
 
     // Eventos
     card.querySelectorAll(".btn-progreso").forEach(btn => {
@@ -925,23 +1117,50 @@ function pintarLogros() {
   const cont = document.getElementById("feedLogros");
   cont.innerHTML = "";
 
-  const logros = usuarioData.logros || {};
-
-  if (Object.keys(logros).length === 0) {
+  if (!usuarioData || !usuarioData.logros) {
     cont.textContent = "Aún no has desbloqueado logros";
     return;
   }
 
-  Object.values(logros).forEach(l => {
+const logros = Object.values(usuarioData.logros).sort(
+  (a, b) => {
+    const fa = a.fecha?.seconds
+      ? a.fecha.seconds * 1000
+      : new Date(a.fecha).getTime();
+
+    const fb = b.fecha?.seconds
+      ? b.fecha.seconds * 1000
+      : new Date(b.fecha).getTime();
+
+    return fb - fa;
+  }
+);
+
+  if (logros.length === 0) {
+    cont.textContent = "Aún no has desbloqueado logros";
+    return;
+  }
+
+  logros.forEach(l => {
     const div = document.createElement("div");
     div.className = "logro";
+
+    let fecha;
+    if (l.fecha?.seconds) {
+      fecha = new Date(l.fecha.seconds * 1000);
+    } else {
+      fecha = new Date(l.fecha);
+    }
+
     div.innerHTML = `
       <strong>${l.titulo}</strong><br>
-      <small>${new Date(l.fecha.seconds * 1000).toLocaleDateString()}</small>
+      <small>${fecha.toLocaleDateString("es-ES")}</small>
     `;
+
     cont.appendChild(div);
   });
 }
+
 function mostrarNotificacionLogro(logro) {
   alert(`🏆 Logro desbloqueado: ${logro.titulo}`);
 }
@@ -1023,13 +1242,79 @@ function formatearFecha(ts) {
     year: "numeric"
   });
 }
+//
+//Object.values(logros).forEach(l => {
+//  const fecha = l.fecha.seconds ? new Date(l.fecha.seconds * 1000) : new Date(l.fecha);
+//  div.innerHTML = `
+//    <strong>${l.titulo}</strong><br>
+//    <small>${fecha.toLocaleDateString()}</small>
+//  `;
+//});
+function crearEstrellas() {
+  const cont = document.getElementById("estrellas");
+  cont.innerHTML = "";
 
-Object.values(logros).forEach(l => {
-  const fecha = l.fecha.seconds ? new Date(l.fecha.seconds * 1000) : new Date(l.fecha);
-  div.innerHTML = `
-    <strong>${l.titulo}</strong><br>
-    <small>${fecha.toLocaleDateString()}</small>
+  for (let i = 1; i <= 10; i++) {
+    const star = document.createElement("span");
+    star.className = "estrella";
+    star.textContent = "★";
+
+    star.onclick = () => {
+      valoracionActual = i / 2;
+      actualizarEstrellas();
+    };
+
+    cont.appendChild(star);
+  }
+}
+
+function actualizarEstrellas() {
+  document.querySelectorAll(".estrella").forEach((s, i) => {
+    s.classList.toggle("activa", i < valoracionActual * 2);
+  });
+
+  document.getElementById("notaValoracion").textContent =
+    (valoracionActual * 2).toFixed(1);
+}
+function iconoLogro(logro) {
+  if (logro.tipo === "especial") return "⭐⭐⭐⭐½";
+  if (logro.tipo === "competitivo") return "🏆";
+  return logro.icono;
+}
+
+
+let indice = 0;
+let logros = [];
+
+function iniciarCicloLogros(lista) {
+  logros = lista;
+  mostrarLogro();
+  setInterval(siguienteLogro, 5000);
+}
+
+function siguienteLogro() {
+  indice = (indice + 1) % logros.length;
+  mostrarLogro();
+}
+
+function mostrarLogro() {
+  const l = logros[indice];
+  document.getElementById("logro-dinamico").innerHTML = `
+    <span class="icono">${l.icono}</span>
+    <strong>${l.nombre}</strong>
+    <small>${tiempoRelativo(l.fecha)}</small>
   `;
-});
+}
 
+function tiempoRelativo(fecha) {
+  const diff = Date.now() - fecha.toMillis();
+  const min = Math.floor(diff / 60000);
 
+  if (min < 1) return "ahora mismo";
+  if (min < 60) return `hace ${min} min`;
+
+  const h = Math.floor(min / 60);
+  if (h < 24) return `hace ${h} h`;
+
+  return "ayer";
+}

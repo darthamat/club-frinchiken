@@ -289,3 +289,89 @@ button.gold {
   color: gold;
   font-weight: bold;
 }
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: #ababab;
+  padding: 20px;
+  border-radius: 10px;
+  width: 320px;
+  text-align: center;
+}
+
+.estrellas {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin: 10px 0;
+  cursor: pointer;
+}
+
+.estrella {
+  font-size: 26px;
+  color: #ccc;
+}
+
+.estrella.activa {
+  color: gold;
+}
+
+.estrellas-card {
+  margin: 4px 0;
+}
+
+.estrellas-card .estrella {
+  font-size: 14px;
+  color: #ccc;
+}
+
+.estrellas-card .estrella.activa {
+  color: gold;
+}
+
+.estrellas-card .estrella.media {
+  color: gold;
+  opacity: 0.5;
+}
+
+.sin-valoracion {
+  font-size: 12px;
+  color: #888;
+  font-style: italic;
+}
+
+.panel-actividad {
+  background: #111;
+  border-radius: 12px;
+  padding: 1rem;
+  color: #eee;
+}
+
+#logro-dinamico {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  animation: fadeIn 0.5s ease;
+}
+
+.icono {
+  font-size: 1.5rem;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
