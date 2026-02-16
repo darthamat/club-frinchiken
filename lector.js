@@ -160,13 +160,6 @@ usuarioActual.tipoAdmin = data.tipoAdmin ?? null;
 
 actualizarBotonesAdmin();
 
-  await addDoc(collection(db, "actividad_logros"), {
-  logroId: logro.id,
-  nombre: logro.nombre,
-  icono: logro.icono,
-  fecha: serverTimestamp()
-});
-
 
   nombrePersonajeEl.textContent = usuarioData.nombrePersonaje || "Sin nombre";
   claseEl.textContent = usuarioData.clase || "Aventurero";
@@ -896,119 +889,245 @@ async function cambiarProgreso(lectura, delta) {
 
 
 // ---------------- PINTAR LECTURAS ----------------
+//
 function pintarLecturas() {
   listaLecturasEl.innerHTML = "";
 
+  // Filtrar lecturas según el toggle de terminadas
   const lista = mostrarTerminados
     ? lecturasCache
     : lecturasCache.filter(l => l.activa);
 
-  lista.forEach((l) => {
+  // Ordenar primero retos activos, luego lecturas normales
+  const retos = lista.filter(l => l.esReto);
+  const normales = lista.filter(l => !l.esReto);
+
+  const listaOrdenada = [...retos, ...normales];
+
+  listaOrdenada.forEach((l) => {
     const card = document.createElement("div");
     card.className = "lectura-card";
 
+    // Borde dorado para retos
+    if (l.esReto) card.classList.add("reto-card");
+
+    // Nombre dinámico para retos
+    let tituloVisible = l.titulo;
     if (l.esReto) {
-      card.classList.add("reto-card");
+      const fecha = l.fechaInicio
+        ? new Date(l.fechaInicio)
+        : new Date();
+      const mes = fecha.toLocaleString("es-ES", { month: "long" }).toUpperCase();
+      const anio = fecha.getFullYear();
+
+      tituloVisible = `🏆 RETO ${mes} ${anio}`;
     }
 
     card.innerHTML = `
-  <div class="lectura-info">
-    <strong>${l.titulo}</strong><br>
-    <small>${l.autor}</small>
+      <div class="lectura-info">
+        <strong>${tituloVisible}</strong><br>
+        <small>${l.autor || ""}</small>
+        ${renderizarEstrellas(l.valoracion)}
+        ${l.fechaFin ? `<small>📅 ${formatearFecha(l.fechaFin)}</small>` : ""}
+      </div>
 
-    ${renderizarEstrellas(l.valoracion)}
+      <div class="lectura-progreso">
+        <div class="barra">
+          <div class="fill" style="width:${l.progreso || 0}%"></div>
+        </div>
+        <span>${l.progreso || 0}%</span>
+      </div>
 
-    ${l.fechaFin ? `<small>📅 ${formatearFecha(l.fechaFin)}</small>` : ""}
-  </div>
+      <div class="lectura-acciones">
+        <button class="btn-progreso" data-delta="-10">-10%</button>
+        <button class="btn-progreso" data-delta="10">+10%</button>
+        <button class="btn-terminar">
+          ${l.esReto ? "🏆 Terminar reto" : "📗 Terminar libro"}
+        </button>
+        <button class="btn-eliminar">❌</button>
+      </div>
+    `;
 
-  <div class="lectura-progreso">
-    <div class="barra">
-      <div class="fill" style="width:${l.progreso || 0}%"></div>
-    </div>
-    <span>${l.progreso || 0}%</span>
-  </div>
-
-  <div class="lectura-acciones">
-    <button class="btn-progreso" data-delta="-10">-10%</button>
-    <button class="btn-progreso" data-delta="10">+10%</button>
-
-    <button class="btn-terminar">
-      ${l.esReto ? "🏆 Terminar reto" : "📗 Terminar libro"}
-    </button>
-
-    <button class="btn-eliminar">❌</button>
-  </div>
-`;
-//
-//    card.innerHTML = `
-//      <div class="lectura-info">
-//        <strong>${l.titulo}</strong><br>
-//        <small>${l.autor}</small>
-//        <small>📅 ${formatearFecha(l.fechaFin)}</small>
-//      </div>
-//
-//      <div class="lectura-progreso">
-//        <div class="barra">
-//          <div class="fill" style="width:${l.progreso || 0}%"></div>
-//        </div>
-//        <span>${l.progreso || 0}%</span>
-//      </div>
-//
-//  <div class="lectura-acciones">
-//  <button class="btn-progreso" data-delta="-10">-10%</button>
-//  <button class="btn-progreso" data-delta="10">+10%</button>
-//
-//  <button class="btn-terminar">
-//    ${l.esReto ? "🏆 Terminar reto" : "📗 Terminar libro"}
-//  </button>
-//
-//  <button class="btn-eliminar" title="Eliminar lectura">❌</button>
-//</div>
-//    `;
-
-    // Eventos
+    // Eventos de progreso
     card.querySelectorAll(".btn-progreso").forEach(btn => {
+      btn.disabled = !l.activa;
       btn.onclick = () => cambiarProgreso(l, Number(btn.dataset.delta));
     });
 
-    card.querySelectorAll(".btn-progreso").forEach(btn => {
-  btn.disabled = !l.activa;
-  btn.onclick = () => cambiarProgreso(l, Number(btn.dataset.delta));
-});
-
+    // Botón terminar lectura/reto
     card.querySelector(".btn-terminar").onclick = () => terminarLectura(l);
 
-    listaLecturasEl.appendChild(card);
-
+    // Botón eliminar lectura/reto
     card.querySelector(".btn-eliminar").onclick = async () => {
-  const texto = l.esReto
-    ? "⚠️ ¿Eliminar el reto actual?"
-    : "⚠️ ¿Eliminar esta lectura?";
+      const texto = l.esReto
+        ? "⚠️ ¿Eliminar este reto?"
+        : "⚠️ ¿Eliminar esta lectura?";
+      if (!confirm(texto)) return;
 
-  if (!confirm(texto)) return;
+      if (l.id) {
+        await deleteDoc(doc(db, "users", usuarioActual.uid, "lecturas", l.id));
+      }
 
-  if (l.id) {
-    await deleteDoc(
-      doc(db, "users", usuarioActual.uid, "lecturas", l.id)
-    );
-  }
+      // Eliminar de memoria y repintar
+      lecturasCache = lecturasCache.filter(x => x.id !== l.id);
+      pintarLecturas();
+    };
+
+    listaLecturasEl.appendChild(card);
+  });
+}
+
+
+
+//function pintarLecturas() {
+//  listaLecturasEl.innerHTML = "";
+//
+//  const lista = mostrarTerminados
+//    ? lecturasCache
+//    : lecturasCache.filter(l => l.activa);
+//
+//  lista.forEach((l) => {
+//    const card = document.createElement("div");
+//    card.className = "lectura-card";
+//
+//    if (l.esReto) {
+//      card.classList.add("reto-card");
+//    }
+//
+//    card.innerHTML = `
+//  <div class="lectura-info">
+//    <strong>${l.titulo}</strong><br>
+//    <small>${l.autor}</small>
+//
+//    ${renderizarEstrellas(l.valoracion)}
+//
+//    ${l.fechaFin ? `<small>📅 ${formatearFecha(l.fechaFin)}</small>` : ""}
+//  </div>
+//
+//  <div class="lectura-progreso">
+//    <div class="barra">
+//      <div class="fill" style="width:${l.progreso || 0}%"></div>
+//    </div>
+//    <span>${l.progreso || 0}%</span>
+//  </div>
+//
+//  <div class="lectura-acciones">
+//    <button class="btn-progreso" data-delta="-10">-10%</button>
+//    <button class="btn-progreso" data-delta="10">+10%</button>
+//
+//    <button class="btn-terminar">
+//      ${l.esReto ? "🏆 Terminar reto" : "📗 Terminar libro"}
+//    </button>
+//
+//    <button class="btn-eliminar">❌</button>
+//  </div>
+//`;
+//
+//    // Eventos
+//    card.querySelectorAll(".btn-progreso").forEach(btn => {
+//      btn.onclick = () => cambiarProgreso(l, Number(btn.dataset.delta));
+//    });
+//
+//    card.querySelectorAll(".btn-progreso").forEach(btn => {
+//  btn.disabled = !l.activa;
+//  btn.onclick = () => cambiarProgreso(l, Number(btn.dataset.delta));
+//});
+//
+//    card.querySelector(".btn-terminar").onclick = () => terminarLectura(l);
+//
+//    listaLecturasEl.appendChild(card);
+//
+//    card.querySelector(".btn-eliminar").onclick = async () => {
+//  const texto = l.esReto
+//    ? "⚠️ ¿Eliminar el reto actual?"
+//    : "⚠️ ¿Eliminar esta lectura?";
+//
+//  if (!confirm(texto)) return;
+//
+//  if (l.id) {
+//    await deleteDoc(
+//      doc(db, "users", usuarioActual.uid, "lecturas", l.id)
+//    );
+//  }
 
   // Eliminar de memoria
   lecturasCache = lecturasCache.filter(x => x.id !== l.id);
 
   pintarLecturas();
+
+//// ---------------- TOGGLE TERMINADAS ----------------
+//btnToggleTerminadas.addEventListener("click", () => {
+//  mostrarTerminados = !mostrarTerminados;
+//  btnToggleTerminadas.textContent = mostrarTerminados
+//    ? "Ocultar lecturas terminadas"
+//    : "Mostrar lecturas terminadas";
+//  pintarLecturas();
+//});
+
+
+
+btnToggleTerminadas.onclick = () => {
+  const panel = document.getElementById("panelTerminadas");
+  panel.classList.toggle("hidden");
+
+  if (!panel.classList.contains("hidden")) {
+    pintarTerminadas(panel);
+  }
 };
+
+function pintarTerminadas(panel) {
+  panel.innerHTML = ""; // Limpiar contenido
+
+  // Filtramos lecturas terminadas
+  const terminadas = lecturasCache.filter(l => !l.activa);
+
+  if (terminadas.length === 0) {
+    panel.innerHTML = "<p>No hay lecturas ni retos terminados aún</p>";
+    return;
+  }
+
+  terminadas.forEach(l => {
+    const div = document.createElement("div");
+    div.className = "lectura-card terminada"; // Clase base
+
+    // Si es un reto, añadimos clase reto-card para borde dorado
+    if (l.esReto) div.classList.add("reto-card");
+
+    // Fecha de finalización o del reto
+    let fechaTexto = "";
+    if (l.fechaFin) {
+      const fecha = l.fechaFin?.seconds
+        ? new Date(l.fechaFin.seconds * 1000)
+        : new Date(l.fechaFin);
+      // Para retos, mostrar mes y año; para lecturas normales, día/mes/año
+      fechaTexto = l.esReto
+        ? `📅 ${fecha.toLocaleDateString("es-ES", { month: 'long', year: 'numeric' })}`
+        : `📅 ${fecha.toLocaleDateString("es-ES")}`;
+    }
+
+    // Icono de logro/objetivo
+    const icono = l.esReto ? "🏆" : "";
+
+    div.innerHTML = `
+      <div class="lectura-info">
+        <strong>${l.titulo}</strong> ${icono}<br>
+        <small>${l.autor}</small><br>
+        ${renderizarEstrellas(l.valoracion)}
+        ${fechaTexto ? `<div class="fecha-reto">${fechaTexto}</div>` : ""}
+      </div>
+    `;
+
+    panel.appendChild(div);
   });
 }
 
-// ---------------- TOGGLE TERMINADAS ----------------
-btnToggleTerminadas.addEventListener("click", () => {
-  mostrarTerminados = !mostrarTerminados;
-  btnToggleTerminadas.textContent = mostrarTerminados
-    ? "Ocultar lecturas terminadas"
-    : "Mostrar lecturas terminadas";
-  pintarLecturas();
-});
+
+
+
+
+
+
+
 
 // ---------------- BÚSQUEDA LIBROS ----------------
 async function buscarLibros(texto) {
@@ -1280,5 +1399,40 @@ function iconoLogro(logro) {
   if (logro.tipo === "especial") return "⭐⭐⭐⭐½";
   if (logro.tipo === "competitivo") return "🏆";
   return logro.icono;
+}
+
+async function asignarRetosActivos(usuarioId) {
+  const retosRef = collection(db, "retos");
+  const snapshot = await getDocs(query(retosRef, where("activo", "==", true)));
+
+  for (const retoDoc of snapshot.docs) {
+    const retoData = retoDoc.data();
+    const idReto = retoDoc.id;
+
+    // Revisar si ya está asignado
+    const lecturaSnap = await getDocs(
+      query(
+        collection(db, "users", usuarioId, "lecturas"),
+        where("esReto", "==", true),
+        where("idReto", "==", idReto)
+      )
+    );
+
+    if (lecturaSnap.empty) {
+      // Asignar reto al usuario
+      await addDoc(collection(db, "users", usuarioId, "lecturas"), {
+        idReto,
+        titulo: retoData.titulo,
+        autor: retoData.autor,
+        paginas: retoData.paginas,
+        categoria: retoData.categoria || "",
+        portadaUrl: retoData.portadaUrl || "",
+        esReto: true,
+        activa: true,
+        progreso: 0,
+        fechaInicio: new Date()
+      });
+    }
+  }
 }
 

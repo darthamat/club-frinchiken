@@ -531,7 +531,17 @@ button.gold {
   align-items: center;
   border-radius: 6px;
 }
-
+.panel-horizontal {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 4px 0;
+}
+.reto-card {
+  border: 2px solid #2196f3;
+  min-width: 180px;
+  flex-shrink: 0;
+}
 
 
 

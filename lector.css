@@ -375,3 +375,61 @@ button.gold {
   from { opacity: 0; transform: translateY(5px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* ===== BLOQUES ===== */
+.bloque-retos {
+  margin-bottom: 24px;
+  padding: 12px;
+  background: #f3f7ff;
+  border-radius: 10px;
+  border-left: 6px solid #3f51b5;
+}
+
+.bloque-retos h3 {
+  margin: 0 0 10px;
+  font-size: 1.1em;
+}
+
+.bloque-lecturas h3 {
+  margin: 16px 0 8px;
+}
+
+/* ===== PANEL RETOS ===== */
+.panel-retos {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
+.panel-retos .lectura-card {
+  min-width: 220px;
+  flex-shrink: 0;
+  background: #fff;
+  border: 2px solid #3f51b5;
+}
+
+/* ===== RETOS NO ACTIVOS ===== */
+.reto-inactivo {
+  opacity: 0.55;
+  filter: grayscale(0.6);
+  border-style: dashed;
+}
+
+/* ===== LECTURAS NORMALES ===== */
+.bloque-lecturas .lectura-card {
+  border-left: 4px solid #4caf50;
+}
+
+#panelTerminadas {
+  margin-top: 20px;
+  opacity: 0.85;
+}
+
+#panelTerminadas.hidden {
+  display: none;
+}
+
+.lectura-card.terminada {
+  background: #1a1a1a;
+ }
