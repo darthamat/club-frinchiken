@@ -747,13 +747,7 @@ async function finalizarLecturaConRecompensas(
     alert(`🎁 Objeto mágico: ${recompensa.objeto}`);
   }
 
-  // 🧠 BONUS por valoración alta
-  if (valoracion >= 4) {
-    await updateDoc(userRef, {
-      experiencia: increment(50)
-    });
-    alert("✨ Bonus crítico: +50 XP");
-  }
+
 
   pintarLecturas();
   await comprobarLogros(l);

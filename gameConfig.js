@@ -210,6 +210,15 @@ export const LOGROS = [
     condicion: (l) => l.categoria?.toLowerCase().includes("fantasia")
   },
 
+    {
+    id: "cf",
+    nombre: "Mente científica",
+    descripcion: "Leíste ciencia ficción",
+    tipo: "normal",
+    icono: "📚",
+    condicion: (l) => l.categoria?.toLowerCase().includes("ciencia ficción")
+  },
+
   // ======================
   // ⭐ LOGROS ESPECIALES
   // ======================
@@ -217,7 +226,7 @@ export const LOGROS = [
   {
     id: "critico_literario",
     nombre: "Crítico literario ⭐⭐⭐⭐½",
-    descripcion: "Recibiste una valoración media superior a 4,5",
+    descripcion: "Diste una valoración media superior a 4,5",
     tipo: "especial",
     icono: "⭐",
     condicion: (stats) => stats.mediaValoraciones >= 4.5
