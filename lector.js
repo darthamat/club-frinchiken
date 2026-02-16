@@ -912,41 +912,50 @@ function pintarLecturas() {
     if (l.esReto) card.classList.add("reto-card");
 
     // Nombre dinámico para retos
-    let tituloVisible = l.titulo;
-    if (l.esReto) {
-      const fecha = l.fechaInicio
-        ? new Date(l.fechaInicio)
-        : new Date();
-      const mes = fecha.toLocaleString("es-ES", { month: "long" }).toUpperCase();
-      const anio = fecha.getFullYear();
+let tituloVisible = l.titulo;
 
-      tituloVisible = `🏆 RETO ${mes} ${anio}`;
-    }
+if (l.esReto) {
+  let fechaReto;
+  if (l.fechaInicio) {
+    // Manejar Firestore Timestamp o string
+    fechaReto = l.fechaInicio.toDate ? l.fechaInicio.toDate() : new Date(l.fechaInicio);
+  } else {
+    fechaReto = new Date();
+  }
 
-    card.innerHTML = `
-      <div class="lectura-info">
-        <strong>${tituloVisible}</strong><br>
-        <small>${l.autor || ""}</small>
-        ${renderizarEstrellas(l.valoracion)}
-        ${l.fechaFin ? `<small>📅 ${formatearFecha(l.fechaFin)}</small>` : ""}
-      </div>
+  const mes = fechaReto.toLocaleString("es-ES", { month: "long" }).toUpperCase();
+  const anio = fechaReto.getFullYear();
 
-      <div class="lectura-progreso">
-        <div class="barra">
-          <div class="fill" style="width:${l.progreso || 0}%"></div>
-        </div>
-        <span>${l.progreso || 0}%</span>
-      </div>
+  // Aquí construimos el título visible
+  tituloVisible = `🏆 RETO ${mes} ${anio}`;
+}
 
-      <div class="lectura-acciones">
-        <button class="btn-progreso" data-delta="-10">-10%</button>
-        <button class="btn-progreso" data-delta="10">+10%</button>
-        <button class="btn-terminar">
-          ${l.esReto ? "🏆 Terminar reto" : "📗 Terminar libro"}
-        </button>
-        <button class="btn-eliminar">❌</button>
-      </div>
-    `;
+card.innerHTML = `
+  <div class="lectura-info">
+    <strong title="${l.titulo}">${tituloVisible}</strong><br>
+    <small>${l.autor || ""}</small>
+
+    ${renderizarEstrellas(l.valoracion)}
+
+    ${l.fechaFin ? `<small>📅 ${formatearFecha(l.fechaFin)}</small>` : ""}
+  </div>
+
+  <div class="lectura-progreso">
+    <div class="barra">
+      <div class="fill" style="width:${l.progreso || 0}%"></div>
+    </div>
+    <span>${l.progreso || 0}%</span>
+  </div>
+
+  <div class="lectura-acciones">
+    <button class="btn-progreso" data-delta="-10">-10%</button>
+    <button class="btn-progreso" data-delta="10">+10%</button>
+    <button class="btn-terminar">
+      ${l.esReto ? "🏆 Terminar reto" : "📗 Terminar libro"}
+    </button>
+    <button class="btn-eliminar">❌</button>
+  </div>
+`;
 
     // Eventos de progreso
     card.querySelectorAll(".btn-progreso").forEach(btn => {
