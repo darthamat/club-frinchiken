@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="lector.css">
+  <title>Club de Lectura Frinchiken - Lector</title>
+</head>
+<body>
+
+<div class="hud">
+<button id="btnLogout" class="btn-secundario">🚪 Salir</button>
+  <!-- ==================== PLAYER CARD ==================== -->
+  <section class="player-card">
+   <label class="avatar-wrapper">
+  <img id="avatarImg" src="./assets/avatar.png" class="avatar" alt="Avatar">
+  <input type="file" id="avatarInput" accept="image/*" hidden>
+</label>
+    <div>
+      <h2 id="nombrePersonaje">Cargando...</h2>
+
+
+      <div class="botones-admin">
+  <select id="selectAdmin" style="display:none;"></select>
+  <button id="btn-asignar-admin">👑 Elegir nuevo Retador</button>
+  <button id="btn-nuevo-reto">📖 Nuevo reto</button>
+</div>
+
+
+      <p>Clase: <span id="clasePersonaje">---</span></p>
+      <p>Nivel <span id="nivelUsuario">1</span></p>
+      <div class="xp-bar">
+        <div class="xp-fill" id="barraXP"></div>
+      </div>
+      <small id="xpUsuario">0 / 100 XP</small>
+       <p>⭐ Prestigio: <span id="usuarioPrestigio">0</span><br></p>
+ <p> 💰 Marcapáginas bonitos: <span id="usuarioMonedas">0</span></p>
+    </div>
+  </section>
+
+  <!-- ==================== PANELS ==================== -->
+  <section class="panels">
+
+    <!-- Stats RPG -->
+    <div class="panel stats-panel">
+      <h3>📊 Características</h3>
+      <div class="stat">Fuerza: <span id="statFuerza">10</span></div>
+      <div class="stat">Agilidad: <span id="statAgilidad">10</span></div>
+      <div class="stat">Inteligencia: <span id="statInteligencia">10</span></div>
+      <div class="stat">Sabiduría: <span id="statSabiduria">10</span></div>
+
+      <div class="stat">
+        Mente:
+        <div class="barra-stat">
+          <div class="barra-fill" id="statMente"></div>
+        </div>
+      </div>
+
+      <div class="stat">
+        Corazón:
+        <div class="barra-stat">
+          <div class="barra-fill" id="statCorazon"></div>
+        </div>
+      </div>
+
+      <div class="stat">
+        Fatiga:
+        <div class="barra-stat">
+          <div class="barra-fill" id="statFatiga"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Logros -->
+    <div class="panel logros-panel">
+      <h3>🏆 Logros</h3>
+      <div id="feedLogros">
+        <!-- Aquí se insertarán logros aleatorios -->
+      </div>
+    </div>
+        <span class="logro-icono">
+  {{ iconoLogro(logro) }}
+</span>
+
+  </section>
+
+<!-- ==================== REGISTRO DE NUEVAS LECTURAS ==================== -->
+<section class="panel registro-lectura">
+
+  <h2>📚 Registrar lectura</h2>
+
+   <div id="mensajeReto" class="mensaje-reto hidden"></div>
+
+  <!-- Botón para rellenar el libro del reto -->
+  <button class="btn-reto" id="btnReto">📖 Reto Actual</button>
+
+  <!-- Buscador normal -->
+  <div class="buscador">
+    <input id="busquedaLibro" type="text" placeholder="Buscar libro..." />
+    <button type="button" id="btnBuscar">🔍</button>
+  </div>
+
+  <!-- Lista de resultados -->
+  <ul id="resultados" class="resultados hidden"></ul>
+
+  <!-- Formulario de la lectura -->
+  <div class="libro-seleccionado">
+    <img id="portadaLibro"
+     src="https://via.placeholder.com/120x180"
+     alt="Portada" />
+
+
+    <div class="datos-libro">
+      <label>
+        Título
+        <input type="text" id="titulo">
+      </label>
+      <label>
+        Autor
+        <input type="text" id="autor">
+      </label>
+      <label>
+        Páginas
+        <input type="number" id="paginas">
+      </label>
+      <label>
+        Categoría
+        <select id="categoria">
+          <option>Fantasía</option>
+          <option>Ciencia ficción</option>
+          <option>Ensayo</option>
+          <option>Historia</option>
+          <option>Romance</option>
+          <option>Novela</option>
+          <option>Terror</option>
+          <option>Thriller</option>
+        </select>
+      </label>
+    </div>
+  </div>
+
+  <!-- Botón para registrar la lectura -->
+  <div class="acciones">
+    <button class="btn-secundario">Cancelar</button>
+    <button class="btn-principal" id="btnRegistrar">📘 Registrar lectura</button>
+  </div>
+
+</section>
+
+    <!-- ==================== LECTURA ACTUAL ==================== -->
+  <section class="panel lectura">
+    <h3>📖 Leyendo actualmente</h3>
+
+       <h3>Retos activos</h3>
+<div id="panelRetos" class="panel-horizontal"></div>
+
+    <ul id="listaLecturas"></ul>
+
+    <div id="panelTerminadas" class="hidden"></div>
+
+
+
+
+<h3>Mis lecturas</h3>
+<div id="panelLecturas"></div>
+  </section>
+
+
+
+
+
+
+</div>
+  <div id="modalValoracion" class="modal hidden">
+  <div class="modal-content">
+    <h3>📘 ¿Has terminado el libro?</h3>
+
+    <div class="estrellas" id="estrellas"></div>
+
+    <p class="nota">Puntuación: <span id="notaValoracion">0</span> / 10</p>
+
+    <textarea
+      id="comentarioLectura"
+      placeholder="Escribe un comentario (opcional)"
+      rows="3"
+    ></textarea>
+
+    <div class="modal-acciones">
+      <button id="btnCancelarValoracion">Cancelar</button>
+      <button id="btnConfirmarValoracion">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="lector.js"></script>
+</body>
+</html>
+
+
+

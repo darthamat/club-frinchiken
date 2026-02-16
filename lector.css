@@ -1,0 +1,435 @@
+body {
+  background: #1b1f2a;
+  font-family: 'Segoe UI', sans-serif;
+  color: #eee;
+}
+
+body {
+  background:
+    linear-gradient(rgba(245, 245, 240, 0.9), rgba(245, 245, 240, 0.9)),
+    url("assets/background.jpg");
+  background-size: cover;
+  background-attachment: fixed;
+  font-family: 'Segoe UI', sans-serif;
+  color: eee222;
+}
+
+.hud {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+}
+.nombrePersonaje {
+  font-size: 1.3em;
+  font-weight: bold;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid #c9a227;
+  outline: none;
+}
+
+.player-card {
+  display: flex;
+  gap: 20px;
+  background: #252b3a;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0,0,0,.4);
+}
+
+.avatar {
+  width: 200px;
+  height: 200px;
+  border-radius: 15%;
+  border: 3px solid gold;
+  margin-top: 20px;
+}
+
+.xp-bar, .progress-bar {
+  background: #333;
+  border-radius: 10px;
+  overflow: hidden;
+  height: 12px;
+}
+
+.xp-fill {
+  width: 68%;
+  height: 100%;
+  background: linear-gradient(90deg, gold, orange);
+}
+
+.progress-fill {
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(90deg, #00ffaa, #00cc88);
+}
+
+.panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.panel {
+  background: #252b3a;
+  padding: 15px;
+  border-radius: 12px;
+}
+
+button {
+  background: #3b82f6;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+button.gold {
+  background: linear-gradient(90deg, gold, orange);
+  color: black;
+}
+.registro-lectura {
+
+  max-width: auto;
+  margin: 20px auto;
+}
+
+#portadaLibro {
+  display: block;
+  max-width: 100%;
+  width: 400px; /* más grande */
+  margin: 15px auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+.resultados {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  background: #1f2533;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0,0,0,.4);
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.resultados li {
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(255,255,255,.05);
+  cursor: pointer;
+  transition: background .2s ease, transform .15s ease;
+}
+
+.resultados li:last-child {
+  border-bottom: none;
+}
+
+.resultados li:hover {
+  background: linear-gradient(90deg, rgba(255,215,0,.25), rgba(255,165,0,.15));
+  transform: translateX(4px);
+}
+
+.resultados li:active {
+  background: rgba(255,215,0,.35);
+}
+.player-card {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  padding: 15px;
+  background: #252b3a;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.4);
+}
+
+.info-player {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.botones-admin {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 5px;
+}
+
+.botones-admin select {
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.botones-admin button {
+  padding: 5px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  color: white;
+}
+
+#btn-asignar-admin {
+  background: #3b82f6;
+}
+
+#btn-nuevo-reto {
+  background: linear-gradient(90deg, gold, orange);
+  color: black;
+}
+
+.mensaje-reto {
+  background: linear-gradient(90deg, gold, orange);
+  color: #111;
+  padding: 10px;
+  border-radius: 10px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.hidden {
+  display: none;
+}
+
+.modo-reto {
+  box-shadow: 0 0 30px gold;
+  animation: pulso 1.5s infinite;
+}
+
+@keyframes pulso {
+  0% { box-shadow: 0 0 20px gold; }
+  50% { box-shadow: 0 0 35px orange; }
+  100% { box-shadow: 0 0 20px gold; }
+}
+
+#selectAdmin {
+  min-width: 220px;
+  margin-left: 10px;
+}
+
+.player-card .botones-admin {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.lectura-card {
+  background: #1e1e1e;
+  border: 2px solid #333;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* 🔥 RETO ACTUAL */
+.reto-card {
+  border: 3px solid gold;
+  background: linear-gradient(145deg, #2a2300, #1a1600);
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+}
+
+/* Progreso */
+.lectura-progreso {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.barra {
+  flex: 1;
+  height: 10px;
+  background: #333;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.barra .fill {
+  height: 100%;
+  background: #00aaff;
+}
+
+.reto-card .barra .fill {
+  background: gold;
+}
+
+/* Acciones */
+.lectura-acciones {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-terminar {
+  background: #444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.reto-card .btn-terminar {
+  background: gold;
+  color: #000;
+  font-weight: bold;
+}
+
+.reto-card::before {
+  content: "🏆 RETO LECTURA MENSUAL";
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: gold;
+  font-weight: bold;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: #ababab;
+  padding: 20px;
+  border-radius: 10px;
+  width: 320px;
+  text-align: center;
+}
+
+.estrellas {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin: 10px 0;
+  cursor: pointer;
+}
+
+.estrella {
+  font-size: 26px;
+  color: #ccc;
+}
+
+.estrella.activa {
+  color: gold;
+}
+
+.estrellas-card {
+  margin: 4px 0;
+}
+
+.estrellas-card .estrella {
+  font-size: 14px;
+  color: #ccc;
+}
+
+.estrellas-card .estrella.activa {
+  color: gold;
+}
+
+.estrellas-card .estrella.media {
+  color: gold;
+  opacity: 0.5;
+}
+
+.sin-valoracion {
+  font-size: 12px;
+  color: #888;
+  font-style: italic;
+}
+
+.panel-actividad {
+  background: #111;
+  border-radius: 12px;
+  padding: 1rem;
+  color: #eee;
+}
+
+#logro-dinamico {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  animation: fadeIn 0.5s ease;
+}
+
+.icono {
+  font-size: 1.5rem;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== BLOQUES ===== */
+.bloque-retos {
+  margin-bottom: 24px;
+  padding: 12px;
+  background: #f3f7ff;
+  border-radius: 10px;
+  border-left: 6px solid #3f51b5;
+}
+
+.bloque-retos h3 {
+  margin: 0 0 10px;
+  font-size: 1.1em;
+}
+
+.bloque-lecturas h3 {
+  margin: 16px 0 8px;
+}
+
+/* ===== PANEL RETOS ===== */
+.panel-retos {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
+.panel-retos .lectura-card {
+  min-width: 220px;
+  flex-shrink: 0;
+  background: #fff;
+  border: 2px solid #3f51b5;
+}
+
+/* ===== RETOS NO ACTIVOS ===== */
+.reto-inactivo {
+  opacity: 0.55;
+  filter: grayscale(0.6);
+  border-style: dashed;
+}
+
+/* ===== LECTURAS NORMALES ===== */
+.bloque-lecturas .lectura-card {
+  border-left: 4px solid #4caf50;
+}
+
+#panelTerminadas {
+  margin-top: 20px;
+  opacity: 0.85;
+}
+
+#panelTerminadas.hidden {
+  display: none;
+}
+
+.lectura-card.terminada {
+  background: #1a1a1a;
+ }

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="style.css">
+  <title>Club de Lectura Frinchiken</title>
+</head>
+<body>
+
+<!-- ==================== HEADER ==================== -->
+<header class="top-bar" style="display:flex; justify-content:center; gap:10px; padding:10px;">
+  <button id="btnLoginPage">Acceder</button>
+  <button id="btnRegisterPage">Registrar nueva cuenta</button>
+</header>
+<hr class="divider" style="display:flex; justify-content:center; gap:1px; padding:1px;">
+
+<!-- ==================== RETO ACTUAL ==================== -->
+<div class="container" style="width:70%; margin:auto; text-align:center;">
+  <h1>===+++---RETO ACTUAL---+++===</h1>
+  <h2 id="titulo">Cargando...</h2>
+  <p id="autor"></p>
+  <img id="portada" src=" " alt="Portada del libro" style="max-width:250px; display:block; margin:auto;">
+</div>
+
+<!-- ==================== LOGROS ==================== -->
+
+<section class="panel-actividad">
+  <h3>🏆 Logros recientes</h3>
+  <div id="logro-dinamico" class="panel-logros"></div>
+</section>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
