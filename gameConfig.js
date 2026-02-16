@@ -112,7 +112,7 @@ export const OBJETOS_LEGENDARIOS = [
 
 ];
 
-export const LOGROS = [
+export const LOGROS1 = [
 
   // ======================
   // 🌱 MICRO-LOGROS (todos ganan algo)
@@ -403,3 +403,154 @@ export const LOGROS = [
 //  }
 //}
 //];
+
+// ======================
+// 🏆 LOGROS Y RECOMPENSAS
+// ======================
+
+// Función auxiliar para normalizar categorías
+function normalizarGenero(cat) {
+  return cat?.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+}
+
+// Cada logro tiene: id, nombre, descripcion, tipo, icono, condicion (lectura o stats)
+// y opcionalmente efectos extra sobre las características
+export const LOGROS = [
+  // ======================
+  // 🌱 MICRO-LOGROS (todos ganan algo)
+  // ======================
+  {
+    id: "primer_libro",
+    nombre: "Primer capítulo",
+    descripcion: "Completaste tu primera lectura",
+    tipo: "micro",
+    icono: "📘",
+    condicion: (l) => l && l.finalizada === true,
+    efectos: { xp: 10, monedas: 5 }
+  },
+  {
+    id: "primera_resena",
+    nombre: "Opinión propia",
+    descripcion: "Escribiste tu primera reseña",
+    tipo: "micro",
+    icono: "✍️",
+    condicion: (stats) => stats.totalResenas >= 1,
+    efectos: { xp: 5 }
+  },
+  {
+    id: "racha_3_dias",
+    nombre: "Constancia",
+    descripcion: "Leíste 3 días seguidos",
+    tipo: "micro",
+    icono: "🔥",
+    condicion: (stats) => stats.rachaDias >= 3,
+    efectos: { monedas: 10 }
+  },
+
+  // ======================
+  // 📚 LOGROS NORMALES POR ESTADÍSTICAS
+  // ======================
+  {
+    id: "lector_incansable",
+    nombre: "Lector incansable",
+    descripcion: "Completaste 10 libros",
+    tipo: "normal",
+    icono: "📚",
+    condicion: (stats) => stats.totalLibros >= 10,
+    efectos: { xp: 50 }
+  },
+  {
+    id: "tocho_1000",
+    nombre: "Lector/a de tochos",
+    descripcion: "Leíste un libro de 1000 páginas o más",
+    tipo: "normal",
+    icono: "📖",
+    condicion: (l) => l.paginas >= 1000,
+    efectos: { xp: 20 }
+  },
+
+  // ======================
+  // 🎭 LOGROS POR GÉNERO (y características)
+  // ======================
+  {
+    id: "romantico",
+    nombre: "Corazón de tinta",
+    descripcion: "Leíste un libro romántico",
+    tipo: "normal",
+    icono: "❤️",
+    condicion: (l) => {
+      const cat = normalizarGenero(l.categoria);
+      return cat?.includes("romance") || cat?.includes("amor") || cat?.includes("erotico");
+    },
+    efectos: { corazon: 1 } // +1 a la característica corazon
+  },
+  {
+    id: "erotico",
+    nombre: "Lector/a cachondo/a 😏",
+    descripcion: "Leíste literatura erótica",
+    tipo: "normal",
+    icono: "🔥",
+    condicion: (l) => normalizarGenero(l.categoria)?.includes("erotico"),
+    efectos: { corazon: 1 }
+  },
+  {
+    id: "fantasia",
+    nombre: "Soñador/a empedernido",
+    descripcion: "Leíste literatura fantástica",
+    tipo: "normal",
+    icono: "🐉",
+    condicion: (l) => normalizarGenero(l.categoria)?.includes("fantasia")
+  },
+  {
+    id: "cf",
+    nombre: "Mente científica",
+    descripcion: "Leíste ciencia ficción",
+    tipo: "normal",
+    icono: "🧪",
+    condicion: (l) => normalizarGenero(l.categoria)?.includes("ciencia ficcion"),
+    efectos: { mente: 1 } // +1 a la característica mente
+  },
+
+   {
+    id: "terror",
+    titulo: "Mal rollito - Leíste un libro de terror",
+    descripcion: "Leíste un libro de terror",
+    condicion: (l) => normalizarGenero(l.categoria)?.includes("terror"),
+     efectos: { mente: -1 } // +1 a la característica mente
+ },
+
+  // ======================
+  // ⭐ LOGROS ESPECIALES
+  // ======================
+  {
+    id: "critico_literario",
+    nombre: "Crítico literario ⭐⭐⭐⭐½",
+    descripcion: "Diste una valoración media superior a 4,5",
+    tipo: "especial",
+    icono: "⭐",
+    condicion: (stats) => stats.mediaValoraciones >= 4.5,
+    efectos: { prestigio: 50 }
+  },
+  {
+    id: "devorador_anual",
+    nombre: "Devorador/a de bibliotecas",
+    descripcion: "Leíste 30 libros en un año",
+    tipo: "especial",
+    icono: "🏛️",
+    condicion: (stats) => stats.librosAnio >= 30,
+    efectos: { xp: 500 }
+  },
+
+  // ======================
+  // 🏆 RETOS MENSUALES
+  // ======================
+  {
+    id: "reto_actual",
+    nombre: "RETO",
+    descripcion: "Completaste el reto mensual",
+    tipo: "reto",
+    icono: "🏆",
+    condicion: (l) => l.esReto === true,
+    efectos: { xp: 50, monedas: 25, prestigio: 1 }
+  }
+];
