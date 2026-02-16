@@ -492,6 +492,9 @@ button.gold {
 }
 
 .panel-actividad {
+  width: auto;
+  max-width: fit-content;
+  justify-self: center;
   background: #111;
   border-radius: 12px;
   padding: 1rem;
@@ -500,7 +503,9 @@ button.gold {
 }
 
 #logro-dinamico {
+
   display: flex;
+
   align-items: center;
   gap: 0.5rem;
   animation: fadeIn 0.5s ease;
@@ -513,6 +518,18 @@ button.gold {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(5px); }
   to { opacity: 1; transform: translateY(0); }
+}
+.panel-logros {
+  max-width: auto;       /* o el ancho que quieras */
+  height: 150px;           /* altura fija */
+  overflow: hidden;        /* esconder overflow */
+  display: flex;
+  flex-direction: column;  /* vertical */
+  gap: 8px;
+
+  padding: 8px;
+  align-items: center;
+  border-radius: 6px;
 }
 
 

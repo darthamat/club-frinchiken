@@ -86,7 +86,7 @@ async function mostrarLogrosVisuales() {
   const logros = await cargarLogrosComunidad();
   if (!logros.length) return;
 
-  const ticker = document.getElementById("tickerComunidad");
+  const ticker = document.getElementById("logro-dinamico");
   ticker.innerHTML = "";
 
   // Selecciona 10 logros aleatorios para el ticker
@@ -154,14 +154,21 @@ document.addEventListener("DOMContentLoaded", () => {
 });*/
 
 
-let indice = 0;
+
 let logros = [];
+let indice = 0;
 
 function iniciarCicloLogros(lista) {
-  logros = lista;
+  logros = lista; // logros de comunidad
+  if (!logros || logros.length === 0) return;
+
   mostrarLogro();
-  setInterval(siguienteLogro, 5000);
+  setInterval(() => {
+    indice = (indice + 1) % logros.length;
+    mostrarLogro();
+  }, 5000);
 }
+
 
 function siguienteLogro() {
   indice = (indice + 1) % logros.length;
@@ -169,11 +176,18 @@ function siguienteLogro() {
 }
 
 function mostrarLogro() {
+  const cont = document.getElementById("logro-dinamico");
+  if (!cont || logros.length === 0) return;
+
   const l = logros[indice];
-  document.getElementById("logro-dinamico").innerHTML = `
-    <span class="icono">${l.icono}</span>
-    <strong>${l.nombre}</strong>
-    <small>${tiempoRelativo(l.fecha)}</small>
+
+  // Solo mostrar icono + nombre del logro, opcional: ocultar usuario
+  cont.innerHTML = `
+    <div class="logro">
+      <span class="icono">${l.icono || "🏆"}</span>
+      <strong>${l.nombre}</strong>
+      <small>${tiempoRelativo(l.fecha)}</small>
+    </div>
   `;
 }
 
