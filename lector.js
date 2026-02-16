@@ -933,6 +933,7 @@ if (l.esReto) {
 card.innerHTML = `
   <div class="lectura-info">
     <strong title="${l.titulo}">${tituloVisible}</strong><br>
+    <small>${l.titulo|| ""}</small><br>
     <small>${l.autor || ""}</small>
 
     ${renderizarEstrellas(l.valoracion)}
