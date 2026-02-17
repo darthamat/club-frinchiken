@@ -1,3 +1,25 @@
+:root {
+  --color-primario: #6b7280;
+  --color-secundario: #9ca3af;
+  --color-acento: #facc15;
+  --fondo-panel: #020617;
+}
+
+body {
+  background: var(--fondo-panel);
+  color: var(--color-secundario);
+}
+
+button {
+  background: var(--color-primario);
+  border: 2px solid var(--color-acento);
+}
+
+
+
+
+
+/*
 body {
   background: #1b1f2a;
   font-family: 'Segoe UI', sans-serif;
@@ -13,6 +35,7 @@ body {
   font-family: 'Segoe UI', sans-serif;
   color: eee222;
 }
+*/
 
 .hud {
   max-width: 900px;
