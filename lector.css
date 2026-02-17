@@ -29,9 +29,7 @@ body {
 body {
   background:
     linear-gradient(rgba(245, 245, 240, 0.9), rgba(245, 245, 240, 0.9)),
-    url("assets/background.jpg");
-  background-size: cover;
-  background-attachment: fixed;
+
   font-family: 'Segoe UI', sans-serif;
   color: eee222;
 }

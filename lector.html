@@ -134,26 +134,29 @@
         <input type="text" id="titulo">
       </label>
       <label>
-        Autor
+        Autor/a
         <input type="text" id="autor">
-      </label>
+      </label><br>
       <label>
         Páginas
         <input type="number" id="paginas">
       </label>
-      <label>
-        Categoría
-        <select id="categoria">
-          <option>Fantasía</option>
-          <option>Ciencia ficción</option>
-          <option>Ensayo</option>
-          <option>Historia</option>
-          <option>Romance</option>
-          <option>Novela</option>
-          <option>Terror</option>
-          <option>Thriller</option>
+      <label  for="comboCategorias">Categoría:</label>
+<select id="comboCategorias">
+
+
+         <option value="">-- Selecciona una categoría --</option>
+          <option value="Fantasían">Fantasía</option>
+          <option value="Ciencia ficción">Ciencia ficción</option>
+          <option value="Ensayo">Ensayo</option>
+          <option value="Historia">Historia</option>
+          <option value="Romantica">Romántica</option>
+          <option value="Novela">Novela</option>
+          <option value="Terror">Terror</option>
+          <option value="Thriller">Thriller</option>
         </select>
-      </label>
+
+
     </div>
   </div>
 
@@ -215,6 +218,10 @@
 <script type="module" src="lector.js"></script>
 </body>
 </html>
-
+    <style>
+            .centrado {
+                text-align: center;
+            }
+        </style>
 
 

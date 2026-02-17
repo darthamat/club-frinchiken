@@ -27,6 +27,12 @@
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
+
+#portada:hover {
+  transform: scale(1.2);
+}
+
+
     h1 {
         letter-spacing: 1px;
         font-family: Georgia, serif;
@@ -417,8 +423,9 @@ button.gold {
 }
 
 .ticker-item {
-  background: #222;
+  background: #232323;
   padding: 8px 12px;
+
   border-radius: 6px;
   display: flex;
   align-items: center;
@@ -493,9 +500,10 @@ button.gold {
 
 .panel-actividad {
   width: auto;
+
   max-width: fit-content;
   justify-self: center;
-  background: #111;
+  background: rgba(84, 168, 235, 0.52);
   border-radius: 12px;
   padding: 1rem;
   margin-top: 50px;
@@ -521,7 +529,7 @@ button.gold {
 }
 .panel-logros {
   max-width: auto;       /* o el ancho que quieras */
-  height: 150px;           /* altura fija */
+  height: auto;           /* altura fija */
   overflow: hidden;        /* esconder overflow */
   display: flex;
   flex-direction: column;  /* vertical */

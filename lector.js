@@ -62,7 +62,7 @@ const btnLogout = document.getElementById("btnLogout");
 const tituloInput = document.getElementById("titulo");
 const autorInput = document.getElementById("autor");
 const paginasInput = document.getElementById("paginas");
-const categoriaInput = document.getElementById("categoria");
+const categoriaInput = document.getElementById("comboCategorias");
 const portadaLibro = document.getElementById("portadaLibro");
 
 const listaLecturasEl = document.getElementById("listaLecturas");
@@ -78,6 +78,37 @@ const usuarioMonedas = document.getElementById("usuarioMonedas");
 const btnAsignarAdmin = document.getElementById("btn-asignar-admin");
 const btnNuevoReto = document.getElementById("btn-nuevo-reto");
 const selectAdmin = document.getElementById("selectAdmin");
+
+const CATEGORIAS_OFICIALES = [
+  "Ficción",
+  "No ficción",
+  "Fantasía",
+  "Ciencia ficción",
+  "Historia",
+  "Romántica",
+  "Erótica",
+  "Poesía",
+  "Terror",
+  "Aventura",
+  "Misterio",
+  "Juvenil"
+];
+
+const CATEGORIAS_MAP = {
+  "Fiction": "Ficción",
+  "Novels": "Ficción",
+  "Nonfiction": "No ficción",
+  "Fantasy": "Fantasía",
+  "Science": "Ciencia",
+  "History": "Historia",
+  "Romance": "Romance",
+  "Adventure": "Aventura",
+  "Mystery": "Misterio",
+  "Young Adult": "Juvenil",
+  "Juvenile": "Juvenil",
+  "Children": "Juvenil"
+  // Agrega más según necesites
+};
 
 //const fechaFin = l.fechaFin ?? new Date();
 
@@ -199,11 +230,7 @@ actualizarBotonesAdmin();
   usuarioPrestigio.textContent = usuarioData.prestigio;
   usuarioMonedas.textContent = usuarioData.monedas;
 
-  usuarioData.logros[logro.id] = {
-  fecha: new Date(),
-  titulo: logro.titulo,
-  efectos: logro.efectos
-};
+
 
   actualizarXP(false); // ⛔ sin alert al cargar
 
@@ -384,9 +411,21 @@ async function generarIdRetoHistorico() {
 
 // ------------------ SELECCIONAR LIBRO ------------------
 function seleccionarLibro(libro) {
-  // Rellenar el formulario con los datos del libro
+  // Asegurarse de que categoria sea string
+  libro.categoria = libro.categoria || "";
+
+  // Rellenar formulario con todos los datos
   rellenarFormularioLectura(libro);
 
+  // Actualizar combobox de categorías dinámicamente
+  if (libro.categoria && !Array.from(categoriaSelect.options).some(opt => opt.value === libro.categoria)) {
+    const nuevaOpcion = document.createElement("option");
+    nuevaOpcion.value = libro.categoria;
+    nuevaOpcion.textContent = libro.categoria;
+    categoriaSelect.appendChild(nuevaOpcion);
+  }
+
+  // BOTONES DE ACCIÓN
   if (modoCrearReto) {
     // Cambiar botón de registrar a "Registrar nuevo reto"
     btnRegistrar.textContent = "Registrar nuevo reto";
@@ -397,7 +436,7 @@ function seleccionarLibro(libro) {
 
       // Volver el botón a su estado normal
       btnRegistrar.textContent = "Registrar lectura";
-      btnRegistrar.onclick = registrarLecturaNormal; // función original de registrar lectura
+      btnRegistrar.onclick = registrarLecturaNormal; // función original
     };
   } else {
     // Si no estamos creando un reto, aseguramos que el botón funcione normalmente
@@ -413,10 +452,26 @@ function rellenarFormularioLectura(libro) {
   paginasInput.value = libro.paginas || 0;
   portadaLibro.src = libro.portadaUrl || "https://via.placeholder.com/120x180";
 
-  // Categoría solo si existe
-  categoriaInput.value = libro.categoria || "";
+  const cat = libro.categoria || "";
 
+  // Si es select (combobox)
+  if (categoriaInput.tagName === "SELECT") {
+    let opcionExistente = Array.from(categoriaInput.options)
+      .find(opt => opt.value === cat);
+
+    if (!opcionExistente && cat) {
+      const nuevaOpcion = document.createElement("option");
+      nuevaOpcion.value = cat;
+      nuevaOpcion.textContent = cat;
+      categoriaInput.appendChild(nuevaOpcion);
+    }
+
+    categoriaInput.value = cat; // seleccionar la opción correcta
+  } else {
+    categoriaInput.value = cat; // si fuera input normal
+  }
 }
+
 
 // ------------------ FUNCIÓN ORIGINAL REGISTRAR LECTURA ------------------
 async function registrarLecturaNormal() {
@@ -1198,7 +1253,7 @@ async function buscarLibros(texto) {
       titulo: info.title,
       autor: info.authors?.[0],
       paginas: info.pageCount || 0,
-      categoria: info.categories?.join(", ") || "",
+      categoria: normalizarCategoria(info.categories?.[0] || ""),
       portadaUrl: info.imageLinks?.thumbnail
     });
 
@@ -1268,6 +1323,12 @@ async function comprobarLogros(lectura) {
           titulo: logro.titulo
         }
       });
+
+        usuarioData.logros[logro.id] = {
+  fecha: new Date(),
+  titulo: logro.titulo,
+  efectos: logro.efectos
+};
 
       if (logro.efectos) {
         await aplicarEfectosLogro(logro.efectos);
@@ -1698,7 +1759,15 @@ async function aplicarEfectosLogro(efectos) {
     await updateDoc(userRef, updates);
   }
 }
+function normalizarCategoria(cat) {
+  if (!cat) return "";
 
+  // Si existe en el mapa, usamos la traducción
+  if (CATEGORIAS_MAP[cat]) return CATEGORIAS_MAP[cat];
+
+  // Si no existe, dejamos tal cual
+  return cat;
+}
 
 
 
