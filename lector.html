@@ -32,9 +32,29 @@
         <div class="xp-fill" id="barraXP"></div>
       </div>
       <small id="xpUsuario">0 / 100 XP</small>
+
+
+
+
        <p>⭐ Prestigio: <span id="usuarioPrestigio">0</span><br></p>
  <p> 💰 Marcapáginas bonitos: <span id="usuarioMonedas">0</span></p>
+     <!-- OBJETOS MÁGICOS -->
+  <div class="objetos-magicos-panel">
+    <h4>✨ Objetos mágicos</h4>
+    <div class="objetos-grid">
+      <!-- OBJETOS ENCONTRADOS -->
+      <div
+        v-for="objeto in objetosEncontrados"
+        :key="objeto.id"
+        class="objeto-icono"
+        :class="objeto.rareza"
+        :title="objeto.titulo"
+       v-text="objeto.icono || '❓'"
+      ></div>
     </div>
+  </div>
+</div>
+
   </section>
 
   <!-- ==================== PANELS ==================== -->
