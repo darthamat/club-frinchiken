@@ -199,6 +199,12 @@ actualizarBotonesAdmin();
   usuarioPrestigio.textContent = usuarioData.prestigio;
   usuarioMonedas.textContent = usuarioData.monedas;
 
+  usuarioData.logros[logro.id] = {
+  fecha: new Date(),
+  titulo: logro.titulo,
+  efectos: logro.efectos
+};
+
   actualizarXP(false); // ⛔ sin alert al cargar
 
   //pintarLogros();
@@ -1263,10 +1269,24 @@ async function comprobarLogros(lectura) {
         }
       });
 
+      if (logro.efectos) {
+        await aplicarEfectosLogro(logro.efectos);
+      }
+
+             let mensaje = `🏆 ${logro.titulo}`;
+  if (logro.efectos?.xp) mensaje += `\n+${logro.efectos.xp} XP`;
+  if (logro.efectos?.monedas) mensaje += `\n+${logro.efectos.monedas} monedas`;
+  if (logro.efectos?.prestigio) mensaje += `\n+${logro.efectos.prestigio} prestigio`;
+
+  alert(mensaje);
+
       mostrarNotificacionLogro(logro);
+
+
     }
   }
 }
+
 
 //pintar logros
 
@@ -1321,6 +1341,8 @@ const logros = Object.values(usuarioData.logros).sort(
 function mostrarNotificacionLogro(logro) {
   alert(`🏆 Logro desbloqueado: ${logro.titulo}`);
 }
+
+
 async function cargarUsuarios() {
   const select = document.getElementById("selectAdmin");
   select.innerHTML = ""; // limpiar
@@ -1641,6 +1663,42 @@ function aplicarTemaPorClase(clase) {
   root.style.setProperty("--color-acento", tema.acento);
   root.style.setProperty("--fondo-panel", tema.fondo);
 }
+
+async function aplicarEfectosLogro(efectos) {
+  const userRef = doc(db, "users", usuarioActual.uid);
+
+  const updates = {};
+
+  // XP
+  if (efectos.xp) {
+    usuarioData.experiencia += efectos.xp;
+    updates.experiencia = usuarioData.experiencia;
+  }
+
+  // Monedas
+  if (efectos.monedas) {
+    usuarioData.monedas += efectos.monedas;
+    updates.monedas = increment(efectos.monedas);
+  }
+
+  // Prestigio
+  if (efectos.prestigio) {
+    usuarioData.prestigio += efectos.prestigio;
+    updates.prestigio = increment(efectos.prestigio);
+  }
+
+  // Subidas de nivel por XP
+  if (efectos.xp) {
+    actualizarXP(true);
+    updates.nivel = usuarioData.nivel;
+    updates.experienciaNecesaria = usuarioData.experienciaNecesaria;
+  }
+
+  if (Object.keys(updates).length > 0) {
+    await updateDoc(userRef, updates);
+  }
+}
+
 
 
 
