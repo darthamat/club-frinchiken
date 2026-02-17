@@ -1175,7 +1175,6 @@ btnToggleTerminadas.onclick = () => {
 function pintarTerminadas(panel) {
   panel.innerHTML = ""; // Limpiar contenido
 
-  // Filtramos lecturas terminadas
   const terminadas = lecturasCache.filter(l => !l.activa);
 
   if (terminadas.length === 0) {
@@ -1185,40 +1184,67 @@ function pintarTerminadas(panel) {
 
   terminadas.forEach(l => {
     const div = document.createElement("div");
-    div.className = "lectura-card terminada"; // Clase base
+    div.className = "lectura-card terminada";
 
-    // Si es un reto, añadimos clase reto-card para borde dorado
     if (l.esReto) div.classList.add("reto-card");
 
-    // Fecha de finalización o del reto
+    // Fecha
     let fechaTexto = "";
     if (l.fechaFin) {
       const fecha = l.fechaFin?.seconds
         ? new Date(l.fechaFin.seconds * 1000)
         : new Date(l.fechaFin);
-      // Para retos, mostrar mes y año; para lecturas normales, día/mes/año
       fechaTexto = l.esReto
         ? `📅 ${fecha.toLocaleDateString("es-ES", { month: 'long', year: 'numeric' })}`
         : `📅 ${fecha.toLocaleDateString("es-ES")}`;
     }
 
-    // Icono de logro/objetivo
-    const icono = l.esReto ? "🏆" : "";
-
     div.innerHTML = `
       <div class="lectura-info">
-        <strong>${l.titulo}</strong> ${icono}<br>
+        <img src="${l.portadaUrl || 'https://via.placeholder.com/60x90'}"
+             alt="Portada" style="width:60px; height:90px; float:left; margin-right:8px;">
+        <strong>${l.titulo}</strong> ${l.esReto ? "🏆" : ""}<br>
         <small>${l.autor}</small><br>
-
         ${renderizarEstrellas(l.valoracion)}
-        <small>Comentario:"${l.comentario}"</small><br>
+        <textarea class="comentario-edit" placeholder="Comentario">${l.comentario || ""}</textarea><br>
         ${fechaTexto ? `<div class="fecha-reto">${fechaTexto}</div>` : ""}
       </div>
+      <div class="lectura-acciones">
+        <button class="btn-guardar">💾 Guardar cambios</button>
+        <button class="btn-eliminar">❌ Eliminar</button>
+      </div>
     `;
+
+    // Guardar cambios
+    div.querySelector(".btn-guardar").onclick = async () => {
+      const nuevoComentario = div.querySelector(".comentario-edit").value.trim();
+      const nuevaValoracion = prompt("Nueva puntuación (0-10):", l.valoracion || 0);
+      const valorNum = Math.max(0, Math.min(10, Number(nuevaValoracion)));
+
+      const lecturaRef = doc(db, "users", usuarioActual.uid, "lecturas", l.id);
+      await updateDoc(lecturaRef, {
+        comentario: nuevoComentario,
+        valoracion: valorNum
+      });
+
+      l.comentario = nuevoComentario;
+      l.valoracion = valorNum;
+
+      pintarTerminadas(panel); // repintar para reflejar cambios
+    };
+
+    // Eliminar lectura
+    div.querySelector(".btn-eliminar").onclick = async () => {
+      if (!confirm("⚠️ ¿Eliminar esta lectura?")) return;
+      await deleteDoc(doc(db, "users", usuarioActual.uid, "lecturas", l.id));
+      lecturasCache = lecturasCache.filter(x => x.id !== l.id);
+      pintarTerminadas(panel);
+    };
 
     panel.appendChild(div);
   });
 }
+
 
 
 
@@ -1769,5 +1795,39 @@ function normalizarCategoria(cat) {
   return cat;
 }
 
+async function subirPortada(file) {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", "portadas");
 
+
+
+  const res = await fetch( "https://api.cloudinary.com/v1_1/dwuokewzr/image/upload", {
+    method: "POST",
+    body: formData
+  });
+
+  const data = await res.json();
+  return data.secure_url; // URL de la imagen en Cloudinary
+}
+
+async function agregarLectura(titulo, autor, filePortada) {
+  let portadaUrl = "";
+  if (filePortada) {
+    portadaUrl = await subirPortada(filePortada);
+  }
+
+  const nuevaLectura = {
+    titulo,
+    autor,
+    comentario: "",
+    valoracion: 0,
+    activa: true,
+    portadaUrl,
+    fechaInicio: new Date()
+  };
+
+  const docRef = await addDoc(collection(db, "users", usuarioActual.uid, "lecturas"), nuevaLectura);
+  lecturasCache.push({ ...nuevaLectura, id: docRef.id });
+}
 
