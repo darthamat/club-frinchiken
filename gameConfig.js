@@ -665,7 +665,7 @@ export const LOGROS = [
     descripcion: "Completaste el reto mensual",
     tipo: "reto",
     icono: "🏆",
-    condicion: (l) => l.esReto === true,
+    condicion: (l) => l.esReto && !l.activa,
     efectos: { xp: 50, monedas: 25, prestigio: 1 }
   }
 ];
