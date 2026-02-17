@@ -580,7 +580,7 @@ export const LOGROS = [
     descripcion: "Leíste un libro de 1000 páginas o más",
     tipo: "normal",
     icono: "📖",
-    condicion: (l) => l.paginas >= 1000,
+    condicion: (l) => l.paginas >= 1000  && !l.activa,
     efectos: { prestigio: 500 }
   },
 
@@ -595,7 +595,7 @@ export const LOGROS = [
     icono: "❤️",
     condicion: (l) => {
       const cat = normalizarGenero(l.categoria);
-      return cat?.includes("romance") || cat?.includes("amor") || cat?.includes("erotico") || cat?.includes("romant");
+      return cat?.includes("romance") || cat?.includes("amor") || cat?.includes("erotico") || cat?.includes("romant")  && !l.activa;
     },
     efectos: { corazon: 1 } // +1 a la característica corazon
   },
@@ -605,7 +605,7 @@ export const LOGROS = [
     descripcion: "Leíste literatura erótica",
     tipo: "normal",
     icono: "🔥",
-    condicion: (l) => normalizarGenero(l.categoria)?.includes("erotico"),
+    condicion: (l) => normalizarGenero(l.categoria)?.includes("erotico")  && !l.activa,
     efectos: { corazon: 1 }
   },
   {
@@ -614,7 +614,7 @@ export const LOGROS = [
     descripcion: "Leíste literatura fantástica",
     tipo: "normal",
     icono: "🐉",
-    condicion: (l) => normalizarGenero(l.categoria)?.includes("fantasia")
+    condicion: (l) => normalizarGenero(l.categoria)?.includes("fantasia") && !l.activa,
   },
   {
     id: "cf",
@@ -622,7 +622,7 @@ export const LOGROS = [
     descripcion: "Leíste ciencia ficción",
     tipo: "normal",
     icono: "🧪",
-    condicion: (l) => normalizarGenero(l.categoria)?.includes("ciencia ficcion"),
+    condicion: (l) => normalizarGenero(l.categoria)?.includes("ciencia ficcion")&& !l.activa,
     efectos: { mente: 1 } // +1 a la característica mente
   },
 
@@ -630,7 +630,7 @@ export const LOGROS = [
     id: "terror",
     titulo: "Mal rollito - Leíste un libro de terror",
     descripcion: "Leíste un libro de terror",
-    condicion: (l) => normalizarGenero(l.categoria)?.includes("terror"),
+    condicion: (l) => normalizarGenero(l.categoria)?.includes("terror") && !l.activa,
     efectos: { mente: -1 } // +1 a la característica mente
   },
 
