@@ -15,7 +15,7 @@ import {
   getDocs,
   enableIndexedDbPersistence,
   serverTimestamp,
-  increment 
+  increment
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
@@ -127,6 +127,36 @@ if (userData.imagen_avatar && userData.imagen_avatar !== "") {
   pintarLogros();
 });
 
+export default {
+  data() {
+    return {
+      OBJETOS_RAROS,
+      OBJETOS_LEGENDARIOS,
+      usuarioData: {
+        nombrePersonaje: "Arwen",
+        clase: "Mago/a Sabe-lo-Todo",
+        nivel: 5,
+        // aquí guardamos los IDs de los objetos que el jugador ha encontrado
+        objetosEncontradosIds: ["pluma_fenix", "biblioteca_ancestral"]
+      }
+    };
+  },
+  computed: {
+    objetosEncontrados() {
+      // filtramos raros
+      const raros = this.OBJETOS_RAROS.filter(obj =>
+        this.usuarioData.objetosEncontradosIds.includes(obj.id)
+      );
+      // filtramos legendarios (algunos legendarios en tu config son solo strings)
+      const legendarios = this.OBJETOS_LEGENDARIOS
+        .map(obj => typeof obj === "string" ? { id: obj, titulo: obj, rareza: "legendario", icono: "🌟" } : obj)
+        .filter(obj => this.usuarioData.objetosEncontradosIds.includes(obj.id));
+
+      return [...raros, ...legendarios];
+    }
+  }
+};
+
 
 
 
@@ -157,6 +187,8 @@ async function cargarPerfilUsuario() {
 
 usuarioActual.role = data.role ?? "user";
 usuarioActual.tipoAdmin = data.tipoAdmin ?? null;
+
+  aplicarTemaPorClase(usuarioData.clase);
 
 actualizarBotonesAdmin();
 
@@ -1116,7 +1148,9 @@ function pintarTerminadas(panel) {
       <div class="lectura-info">
         <strong>${l.titulo}</strong> ${icono}<br>
         <small>${l.autor}</small><br>
+
         ${renderizarEstrellas(l.valoracion)}
+        <small>Comentario:"${l.comentario}"</small><br>
         ${fechaTexto ? `<div class="fecha-reto">${fechaTexto}</div>` : ""}
       </div>
     `;
@@ -1439,4 +1473,174 @@ async function asignarRetosActivos(usuarioId) {
     }
   }
 }
+function normalizarClase(nombre) {
+  return nombre
+    .toLowerCase()
+    .normalize("NFD")                 // quita tildes
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\/a|\/o/g, "")          // quita /a /o
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
+const TEMAS_CLASES = {
+  "mago-sabe-lo-todo": {
+    primario: "#7c3aed",
+    secundario: "#c4b5fd",
+    acento: "#f0abfc",
+    fondo: "#1e1b4b"
+  },
+
+  "bardo-cuentacuentos": {
+    primario: "#db2777",
+    secundario: "#f9a8d4",
+    acento: "#fde68a",
+    fondo: "#2b1120"
+  },
+
+  "caballero-de-las-palabras": {
+    primario: "#2563eb",
+    secundario: "#bfdbfe",
+    acento: "#facc15",
+    fondo: "#0f172a"
+  },
+
+  "picaro-de-los-post-it": {
+    primario: "#059669",
+    secundario: "#6ee7b7",
+    acento: "#34d399",
+    fondo: "#022c22"
+  },
+
+  "druida-romantasy": {
+    primario: "#16a34a",
+    secundario: "#bbf7d0",
+    acento: "#f472b6",
+    fondo: "#052e16"
+  },
+
+  "inventor-de-tramas": {
+    primario: "#0ea5e9",
+    secundario: "#bae6fd",
+    acento: "#fbbf24",
+    fondo: "#082f49"
+  },
+
+  "explorador-de-bibliotecas": {
+    primario: "#ca8a04",
+    secundario: "#fde68a",
+    acento: "#84cc16",
+    fondo: "#2e1a04"
+  },
+
+  "alquimista-de-historias": {
+    primario: "#9333ea",
+    secundario: "#e9d5ff",
+    acento: "#22d3ee",
+    fondo: "#2e1065"
+  },
+
+  "guardabibliotecas": {
+    primario: "#475569",
+    secundario: "#cbd5e1",
+    acento: "#38bdf8",
+    fondo: "#020617"
+  },
+
+  "adivinador-de-tramas": {
+    primario: "#a21caf",
+    secundario: "#f5d0fe",
+    acento: "#fde047",
+    fondo: "#3b0764"
+  },
+
+  "hechicero-de-tochos-imposibles": {
+    primario: "#7f1d1d",
+    secundario: "#fecaca",
+    acento: "#fb7185",
+    fondo: "#2a0f0f"
+  },
+
+  "viajero-de-mundos-paralelos": {
+    primario: "#0f766e",
+    secundario: "#99f6e4",
+    acento: "#818cf8",
+    fondo: "#042f2e"
+  },
+
+  "senor-de-las-comillas": {
+    primario: "#1f2937",
+    secundario: "#d1d5db",
+    acento: "#facc15",
+    fondo: "#020617"
+  },
+
+  "monje-de-los-ensayos": {
+    primario: "#92400e",
+    secundario: "#fde68a",
+    acento: "#a3e635",
+    fondo: "#2a1606"
+  },
+
+  "gladiador-poetico": {
+    primario: "#be123c",
+    secundario: "#fecdd3",
+    acento: "#fde047",
+    fondo: "#3f0a1c"
+  },
+
+  "cazador-de-spoilers": {
+    primario: "#f97316",
+    secundario: "#fed7aa",
+    acento: "#fde047",
+    fondo: "#2a1506"
+  },
+
+  "pirata-de-libros-digitales": {
+    primario: "#0284c7",
+    secundario: "#bae6fd",
+    acento: "#22d3ee",
+    fondo: "#082f49"
+  },
+
+  "arquero-de-la-lectura": {
+    primario: "#15803d",
+    secundario: "#bbf7d0",
+    acento: "#84cc16",
+    fondo: "#052e16"
+  },
+
+  "alquimista-de-cafe-y-libros": {
+    primario: "#78350f",
+    secundario: "#fde68a",
+    acento: "#fb7185",
+    fondo: "#2a1606"
+  },
+
+  "ladron-de-libros": {
+    primario: "#334155",
+    secundario: "#cbd5e1",
+    acento: "#94a3b8",
+    fondo: "#020617"
+  }
+};
+
+
+function aplicarTemaPorClase(clase) {
+  if (!clase) return;
+
+  const clave = normalizarClase(clase);
+  const tema = TEMAS_CLASES[clave];
+
+  if (!tema) return; // usa el tema base
+
+  const root = document.documentElement;
+
+  root.style.setProperty("--color-primario", tema.primario);
+  root.style.setProperty("--color-secundario", tema.secundario);
+  root.style.setProperty("--color-acento", tema.acento);
+  root.style.setProperty("--fondo-panel", tema.fondo);
+}
+
+
 

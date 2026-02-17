@@ -15,23 +15,22 @@ export const RECOMPENSAS = {
 
 // 🟣 Objetos raros
 export const OBJETOS_RAROS = [
-
   {
     id: "pluma_fenix",
-    nombre: "Pluma de Fénix",
-    descripcion: "Aumenta la XP obtenida durante 7 días",
+    titulo: "Pluma de Fénix",
+    descripcion: "Aumenta el prestigio obtenido durante 7 días",
     rareza: "raro",
     tipo: "pasivo",
     duracion: 7,
     icono: "🪶",
     efectos: {
-      multiplicadorXP: 1.2
+      multiplicadorP: 1.5
     }
   },
 
   {
     id: "marca_dragon",
-    nombre: "Marcapáginas del Dragón",
+    titulo: "Marcapáginas del Dragón",
     descripcion: "Otorga monedas extra al terminar libros",
     rareza: "raro",
     tipo: "pasivo",
@@ -44,63 +43,180 @@ export const OBJETOS_RAROS = [
 
   {
     id: "lupa_detective",
-    nombre: "Lupa de detective",
+    titulo: "Lupa de detective",
     descripcion: "Aumenta la probabilidad de encontrar logros secretos",
     rareza: "raro",
     tipo: "pasivo",
     duracion: null,
     icono: "🔍",
     efectos: {
-      bonusLogrosSecretos: 0.15
+      bonusLogrosSecretos: 0.25
     }
   },
 
   {
     id: "taza_magica",
-    nombre: "Taza de café mágico",
+    titulo: "Taza de café mágico",
     descripcion: "Ganas XP extra en lecturas nocturnas",
     rareza: "raro",
     tipo: "pasivo",
     duracion: null,
     icono: "☕",
     efectos: {
-      xpNocturna: 10
+      xpNocturna: 50
+    }
+  },
+
+  {
+    id: "amuleto_suerte",
+    titulo: "Amuleto de la suerte",
+    descripcion: "Ganas XP extra en lecturas",
+    rareza: "raro",
+    tipo: "pasivo",
+    duracion: null,
+    icono: "🧿",
+    efectos: {
+      xp: 5,
+      bonusPrestigio: 1.5
+    }
+  },
+
+  {
+    id: "orangutan",
+    titulo: "Mascota: Orangutan asesino",
+    descripcion: "Ganas prestigio, eres famoso",
+    rareza: "raro",
+    tipo: "pasivo",
+    duracion: null,
+    icono: "🦧",
+    efectos: {
+      prestigio: 2500,
+      fuerza: 3
+
+    }
+  },
+
+  {
+    id: "t-rex",
+    titulo: "Mascota: T-Rex simpatico",
+    descripcion: "Ganas prestigio, eres famoso",
+    rareza: "raro",
+    tipo: "pasivo",
+    duracion: null,
+    icono: "🦖",
+    efectos: {
+      prestigio: 2500,
+      fuerza: 3
+    }
+  },
+
+  {
+    id: "racoon",
+    titulo: "Mascota: Rocket Raccoon",
+    descripcion: "Ganas prestigio, esta muy chulo",
+    rareza: "raro",
+    tipo: "pasivo",
+    duracion: null,
+    icono: "🦙",
+    efectos: {
+      prestigio: 1500,
+      fuerza: 3
+    }
+  },
+
+  {
+    id: "robot",
+    titulo: "Mascota: Maximus Prime",
+    descripcion: "Ganas prestigio, esta muy chulo",
+    rareza: "raro",
+    tipo: "pasivo",
+    duracion: null,
+    icono: "🤖",
+    efectos: {
+      prestigio: 1500,
+      fuerza: 3
+    }
+  },
+
+  {
+    id: "vampiro",
+    titulo: "Seguidor: Dracula",
+    descripcion: "Ganas prestigio, esta muy chulo",
+    rareza: "raro",
+    tipo: "pasivo",
+    duracion: null,
+    icono: "🧛",
+    efectos: {
+      prestigio: 1500,
+      fuerza: 1,
+      corazon: -2
+    }
+  },
+
+  {
+    id: "elfo",
+    titulo: "Seguidor: Legolas",
+    descripcion: "Ganas prestigio, esta muy chulo",
+    rareza: "raro",
+    tipo: "pasivo",
+    duracion: null,
+    icono: "🧝",
+    efectos: {
+      prestigio: 1500,
+      agilidad: 2
+    }
+  },
+
+  {
+    id: "luis",
+    titulo: "Seguidor: luis pitufo gruñon",
+    descripcion: "Pierdes prestigio y cordura",
+    rareza: "raro",
+    tipo: "pasivo",
+    duracion: null,
+    icono: "🤬",
+    efectos: {
+      prestigio: -1500,
+      mente: -1
     }
   }
-
-
-//
-//
-//  "Marcapáginas de dragón",
-//  "Lupa de detective",
-//  "Pluma encantada",
-//  "Taza de café mágico",
-//  "Capa de invisibilidad de biblioteca"
-
 ];
 
 // 🟡 Objetos legendarios
 export const OBJETOS_LEGENDARIOS = [
   {
+    id: "capa_invisibilidad",
+    titulo: "Capa de invisibilidad de Harry Potter",
+    descripcion: "Capa de invisibilidad de mago enterao",
+    rareza: "raro",
+    tipo: "pasivo",
+    duracion: null,
+    icono: "🧥",
+    efectos: {
+      multiplicadorXP: 1.2
+    }
+  },
+
+  {
     id: "grimorio_eterno",
-    nombre: "Grimorio Eterno",
+    titulo: "Grimorio Eterno",
     descripcion: "Duplica la XP de los retos completados",
     multiplicadorXP: 2,
     rareza: "legendario"
   },
   {
     id: "biblioteca_ancestral",
-    nombre: "Biblioteca Ancestral",
+    titulo: "Biblioteca Ancestral",
     descripcion: "Otorga prestigio adicional por cada reto",
-    bonusPrestigio: 100,
+    bonusPrestigio: 500,
     rareza: "legendario"
   },
-   "El Anillo Único",
+  "El Anillo Único",
   "Un huevo de dragon de Daenerys",
   "La dragonlance",
   "La segunda bola de dragon",
   "Sombrero de Terry Pratchett",
-  "Tercer libro de El nombre del Viento",
+  "Tercer libro de El titulo del Viento",
   "La granada de Antioquia",
   "Chapines de rubies",
   "La pipa de Bilbo",
@@ -109,18 +225,16 @@ export const OBJETOS_LEGENDARIOS = [
   "Gafas de lectura Jhony N5",
   "Espada de Gandalf",
   "Armadura de páginas de la primera Biblia"
-
 ];
 
 export const LOGROS1 = [
-
   // ======================
   // 🌱 MICRO-LOGROS (todos ganan algo)
   // ======================
 
   {
     id: "primer_libro",
-    nombre: "Primer capítulo",
+    titulo: "Primer capítulo",
     descripcion: "Completaste tu primera lectura",
     tipo: "micro",
     icono: "📘",
@@ -129,7 +243,7 @@ export const LOGROS1 = [
 
   {
     id: "primera_resena",
-    nombre: "Opinión propia",
+    titulo: "Opinión propia",
     descripcion: "Escribiste tu primera reseña",
     tipo: "micro",
     icono: "✍️",
@@ -138,7 +252,7 @@ export const LOGROS1 = [
 
   {
     id: "racha_3_dias",
-    nombre: "Constancia",
+    titulo: "Constancia",
     descripcion: "Leíste 3 días seguidos",
     tipo: "micro",
     icono: "🔥",
@@ -151,7 +265,7 @@ export const LOGROS1 = [
 
   {
     id: "lector_incansable",
-    nombre: "Lector incansable",
+    titulo: "Lector incansable",
     descripcion: "Completaste 10 libros",
     tipo: "normal",
     icono: "📚",
@@ -160,7 +274,7 @@ export const LOGROS1 = [
 
   {
     id: "tocho_1000",
-    nombre: "Lector/a de tochos",
+    titulo: "Lector/a de tochos",
     descripcion: "Leíste un libro de 1000 páginas o más",
     tipo: "normal",
     icono: "📖",
@@ -169,7 +283,7 @@ export const LOGROS1 = [
 
   {
     id: "nocturno",
-    nombre: "Lector/a nocturno",
+    titulo: "Lector/a nocturno",
     descripcion: "Terminaste un libro entre las 00:00 y las 06:00",
     tipo: "normal",
     icono: "🌙",
@@ -185,7 +299,7 @@ export const LOGROS1 = [
 
   {
     id: "romantico",
-    nombre: "Corazón de tinta",
+    titulo: "Corazón de tinta",
     descripcion: "Leíste un libro romántico",
     tipo: "normal",
     icono: "❤️",
@@ -194,7 +308,7 @@ export const LOGROS1 = [
 
   {
     id: "erotico",
-    nombre: "Lector/a cachondo/a 😏",
+    titulo: "Lector/a cachondo/a 😏",
     descripcion: "Leíste literatura erótica",
     tipo: "normal",
     icono: "🔥",
@@ -203,16 +317,16 @@ export const LOGROS1 = [
 
   {
     id: "fantasia",
-    nombre: "Soñador/a empedernido",
+    titulo: "Soñador/a empedernido",
     descripcion: "Leíste literatura fantástica",
     tipo: "normal",
     icono: "🐉",
     condicion: (l) => l.categoria?.toLowerCase().includes("fantasia")
   },
 
-    {
+  {
     id: "cf",
-    nombre: "Mente científica",
+    titulo: "Mente científica",
     descripcion: "Leíste ciencia ficción",
     tipo: "normal",
     icono: "📚",
@@ -225,7 +339,7 @@ export const LOGROS1 = [
 
   {
     id: "critico_literario",
-    nombre: "Crítico literario ⭐⭐⭐⭐½",
+    titulo: "Crítico literario ⭐⭐⭐⭐½",
     descripcion: "Diste una valoración media superior a 4,5",
     tipo: "especial",
     icono: "⭐",
@@ -234,7 +348,7 @@ export const LOGROS1 = [
 
   {
     id: "devorador_anual",
-    nombre: "Devorador/a de bibliotecas",
+    titulo: "Devorador/a de bibliotecas",
     descripcion: "Leíste 30 libros en un año",
     tipo: "especial",
     icono: "🏛️",
@@ -247,7 +361,7 @@ export const LOGROS1 = [
 
   {
     id: "primer_reto",
-    nombre: "Velocidad lectora",
+    titulo: "Velocidad lectora",
     descripcion: "Fuiste el primero/a en completar un reto",
     tipo: "competitivo",
     icono: "⚡",
@@ -256,31 +370,29 @@ export const LOGROS1 = [
 
   {
     id: "campeon_retros",
-    nombre: "Campeón/a de los retos",
+    titulo: "Campeón/a de los retos",
     descripcion: "Ganaste más retos este año",
     tipo: "competitivo",
     icono: "🏆",
     condicion: (stats) => stats.rankRetos === 1
   }
-
 ];
-
 
 //// 🏆 Logros posibles
 //export const LOGROS = [
 //  {
 //    id: "primer_libro",
-//    nombre: "Primer capítulo",
+//    titulo: "Primer capítulo",
 //    descripcion: "Completa tu primera lectura"
 //  },
 //  {
 //    id: "lector_incansable",
-//    nombre: "Lector incansable",
+//    titulo: "Lector incansable",
 //    descripcion: "Completa 10 libros"
 //  },
 //  {
 //    id: "heroe_del_reto",
-//    nombre: "Héroe del reto",
+//    titulo: "Héroe del reto",
 //    descripcion: "Completa un reto mensual"
 //  },
 //    // 🧩 RETOS
@@ -410,10 +522,13 @@ export const LOGROS1 = [
 
 // Función auxiliar para normalizar categorías
 function normalizarGenero(cat) {
-  return cat?.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  return cat
+    ?.normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
 }
 
-// Cada logro tiene: id, nombre, descripcion, tipo, icono, condicion (lectura o stats)
+// Cada logro tiene: id, titulo, descripcion, tipo, icono, condicion (lectura o stats)
 // y opcionalmente efectos extra sobre las características
 export const LOGROS = [
   // ======================
@@ -421,25 +536,25 @@ export const LOGROS = [
   // ======================
   {
     id: "primer_libro",
-    nombre: "Primer capítulo",
+    titulo: "Primer capítulo",
     descripcion: "Completaste tu primera lectura",
     tipo: "micro",
     icono: "📘",
     condicion: (l) => l && l.finalizada === true,
-    efectos: { xp: 10, monedas: 5 }
+    efectos: { prestigio: 50, monedas: 5 }
   },
   {
     id: "primera_resena",
-    nombre: "Opinión propia",
+    titulo: "Opinión propia",
     descripcion: "Escribiste tu primera reseña",
     tipo: "micro",
     icono: "✍️",
     condicion: (stats) => stats.totalResenas >= 1,
-    efectos: { xp: 5 }
+    efectos: { prestigio: 50 }
   },
   {
     id: "racha_3_dias",
-    nombre: "Constancia",
+    titulo: "Constancia",
     descripcion: "Leíste 3 días seguidos",
     tipo: "micro",
     icono: "🔥",
@@ -452,21 +567,21 @@ export const LOGROS = [
   // ======================
   {
     id: "lector_incansable",
-    nombre: "Lector incansable",
+    titulo: "Lector incansable",
     descripcion: "Completaste 10 libros",
     tipo: "normal",
     icono: "📚",
     condicion: (stats) => stats.totalLibros >= 10,
-    efectos: { xp: 50 }
+    efectos: { prestigio: 100 }
   },
   {
     id: "tocho_1000",
-    nombre: "Lector/a de tochos",
+    titulo: "Lector/a de tochos",
     descripcion: "Leíste un libro de 1000 páginas o más",
     tipo: "normal",
     icono: "📖",
     condicion: (l) => l.paginas >= 1000,
-    efectos: { xp: 20 }
+    efectos: { prestigio: 500 }
   },
 
   // ======================
@@ -474,19 +589,19 @@ export const LOGROS = [
   // ======================
   {
     id: "romantico",
-    nombre: "Corazón de tinta",
+    titulo: "Corazón de tinta",
     descripcion: "Leíste un libro romántico",
     tipo: "normal",
     icono: "❤️",
     condicion: (l) => {
       const cat = normalizarGenero(l.categoria);
-      return cat?.includes("romance") || cat?.includes("amor") || cat?.includes("erotico");
+      return cat?.includes("romance") || cat?.includes("amor") || cat?.includes("erotico") || cat?.includes("romant");
     },
     efectos: { corazon: 1 } // +1 a la característica corazon
   },
   {
     id: "erotico",
-    nombre: "Lector/a cachondo/a 😏",
+    titulo: "Lector/a cachondo/a 😏",
     descripcion: "Leíste literatura erótica",
     tipo: "normal",
     icono: "🔥",
@@ -495,7 +610,7 @@ export const LOGROS = [
   },
   {
     id: "fantasia",
-    nombre: "Soñador/a empedernido",
+    titulo: "Soñador/a empedernido",
     descripcion: "Leíste literatura fantástica",
     tipo: "normal",
     icono: "🐉",
@@ -503,7 +618,7 @@ export const LOGROS = [
   },
   {
     id: "cf",
-    nombre: "Mente científica",
+    titulo: "Mente científica",
     descripcion: "Leíste ciencia ficción",
     tipo: "normal",
     icono: "🧪",
@@ -511,20 +626,20 @@ export const LOGROS = [
     efectos: { mente: 1 } // +1 a la característica mente
   },
 
-   {
+  {
     id: "terror",
     titulo: "Mal rollito - Leíste un libro de terror",
     descripcion: "Leíste un libro de terror",
     condicion: (l) => normalizarGenero(l.categoria)?.includes("terror"),
-     efectos: { mente: -1 } // +1 a la característica mente
- },
+    efectos: { mente: -1 } // +1 a la característica mente
+  },
 
   // ======================
   // ⭐ LOGROS ESPECIALES
   // ======================
   {
     id: "critico_literario",
-    nombre: "Crítico literario ⭐⭐⭐⭐½",
+    titulo: "Crítico literario ⭐⭐⭐⭐½",
     descripcion: "Diste una valoración media superior a 4,5",
     tipo: "especial",
     icono: "⭐",
@@ -533,7 +648,7 @@ export const LOGROS = [
   },
   {
     id: "devorador_anual",
-    nombre: "Devorador/a de bibliotecas",
+    titulo: "Devorador/a de bibliotecas",
     descripcion: "Leíste 30 libros en un año",
     tipo: "especial",
     icono: "🏛️",
@@ -546,7 +661,7 @@ export const LOGROS = [
   // ======================
   {
     id: "reto_actual",
-    nombre: "RETO",
+    titulo: "Reto del mes superado",
     descripcion: "Completaste el reto mensual",
     tipo: "reto",
     icono: "🏆",

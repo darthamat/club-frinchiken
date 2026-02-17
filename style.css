@@ -17,7 +17,7 @@
   font-family: Georgia, serif;
   text-align: center;
   padding: 40px;
-  
+
 }
 #portada {
   display: block;
@@ -32,7 +32,7 @@
         font-family: Georgia, serif;
     }
 
-    
+
 
    .div1{
            width: auto;
@@ -52,7 +52,7 @@
             border-color: crimson;
             padding: 10px;
        }
-     
+
      img{
          height: 100%;
          width: auto;
@@ -68,7 +68,7 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
- 
+
 }
 
 /* Botón */
@@ -84,7 +84,7 @@
 
 .btn-acceder:hover {
   color: #ff0000;
-  
+
 }
 
 /* Línea divisoria */

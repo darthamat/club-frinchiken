@@ -85,10 +85,10 @@ btnRegister.addEventListener("click", async () => {
 
     errorMsg.style.color = "green";
     errorMsg.textContent = "¡Registro completado! !Se ha asignado una clase aleatoria! Puedes iniciar sesión.";
-    
+
     // Redirigir al login después de 2s
     setTimeout(()=>window.location.href="login.html",2000);
-    
+
   } catch(e){
     errorMsg.style.color = "red";
     errorMsg.textContent = e.message;

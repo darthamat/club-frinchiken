@@ -1,3 +1,25 @@
+:root {
+  --color-primario: #6b7280;
+  --color-secundario: #9ca3af;
+  --color-acento: #facc15;
+  --fondo-panel: #020617;
+}
+
+body {
+  background: var(--fondo-panel);
+  color: var(--color-secundario);
+}
+
+button {
+  background: var(--color-primario);
+  border: 2px solid var(--color-acento);
+}
+
+
+
+
+
+/*
 body {
   background: #1b1f2a;
   font-family: 'Segoe UI', sans-serif;
@@ -13,6 +35,7 @@ body {
   font-family: 'Segoe UI', sans-serif;
   color: eee222;
 }
+*/
 
 .hud {
   max-width: 900px;
@@ -94,7 +117,7 @@ button.gold {
 }
 .registro-lectura {
 
-  max-width: 700px;
+  max-width: auto;
   margin: 20px auto;
 }
 
@@ -433,3 +456,97 @@ button.gold {
 .lectura-card.terminada {
   background: #1a1a1a;
  }
+
+
+
+
+.logros-panel {
+  height: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.logros-contenido {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+/* Scroll bonito */
+.logros-contenido::-webkit-scrollbar {
+  width: 6px;
+}
+.logros-contenido::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.2);
+  border-radius: 10px;
+}
+
+.panel-lateral {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bloque {
+  background: var(--fondo-panel);
+  border-radius: 10px;
+  padding: 10px;
+}
+.cabecera-personaje {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+/* INFO PERSONAJE */
+.info-personaje {
+  flex: 1;
+}
+
+/* PANEL DE OBJETOS */
+.objetos-magicos-panel {
+  min-width: 160px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  text-align: center;
+
+}
+
+.objetos-magicos-panel h4 {
+  margin: 0 0 8px;
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+/* GRID DE OBJETOS */
+.objetos-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+
+
+}
+
+/* ICONOS */
+.objeto-icono {
+  font-size: 1.4rem;
+  cursor: default;
+  transition: transform 0.2s, filter 0.2s;
+
+}
+
+.objeto-icono:hover {
+  transform: scale(1.2);
+}
+
+/* COLORES SEGÚN RAREZA */
+.objeto-icono.raro {
+  color: #6fa8dc; /* azul suave */
+}
+
+.objeto-icono.legendario {
+  color: gold;
+  text-shadow: 0 0 4px #fff, 0 0 6px gold;
+}
