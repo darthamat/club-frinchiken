@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, doc, getDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, getDocs, collection, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 // ---------------- CONFIG FIREBASE ----------------
@@ -34,6 +34,8 @@ btnRegisterPage.addEventListener("click", () => {
   window.location.href = "register.html"; // Página de registro de cuenta
 });
 
+
+
 // ---------------- CARGAR RETO ACTUAL ----------------
 async function cargarRetoActual(){
   try{
@@ -57,6 +59,7 @@ async function cargarRetoActual(){
   }
 }
 cargarRetoActual();
+
 
 async function cargarLogrosComunidad() {
   const snap = await getDocs(collection(db, "users"));
@@ -205,3 +208,37 @@ function tiempoRelativo(fecha) {
 }
 
 
+async function cargarHallOfFame() {
+  const rankingDiv = document.getElementById("ranking");
+  rankingDiv.innerHTML = "Cargando ranking...";
+
+  const q = query(
+    collection(db, "users"),
+    orderBy("prestigio", "desc"),
+    orderBy("nivel", "desc"),
+    limit(10)
+  );
+
+  const snap = await getDocs(q);
+  rankingDiv.innerHTML = "";
+
+  let posicion = 1;
+
+  snap.forEach(doc => {
+    const u = doc.data();
+
+    const div = document.createElement("div");
+    div.className = `jugador top${posicion}`;
+
+    div.innerHTML = `
+      <div>
+        <div class="nombre">${posicion}. ${u.nombrePersonaje || "Sin nombre"}</div>
+        <div class="stats">Nivel ${u.nivel} · Prestigio ${u.prestigio}</div>
+      </div>
+    `;
+
+    rankingDiv.appendChild(div);
+    posicion++;
+  });
+}
+cargarHallOfFame();

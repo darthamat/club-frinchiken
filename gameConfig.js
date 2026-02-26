@@ -188,7 +188,7 @@ export const OBJETOS_LEGENDARIOS = [
     id: "capa_invisibilidad",
     titulo: "Capa de invisibilidad de Harry Potter",
     descripcion: "Capa de invisibilidad de mago enterao",
-    rareza: "raro",
+    rareza: "legendario",
     tipo: "pasivo",
     duracion: null,
     icono: "🧥",
@@ -219,8 +219,34 @@ export const OBJETOS_LEGENDARIOS = [
   "Tercer libro de El titulo del Viento",
   "La granada de Antioquia",
   "Chapines de rubies",
-  "La pipa de Bilbo",
-  "Tiara de Donut",
+  {
+  id: "pipa_bilbo",
+  titulo: "La pipa de Bilbo",
+  descripcion: "Aumenta la mente del lector sabio",
+  rareza: "legendario",
+  tipo: "pasivo",
+  duracion: null,
+  icono: "🚬",
+  efectos: {
+    mente: 2
+  }
+},
+  {
+  id: "tiara_donut",
+  titulo: "La tiara de Donut",
+  descripcion: "Aumenta el nivel del portador a nivel legendario",
+  rareza: "legendario",
+  tipo: "pasivo",
+  duracion: null,
+  icono: "🚬",
+  efectos: {
+    mente: 50,
+    fuerza: 50,
+    inteligencia: 50,
+
+  }
+},
+
   "eBook de Mithril",
   "Gafas de lectura Jhony N5",
   "Espada de Gandalf",
@@ -638,14 +664,24 @@ export const LOGROS = [
   // ⭐ LOGROS ESPECIALES
   // ======================
   {
-    id: "critico_literario",
-    titulo: "Crítico literario ⭐⭐⭐⭐½",
+    id: "critico_literario_happy",
+    titulo: "Crítico literario Happy ⭐⭐⭐⭐",
     descripcion: "Diste una valoración media superior a 4,5",
     tipo: "especial",
     icono: "⭐",
     condicion: (stats) => stats.mediaValoraciones >= 4.5,
     efectos: { prestigio: 50 }
   },
+    {
+      id: "critico_literario_hater",
+    titulo: "Crítico literario hater ⭐",
+    descripcion: "Diste una valoración media inferior a 1,5",
+    tipo: "especial",
+    icono: "⭐",
+    condicion: (stats) => stats.mediaValoraciones <= 1.5,
+    efectos: { prestigio: 50 }
+  },
+
   {
     id: "devorador_anual",
     titulo: "Devorador/a de bibliotecas",
@@ -666,6 +702,6 @@ export const LOGROS = [
     tipo: "reto",
     icono: "🏆",
     condicion: (l) => l.esReto && !l.activa,
-    efectos: { xp: 50, monedas: 25, prestigio: 1 }
+    efectos: { xp: 50, monedas: 25, prestigio: 100 }
   }
 ];

@@ -9,6 +9,8 @@ import {
   where,
   collection,
   addDoc,
+  orderBy,
+  limit,
   updateDoc,
   deleteDoc,
   query,
@@ -768,6 +770,8 @@ document.getElementById("btnConfirmarValoracion").onclick = async () => {
     lecturaPendiente,
     valoracionActual,
     comentario
+
+
   );
 
   lecturaPendiente = null;
@@ -836,9 +840,13 @@ async function finalizarLecturaConRecompensas(
     alert(`💰 +${recompensa.monedas} marcapáginas`);
   }
 
-  if (recompensa.objeto) {
-    alert(`🎁 Objeto mágico: ${recompensa.objeto}`);
+if (recompensa.objeto?.id) {
+  await otorgarObjeto(recompensa.objeto);
+
+  if (recompensa.objeto.efectos) {
+    await aplicarEfectosObjeto(recompensa.objeto.efectos);
   }
+}
 
 
 
@@ -1831,3 +1839,103 @@ async function agregarLectura(titulo, autor, filePortada) {
   lecturasCache.push({ ...nuevaLectura, id: docRef.id });
 }
 
+export function aplicarEfectos(effects, stats) {
+  if (!effects) return;
+
+  Object.entries(effects).forEach(([key, value]) => {
+    if (typeof value === "number") {
+      stats[key] = (stats[key] || 0) + value;
+    }
+  });
+}
+
+objetosEquipados.forEach(obj => aplicarEfectos(obj.efectos, stats));
+
+async function otorgarObjeto(objeto) {
+  if (!objeto?.id) return;
+
+  const userRef = doc(db, "users", usuarioActual.uid);
+
+  // Evitar duplicados
+  if (usuarioData.objetos?.[objeto.id]) return;
+
+  usuarioData.objetos ??= {};
+  usuarioData.objetos[objeto.id] = {
+    id: objeto.id,
+    rareza: objeto.rareza,
+    fecha: new Date()
+  };
+
+  await updateDoc(userRef, {
+    [`objetos.${objeto.id}`]: {
+      rareza: objeto.rareza,
+      fecha: serverTimestamp()
+    }
+  });
+
+  alert(`🎁 Has obtenido: ${objeto.titulo}`);
+}
+
+async function aplicarEfectosObjeto(efectos) {
+  if (!efectos) return;
+
+  const userRef = doc(db, "users", usuarioActual.uid);
+  const updates = {};
+
+  if (efectos.xp) {
+    usuarioData.experiencia += efectos.xp;
+    updates.experiencia = usuarioData.experiencia;
+  }
+
+  if (efectos.monedas) {
+    usuarioData.monedas += efectos.monedas;
+    updates.monedas = increment(efectos.monedas);
+  }
+
+  if (efectos.prestigio) {
+    usuarioData.prestigio += efectos.prestigio;
+    updates.prestigio = increment(efectos.prestigio);
+  }
+
+  if (Object.keys(updates).length) {
+    actualizarXP(true);
+    updates.nivel = usuarioData.nivel;
+    updates.experienciaNecesaria = usuarioData.experienciaNecesaria;
+    await updateDoc(userRef, updates);
+  }
+}
+
+
+async function cargarHallOfFame() {
+  const rankingDiv = document.getElementById("ranking");
+  rankingDiv.innerHTML = "Cargando ranking...";
+
+  const q = query(
+    collection(db, "users"),
+    orderBy("prestigio", "desc"),
+    orderBy("nivel", "desc"),
+    limit(10)
+  );
+
+  const snap = await getDocs(q);
+  rankingDiv.innerHTML = "";
+
+  let posicion = 1;
+
+  snap.forEach(doc => {
+    const u = doc.data();
+
+    const div = document.createElement("div");
+    div.className = `jugador top${posicion}`;
+
+    div.innerHTML = `
+      <div>
+        <div class="nombre">${posicion}. ${u.nombrePersonaje || "Sin nombre"}</div>
+        <div class="stats">Nivel ${u.nivel} · Prestigio ${u.prestigio}</div>
+      </div>
+    `;
+
+    rankingDiv.appendChild(div);
+    posicion++;
+  });
+}

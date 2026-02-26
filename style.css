@@ -550,7 +550,39 @@ button.gold {
   min-width: 180px;
   flex-shrink: 0;
 }
+#hallOfFame {
+  margin: 30px auto;
+  max-width: 500px;
+  background: #0f172a;
+  border-radius: 12px;
+  padding: 16px;
+  color: white;
+}
 
+#ranking .jugador {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #334155;
+}
+
+#ranking .jugador:last-child {
+  border-bottom: none;
+}
+
+.jugador .nombre {
+  font-weight: bold;
+}
+
+.jugador .stats {
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+.top1 { color: gold; }
+.top2 { color: silver; }
+.top3 { color: #cd7f32; } /* bronce */
 
 
 
