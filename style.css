@@ -552,7 +552,8 @@ button.gold {
 }
 #hallOfFame {
   margin: 30px auto;
-  max-width: 500px;
+justify-items: center;
+  max-width: 300px;
   background: #0f172a;
   border-radius: 12px;
   padding: 16px;
