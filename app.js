@@ -214,8 +214,9 @@ async function cargarHallOfFame() {
 
   const q = query(
     collection(db, "users"),
-    orderBy("prestigio", "desc"),
     orderBy("nivel", "desc"),
+    orderBy("prestigio", "desc"),
+
     limit(10)
   );
 
