@@ -1270,7 +1270,7 @@ async function buscarLibros(texto) {
   // key api = &key=AIzaSyDcEUoGcKs6vwoNUF0ok1W-d8F2vVjCqP0
 
   const res = await fetch(
-    `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(texto)}&maxResults=5`
+    `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(texto)}&maxResults=10&key=AIzaSyDcEUoGcKs6vwoNUF0ok1W-d8F2vVjCqP0`
   );
   const data = await res.json();
   if (!data.items) return;
