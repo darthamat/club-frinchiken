@@ -38,7 +38,30 @@
 
        <p>⭐ Prestigio: <span id="usuarioPrestigio">0</span><br></p>
  <p> 💰 Marcapáginas bonitos: <span id="usuarioMonedas">0</span></p>
-     <!-- OBJETOS MÁGICOS -->
+     <!-- OBJETOS MÁGICOS EQUIPADOS-->
+
+      <button id="btnMochila">🎒 Mochila</button>
+
+<div id="panelMochila" class="panel-mochila hidden">
+
+  <h2>🎒 Mochila del Lecto-Aventurero</h2>
+
+  <div class="equipo">
+    <h3>⚔ Objetos equipados</h3>
+    <div id="equipoObjetos" class="equipo-grid"></div>
+  </div>
+
+  <div class="inventario">
+    <h3>📦 Inventario</h3>
+    <div id="inventarioGrid" class="inventario-grid"></div>
+  </div>
+
+  <div class="biblioteca">
+    <h3>📖 Biblioteca</h3>
+    <div id="bibliotecaGrid"></div>
+  </div>
+
+</div>
   <div class="objetos-magicos-panel">
     <h4>✨ Objetos mágicos</h4>
     <div class="objetos-grid">
@@ -213,9 +236,32 @@
       <button id="btnConfirmarValoracion">Confirmar</button>
     </div>
   </div>
-</div>
+
 
 <script type="module" src="lector.js"></script>
+
+    <div id="popupObjeto" class="popup-objeto hidden">
+
+  <div class="popup-card">
+
+    <h2>✨ ¡Objeto encontrado!</h2>
+
+    <div id="objetoAnimado" class="objeto-animado">
+      🔥
+    </div>
+
+    <h3 id="nombreObjeto"></h3>
+
+    <p id="rarezaObjeto"></p>
+
+    <button type="button" onclick="cerrarPopupObjeto()">Continuar</button>
+
+  </div>
+
+</div>
+
+</div>
+
 </body>
 </html>
     <style>

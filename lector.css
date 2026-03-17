@@ -548,3 +548,158 @@ button.gold {
   color: gold;
   text-shadow: 0 0 4px #fff, 0 0 6px gold;
 }
+.panel-mochila{
+  background:#0f172a;
+  border-radius:16px;
+  padding:20px;
+  margin-top:20px;
+  box-shadow:0 0 20px rgba(0,0,0,0.6);
+}
+
+.inventario-grid{
+  display:grid;
+  grid-template-columns:repeat(6, 70px);
+  gap:10px;
+}
+
+.slot{
+  width:70px;
+  height:70px;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:28px;
+  cursor:pointer;
+  position:relative;
+  background:#020617;
+  border:2px solid #334155;
+}
+
+.slot.raro{
+  border-color:#3b82f6;
+  box-shadow:0 0 10px #3b82f6;
+}
+
+.slot.legendario{
+  border-color:gold;
+  box-shadow:0 0 12px gold;
+}
+
+.slot:hover{
+  transform:scale(1.1);
+}
+
+.tooltip{
+  position:absolute;
+  bottom:80px;
+  background:#020617;
+  padding:8px;
+  border-radius:8px;
+  font-size:12px;
+  display:none;
+  width:120px;
+}
+
+.slot:hover .tooltip{
+  display:block;
+}
+
+.equipo-grid{
+  display:flex;
+  gap:10px;
+  margin-bottom:15px;
+}
+
+.equipo-slot{
+  width:70px;
+  height:70px;
+  border:2px dashed #64748b;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.libro-card{
+  display:flex;
+  gap:10px;
+  margin-bottom:10px;
+}
+
+.popup-objeto{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.7);
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
+  z-index:1000;
+}
+
+.popup-card{
+
+  background:#020617;
+  border-radius:16px;
+  padding:30px;
+  text-align:center;
+  width:300px;
+
+  animation:aparecer 0.4s ease;
+}
+
+.objeto-animado{
+
+  font-size:60px;
+  margin:20px 0;
+
+  animation:
+      caer 0.6s ease,
+      brillar 1.5s infinite alternate;
+
+}
+
+@keyframes caer{
+
+  from{
+    transform:translateY(-200px) scale(0.5);
+    opacity:0;
+  }
+
+  to{
+    transform:translateY(0) scale(1);
+    opacity:1;
+  }
+
+}
+
+@keyframes brillar{
+
+  from{
+    text-shadow:0 0 5px white;
+  }
+
+  to{
+    text-shadow:0 0 20px gold;
+  }
+
+}
+
+@keyframes aparecer{
+
+  from{
+    transform:scale(0.7);
+    opacity:0;
+  }
+
+  to{
+    transform:scale(1);
+    opacity:1;
+  }
+
+}

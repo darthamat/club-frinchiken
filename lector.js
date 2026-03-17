@@ -1,4 +1,3 @@
-
 // ---------------- IMPORTS ----------------
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
@@ -21,12 +20,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-import {
-  RECOMPENSAS,
-  OBJETOS_RAROS,
-  OBJETOS_LEGENDARIOS,
-  LOGROS
-} from "./gameConfig.js";
+import { RECOMPENSAS, OBJETOS_RAROS, OBJETOS_LEGENDARIOS, LOGROS } from "./gameConfig.js";
 
 // ---------------- FIREBASE ----------------
 const firebaseConfig = {
@@ -97,20 +91,23 @@ const CATEGORIAS_OFICIALES = [
 ];
 
 const CATEGORIAS_MAP = {
-  "Fiction": "Ficción",
-  "Novels": "Ficción",
-  "Nonfiction": "No ficción",
-  "Fantasy": "Fantasía",
-  "Science": "Ciencia",
-  "History": "Historia",
-  "Romance": "Romance",
-  "Adventure": "Aventura",
-  "Mystery": "Misterio",
+  Fiction: "Ficción",
+  Novels: "Ficción",
+  Nonfiction: "No ficción",
+  Fantasy: "Fantasía",
+  Science: "Ciencia",
+  History: "Historia",
+  Romance: "Romance",
+  Adventure: "Aventura",
+  Mystery: "Misterio",
   "Young Adult": "Juvenil",
-  "Juvenile": "Juvenil",
-  "Children": "Juvenil"
+  Juvenile: "Juvenil",
+  Children: "Juvenil"
   // Agrega más según necesites
 };
+
+const btnMochila = document.getElementById("btnMochila");
+const panelMochila = document.getElementById("panelMochila");
 
 //const fechaFin = l.fechaFin ?? new Date();
 
@@ -120,11 +117,10 @@ let lecturaPendiente = null;
 let valoracionActual = 0;
 
 let usuarioActual = {
-  uid: null,       // se llenará al cargar el usuario
+  uid: null, // se llenará al cargar el usuario
   role: null,
   tipoAdmin: null
 };
-
 
 // Lista de usuarios (ejemplo, en tu proyecto la traes de Firestore)
 let usuarios = [];
@@ -136,6 +132,7 @@ let lecturasCache = [];
 let retoCache = null;
 let mostrarTerminados = false;
 
+let objetosEquipados = [];
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
@@ -151,13 +148,26 @@ onAuthStateChanged(auth, async (user) => {
 
   const avatarImg = document.getElementById("avatarImg");
 
-if (userData.imagen_avatar && userData.imagen_avatar !== "") {
-  avatarImg.src = userData.imagen_avatar;
-}
+  if (userData.imagen_avatar && userData.imagen_avatar !== "") {
+    avatarImg.src = userData.imagen_avatar;
+  }
 
   await cargarPerfilUsuario();
   await cargarLecturas();
   pintarLogros();
+
+  const reto = await cargarRetoMensual();
+
+  //// Mostrar en formulario cuando pulsen “Reto actual”
+  //btnReto.onclick = () => {
+  //  tituloInput.value = reto.titulo;
+  //  autorInput.value = reto.autor;
+  //  paginasInput.value = reto.paginas;
+  //  categoriaInput.value = reto.categoria;
+  //  portadaLibro.src = reto.portadaUrl;
+//
+  //  leyendoRetoActual = true; // importante para marcarlo como reto
+  //};
 });
 
 export default {
@@ -177,21 +187,16 @@ export default {
   computed: {
     objetosEncontrados() {
       // filtramos raros
-      const raros = this.OBJETOS_RAROS.filter(obj =>
-        this.usuarioData.objetosEncontradosIds.includes(obj.id)
-      );
+      const raros = this.OBJETOS_RAROS.filter((obj) => this.usuarioData.objetosEncontradosIds.includes(obj.id));
       // filtramos legendarios (algunos legendarios en tu config son solo strings)
-      const legendarios = this.OBJETOS_LEGENDARIOS
-        .map(obj => typeof obj === "string" ? { id: obj, titulo: obj, rareza: "legendario", icono: "🌟" } : obj)
-        .filter(obj => this.usuarioData.objetosEncontradosIds.includes(obj.id));
+      const legendarios = this.OBJETOS_LEGENDARIOS.map((obj) =>
+        typeof obj === "string" ? { id: obj, titulo: obj, rareza: "legendario", icono: "🌟" } : obj
+      ).filter((obj) => this.usuarioData.objetosEncontradosIds.includes(obj.id));
 
       return [...raros, ...legendarios];
     }
   }
 };
-
-
-
 
 // ---------------- LOGOUT ----------------
 btnLogout.addEventListener("click", async () => {
@@ -209,30 +214,27 @@ async function cargarPerfilUsuario() {
   usuarioData = {
     experiencia: data.experiencia ?? 0,
     nivel: data.nivel ?? 1,
-    experienciaNecesaria:
-      data.experienciaNecesaria ?? xpNecesariaParaNivel(data.nivel ?? 1),
+    experienciaNecesaria: data.experienciaNecesaria ?? xpNecesariaParaNivel(data.nivel ?? 1),
     prestigio: data.prestigio ?? 0,
     monedas: data.monedas ?? 0,
     logros: data.logros ?? {},
     nombrePersonaje: data.nombrePersonaje,
-    clase: data.clase
+    clase: data.clase,
+    objetos: data.objetos ?? {}
   };
 
-usuarioActual.role = data.role ?? "user";
-usuarioActual.tipoAdmin = data.tipoAdmin ?? null;
+  usuarioActual.role = data.role ?? "user";
+  usuarioActual.tipoAdmin = data.tipoAdmin ?? null;
 
   aplicarTemaPorClase(usuarioData.clase);
 
-actualizarBotonesAdmin();
-
+  actualizarBotonesAdmin();
 
   nombrePersonajeEl.textContent = usuarioData.nombrePersonaje || "Sin nombre";
   claseEl.textContent = usuarioData.clase || "Aventurero";
   nivelEl.textContent = usuarioData.nivel;
   usuarioPrestigio.textContent = usuarioData.prestigio;
   usuarioMonedas.textContent = usuarioData.monedas;
-
-
 
   actualizarXP(false); // ⛔ sin alert al cargar
 
@@ -245,13 +247,10 @@ function actualizarBotonesAdmin() {
   console.log("ROL:", usuarioActual.role);
   console.log("TIPO ADMIN:", usuarioActual.tipoAdmin);
 
-  btnAsignarAdmin.style.display =
-    usuarioActual.role === "admin" ? "inline-block" : "none";
+  btnAsignarAdmin.style.display = usuarioActual.role === "admin" ? "inline-block" : "none";
 
   btnNuevoReto.style.display =
-    (usuarioActual.role === "admin" || usuarioActual.tipoAdmin === "crear")
-      ? "inline-block"
-      : "none";
+    usuarioActual.role === "admin" || usuarioActual.tipoAdmin === "crear" ? "inline-block" : "none";
 }
 
 async function mostrarSelectAdmin() {
@@ -259,21 +258,18 @@ async function mostrarSelectAdmin() {
 
   const snapshot = await getDocs(collection(db, "users"));
 
-  snapshot.forEach(docSnap => {
+  snapshot.forEach((docSnap) => {
     if (docSnap.id !== usuarioActual.uid) {
       const u = docSnap.data();
       const option = document.createElement("option");
       option.value = docSnap.id;
 
-
       const nombreReal = u.nombreReal ?? "Sin nombre";
-const personaje = u.nombrePersonaje ?? "Sin personaje";
+      const personaje = u.nombrePersonaje ?? "Sin personaje";
 
-option.textContent = `${nombreReal} (${personaje})`;
+      option.textContent = `${nombreReal} (${personaje})`;
 
-
-
-     // option.textContent = `${u.nombreReal} (${u.nombrePersonaje})`;
+      // option.textContent = `${u.nombreReal} (${u.nombrePersonaje})`;
       selectAdmin.appendChild(option);
     }
   });
@@ -294,18 +290,18 @@ btnAsignarAdmin.addEventListener("click", async () => {
   // ✅ Traer usuarios
   const snapshot = await getDocs(collection(db, "users"));
 
-   await cargarUsuarios();
+  await cargarUsuarios();
 
-snapshot.forEach(docSnap => {
-  const data = docSnap.data();
-  if (docSnap.id === usuarioActual.uid) return; // omitirte a ti
-  const option = document.createElement("option");
-  option.value = docSnap.id;
-  const nombreReal = data.nombreReal ?? "Sin nombre";
-  const personaje = data.nombrePersonaje ?? "Sin personaje";
-  option.textContent = `${nombreReal} (${personaje})`;
-  selectAdmin.appendChild(option);
-});
+  snapshot.forEach((docSnap) => {
+    const data = docSnap.data();
+    if (docSnap.id === usuarioActual.uid) return; // omitirte a ti
+    const option = document.createElement("option");
+    option.value = docSnap.id;
+    const nombreReal = data.nombreReal ?? "Sin nombre";
+    const personaje = data.nombrePersonaje ?? "Sin personaje";
+    option.textContent = `${nombreReal} (${personaje})`;
+    selectAdmin.appendChild(option);
+  });
 
   if (selectAdmin.children.length === 0) {
     alert("⚠️ No hay usuarios disponibles para asignar");
@@ -319,10 +315,7 @@ selectAdmin.addEventListener("change", async () => {
   if (!uidNuevoAdmin) return;
 
   // 1️⃣ Quitar admin temporal anterior
-  const q = query(
-    collection(db, "users"),
-    where("tipoAdmin", "==", "crear")
-  );
+  const q = query(collection(db, "users"), where("tipoAdmin", "==", "crear"));
 
   const snap = await getDocs(q);
   for (const d of snap.docs) {
@@ -397,7 +390,7 @@ async function generarIdRetoHistorico() {
   const snap = await getDocs(collection(db, "retos"));
   let maxNumero = 0;
 
-  snap.forEach(docSnap => {
+  snap.forEach((docSnap) => {
     const id = docSnap.id;
     const match = id.match(/^actual(\d+)$/);
     if (match) {
@@ -420,7 +413,7 @@ function seleccionarLibro(libro) {
   rellenarFormularioLectura(libro);
 
   // Actualizar combobox de categorías dinámicamente
-  if (libro.categoria && !Array.from(categoriaSelect.options).some(opt => opt.value === libro.categoria)) {
+  if (libro.categoria && !Array.from(categoriaSelect.options).some((opt) => opt.value === libro.categoria)) {
     const nuevaOpcion = document.createElement("option");
     nuevaOpcion.value = libro.categoria;
     nuevaOpcion.textContent = libro.categoria;
@@ -433,13 +426,21 @@ function seleccionarLibro(libro) {
     btnRegistrar.textContent = "Registrar nuevo reto";
 
     // Cuando se haga click, crear el reto en Firestore
-    btnRegistrar.onclick = async () => {
-      await crearRetoConLibro(libro);
+btnRegistrar.onclick = async () => {
+  if (lecturaPendiente?.esReto) {
+    await registrarRetoMensual();
+    lecturaPendiente = null; // limpiar
+  } else {
+    await registrarLecturaNormal();
+  }
 
-      // Volver el botón a su estado normal
-      btnRegistrar.textContent = "Registrar lectura";
-      btnRegistrar.onclick = registrarLecturaNormal; // función original
-    };
+  // Limpiar formulario
+  tituloInput.value = "";
+  autorInput.value = "";
+  paginasInput.value = "";
+  categoriaInput.value = "";
+  portadaLibro.src = "https://via.placeholder.com/120x180";
+};
   } else {
     // Si no estamos creando un reto, aseguramos que el botón funcione normalmente
     btnRegistrar.textContent = "Registrar lectura";
@@ -458,8 +459,7 @@ function rellenarFormularioLectura(libro) {
 
   // Si es select (combobox)
   if (categoriaInput.tagName === "SELECT") {
-    let opcionExistente = Array.from(categoriaInput.options)
-      .find(opt => opt.value === cat);
+    let opcionExistente = Array.from(categoriaInput.options).find((opt) => opt.value === cat);
 
     if (!opcionExistente && cat) {
       const nuevaOpcion = document.createElement("option");
@@ -474,10 +474,10 @@ function rellenarFormularioLectura(libro) {
   }
 }
 
-
 // ------------------ FUNCIÓN ORIGINAL REGISTRAR LECTURA ------------------
 async function registrarLecturaNormal() {
-  if (!usuarioActual) return;
+  //if (!usuarioActual) return;
+if (!usuarioActual.uid) return;
 
   const lectura = {
     titulo: tituloInput.value.trim(),
@@ -492,10 +492,7 @@ async function registrarLecturaNormal() {
 
   if (!lectura.titulo || !lectura.autor) return alert("Faltan datos");
 
-  const ref = await addDoc(
-    collection(db, "users", usuarioActual.uid, "lecturas"),
-    lectura
-  );
+  const ref = await addDoc(collection(db, "users", usuarioActual.uid, "lecturas"), lectura);
 
   //lecturasCache.unshift({ id: ref.id, ...lectura });
   //pintarLecturas();
@@ -529,12 +526,9 @@ function actualizarXP(mostrarAlert = false) {
   }
 
   nivelEl.textContent = usuarioData.nivel;
-  xpBarraEl.style.width =
-    `${(usuarioData.experiencia / usuarioData.experienciaNecesaria) * 100}%`;
-  xpTextoEl.textContent =
-    `${usuarioData.experiencia} / ${usuarioData.experienciaNecesaria} XP`;
+  xpBarraEl.style.width = `${(usuarioData.experiencia / usuarioData.experienciaNecesaria) * 100}%`;
+  xpTextoEl.textContent = `${usuarioData.experiencia} / ${usuarioData.experienciaNecesaria} XP`;
 }
-
 
 // ---------------- RETO ----------------
 async function cargarReto() {
@@ -547,15 +541,79 @@ async function cargarReto() {
   return retoCache;
 }
 
+//btnReto.addEventListener("click", async () => {
+//  const reto = await cargarRetoMensual();
+//
+//  // Rellenar formulario con los datos del reto
+//  tituloInput.value = reto.titulo;
+//  autorInput.value = reto.autor;
+//  paginasInput.value = reto.paginas;
+//  categoriaInput.value = reto.categoria;
+//  portadaLibro.src = reto.portadaUrl;
+//
+//  // Marcar como reto para el registro
+//  lecturaPendiente = { ...reto, esReto: true };
+//});
+
+async function cargarRetoActual() {
+
+  const retoRef = doc(db, "retos", "reto-actual");
+  const snap = await getDoc(retoRef);
+
+  if (!snap.exists()) return null;
+
+  return snap.data();
+}
+
+//btnReto.addEventListener("click", async () => {
+//
+//  const reto = await cargarRetoActual();
+//
+//  if (!reto) {
+//    alert("No hay reto activo");
+//    return;
+//  }
+//
+//  // rellenar formulario
+//  tituloInput.value = reto.titulo || "";
+//  autorInput.value = reto.autor || "";
+//  paginasInput.value = reto.paginas || 0;
+//  categoriaInput.value = reto.categoria || "";
+//  portadaLibro.src = reto.portadaUrl || "https://via.placeholder.com/120x180";
+//
+//  // marcar como reto
+//  lecturaPendiente = {
+//    ...reto,
+//    esReto: true
+//  };
+//
+//  // cambiar botón
+//  btnRegistrar.textContent = "Registrar nuevo reto";
+//
+//});
+
 btnReto.addEventListener("click", async () => {
-  const reto = await cargarReto();
-  if (!reto) return;
+
+  const reto = await cargarRetoMensual();
+
+  if (!reto) {
+    alert("Aún no se ha creado el reto de este mes");
+    return;
+  }
 
   tituloInput.value = reto.titulo || "";
   autorInput.value = reto.autor || "";
-  paginasInput.value = reto.paginas || "";
+  paginasInput.value = reto.paginas || 0;
   categoriaInput.value = reto.categoria || "";
-  portadaLibro.src = reto.portadaUrl || "";
+  portadaLibro.src = reto.portadaUrl || "https://via.placeholder.com/120x180";
+
+  lecturaPendiente = {
+    ...reto,
+    esReto: true
+  };
+
+  btnRegistrar.textContent = "Registrar reto";
+
 });
 
 // ---------------- REGISTRAR LECTURA ----------------
@@ -623,25 +681,24 @@ btnReto.addEventListener("click", async () => {
 //  }
 //});
 
+// Cambiar texto del botón
+btnRegistrar.textContent = "Registrar nuevo reto";
 
-  // Cambiar texto del botón
-  btnRegistrar.textContent = "Registrar nuevo reto";
+// Limpiar campos
+tituloInput.value = "";
+autorInput.value = "";
+paginasInput.value = "";
+categoriaInput.value = "";
+portadaLibro.src = "https://via.placeholder.com/120x180";
 
-  // Limpiar campos
-  tituloInput.value = "";
-  autorInput.value = "";
-  paginasInput.value = "";
-  categoriaInput.value = "";
-  portadaLibro.src = "https://via.placeholder.com/120x180";
+// Mostrar mensaje
+mostrarMensajeReto("📖 Selecciona el libro para el nuevo reto");
 
-  // Mostrar mensaje
-  mostrarMensajeReto("📖 Selecciona el libro para el nuevo reto");
-
-  // Hacer scroll al panel
-  document.querySelector(".registro-lectura").scrollIntoView({
-    behavior: "smooth",
-    block: "center"
-  });
+// Hacer scroll al panel
+document.querySelector(".registro-lectura").scrollIntoView({
+  behavior: "smooth",
+  block: "center"
+});
 
 btnRegistrar.onclick = manejarRegistro;
 
@@ -679,51 +736,44 @@ async function manejarRegistro() {
 //  limpiarFormulario();
 //}
 
-
 // ---------------- CARGAR LECTURAS ----------------
 async function cargarLecturas() {
-  const snap = await getDocs(
-    query(collection(db, "users", usuarioActual.uid, "lecturas"))
-  );
+  const snap = await getDocs(query(collection(db, "users", usuarioActual.uid, "lecturas")));
 
   lecturasCache = [];
-  snap.forEach(d => lecturasCache.push({ id: d.id, ...d.data() }));
+  snap.forEach((d) => lecturasCache.push({ id: d.id, ...d.data() }));
 
   // Añadir reto si no existe en Firestore
   const reto = await cargarReto();
-  const retoEnFirestore = lecturasCache.find(l => l.esReto);
+  const retoEnFirestore = lecturasCache.find((l) => l.esReto);
 
   if (reto && !retoEnFirestore) {
-    const ref = await addDoc(
-      collection(db, "users", usuarioActual.uid, "lecturas"),
-      {
-        titulo: reto.titulo,
-        autor: reto.autor,
-        categoria: reto.categoria,
-        paginas: reto.paginas,
-        activa: true,
-        progreso: 0,
-        esReto: true,
-        fechaInicio: new Date()
-      }
-    );
+    const ref = await addDoc(collection(db, "users", usuarioActual.uid, "lecturas"), {
+      titulo: reto.titulo,
+      autor: reto.autor,
+      categoria: reto.categoria,
+      paginas: reto.paginas,
+      activa: true,
+      progreso: 0,
+      esReto: true,
+      fechaInicio: new Date()
+    });
     lecturasCache.unshift({
-  id: ref.id,
-  titulo: reto.titulo,
-  autor: reto.autor,
-  categoria: reto.categoria,
-  paginas: reto.paginas,
-  activa: true,
-  progreso: 0,
-  esReto: true,
-  fechaInicio: new Date()
-});
+      id: ref.id,
+      titulo: reto.titulo,
+      autor: reto.autor,
+      categoria: reto.categoria,
+      paginas: reto.paginas,
+      activa: true,
+      progreso: 0,
+      esReto: true,
+      fechaInicio: new Date()
+    });
   }
 
   pintarLecturas();
   await comprobarLogrosGlobales();
-pintarLogros();
-
+  pintarLogros();
 }
 
 async function comprobarLogrosGlobales() {
@@ -744,52 +794,29 @@ async function terminarLectura(l) {
   crearEstrellas();
   actualizarEstrellas();
 
-  document
-    .getElementById("modalValoracion")
-    .classList.remove("hidden");
+  document.getElementById("modalValoracion").classList.remove("hidden");
 }
 
 document.getElementById("btnCancelarValoracion").onclick = () => {
   lecturaPendiente = null;
-  document
-    .getElementById("modalValoracion")
-    .classList.add("hidden");
+  document.getElementById("modalValoracion").classList.add("hidden");
 };
 
 document.getElementById("btnConfirmarValoracion").onclick = async () => {
   if (!lecturaPendiente) return;
 
-  const comentario =
-    document.getElementById("comentarioLectura").value.trim();
+  const comentario = document.getElementById("comentarioLectura").value.trim();
 
-  document
-    .getElementById("modalValoracion")
-    .classList.add("hidden");
+  document.getElementById("modalValoracion").classList.add("hidden");
 
-  await finalizarLecturaConRecompensas(
-    lecturaPendiente,
-    valoracionActual,
-    comentario
-
-
-  );
+  await finalizarLecturaConRecompensas(lecturaPendiente, valoracionActual, comentario);
 
   lecturaPendiente = null;
 };
 
-async function finalizarLecturaConRecompensas(
-  l,
-  valoracion,
-  comentario
-) {
+async function finalizarLecturaConRecompensas(l, valoracion, comentario) {
   const userRef = doc(db, "users", usuarioActual.uid);
-  const lecturaRef = doc(
-    db,
-    "users",
-    usuarioActual.uid,
-    "lecturas",
-    l.id
-  );
+  const lecturaRef = doc(db, "users", usuarioActual.uid, "lecturas", l.id);
 
   // Guardar valoración
   await updateDoc(lecturaRef, {
@@ -819,8 +846,7 @@ async function finalizarLecturaConRecompensas(
       prestigio: increment(l.paginas)
     });
 
-    usuarioPrestigio.textContent =
-      Number(usuarioPrestigio.textContent) + l.paginas;
+    usuarioPrestigio.textContent = Number(usuarioPrestigio.textContent) + l.paginas;
 
     alert(`📚 Lectura completada +${l.paginas} prestigio`);
   }
@@ -840,15 +866,15 @@ async function finalizarLecturaConRecompensas(
     alert(`💰 +${recompensa.monedas} marcapáginas`);
   }
 
-if (recompensa.objeto?.id) {
-  await otorgarObjeto(recompensa.objeto);
+  if (recompensa.objeto && recompensa.objeto.id) {
+    await otorgarObjeto(recompensa.objeto);
 
-  if (recompensa.objeto.efectos) {
-    await aplicarEfectosObjeto(recompensa.objeto.efectos);
+    if (recompensa.objeto.efectos) {
+      await aplicarEfectosObjeto(recompensa.objeto.efectos);
+    }
+
+    mostrarObjetoEncontrado(recompensa.objeto);
   }
-}
-
-
 
   pintarLecturas();
   await comprobarLogros(l);
@@ -879,9 +905,6 @@ function renderizarEstrellas(valoracion) {
   html += `</div>`;
   return html;
 }
-
-
-
 
 //
 //
@@ -959,13 +982,7 @@ async function cambiarProgreso(lectura, delta) {
   nuevoProgreso = Math.max(0, Math.min(100, nuevoProgreso));
 
   // Guardar en Firestore
-  const lecturaRef = doc(
-    db,
-    "users",
-    usuarioActual.uid,
-    "lecturas",
-    lectura.id
-  );
+  const lecturaRef = doc(db, "users", usuarioActual.uid, "lecturas", lectura.id);
 
   await updateDoc(lecturaRef, {
     progreso: nuevoProgreso
@@ -982,20 +999,17 @@ async function cambiarProgreso(lectura, delta) {
   }
 }
 
-
 // ---------------- PINTAR LECTURAS ----------------
 //
 function pintarLecturas() {
   listaLecturasEl.innerHTML = "";
 
   // Filtrar lecturas según el toggle de terminadas
-  const lista = mostrarTerminados
-    ? lecturasCache
-    : lecturasCache.filter(l => l.activa);
+  const lista = mostrarTerminados ? lecturasCache : lecturasCache.filter((l) => l.activa);
 
   // Ordenar primero retos activos, luego lecturas normales
-  const retos = lista.filter(l => l.esReto);
-  const normales = lista.filter(l => !l.esReto);
+  const retos = lista.filter((l) => l.esReto);
+  const normales = lista.filter((l) => !l.esReto);
 
   const listaOrdenada = [...retos, ...normales];
 
@@ -1007,28 +1021,28 @@ function pintarLecturas() {
     if (l.esReto) card.classList.add("reto-card");
 
     // Nombre dinámico para retos
-let tituloVisible = l.titulo;
+    let tituloVisible = l.titulo;
 
-if (l.esReto) {
-  let fechaReto;
-  if (l.fechaInicio) {
-    // Manejar Firestore Timestamp o string
-    fechaReto = l.fechaInicio.toDate ? l.fechaInicio.toDate() : new Date(l.fechaInicio);
-  } else {
-    fechaReto = new Date();
-  }
+    if (l.esReto) {
+      let fechaReto;
+      if (l.fechaInicio) {
+        // Manejar Firestore Timestamp o string
+        fechaReto = l.fechaInicio.toDate ? l.fechaInicio.toDate() : new Date(l.fechaInicio);
+      } else {
+        fechaReto = new Date();
+      }
 
-  const mes = fechaReto.toLocaleString("es-ES", { month: "long" }).toUpperCase();
-  const anio = fechaReto.getFullYear();
+      const mes = fechaReto.toLocaleString("es-ES", { month: "long" }).toUpperCase();
+      const anio = fechaReto.getFullYear();
 
-  // Aquí construimos el título visible
-  tituloVisible = `🏆 RETO ${mes} ${anio}`;
-}
+      // Aquí construimos el título visible
+      tituloVisible = `🏆 RETO ${mes} ${anio}`;
+    }
 
-card.innerHTML = `
+    card.innerHTML = `
   <div class="lectura-info">
     <strong title="${l.titulo}">${tituloVisible}</strong><br>
-    <small>${l.titulo|| ""}</small><br>
+    <small>${l.titulo || ""}</small><br>
     <small>${l.autor || ""}</small>
 
     ${renderizarEstrellas(l.valoracion)}
@@ -1054,7 +1068,7 @@ card.innerHTML = `
 `;
 
     // Eventos de progreso
-    card.querySelectorAll(".btn-progreso").forEach(btn => {
+    card.querySelectorAll(".btn-progreso").forEach((btn) => {
       btn.disabled = !l.activa;
       btn.onclick = () => cambiarProgreso(l, Number(btn.dataset.delta));
     });
@@ -1064,9 +1078,7 @@ card.innerHTML = `
 
     // Botón eliminar lectura/reto
     card.querySelector(".btn-eliminar").onclick = async () => {
-      const texto = l.esReto
-        ? "⚠️ ¿Eliminar este reto?"
-        : "⚠️ ¿Eliminar esta lectura?";
+      const texto = l.esReto ? "⚠️ ¿Eliminar este reto?" : "⚠️ ¿Eliminar esta lectura?";
       if (!confirm(texto)) return;
 
       if (l.id) {
@@ -1074,15 +1086,13 @@ card.innerHTML = `
       }
 
       // Eliminar de memoria y repintar
-      lecturasCache = lecturasCache.filter(x => x.id !== l.id);
+      lecturasCache = lecturasCache.filter((x) => x.id !== l.id);
       pintarLecturas();
     };
 
     listaLecturasEl.appendChild(card);
   });
 }
-
-
 
 //function pintarLecturas() {
 //  listaLecturasEl.innerHTML = "";
@@ -1155,10 +1165,10 @@ card.innerHTML = `
 //    );
 //  }
 
-  // Eliminar de memoria
-  lecturasCache = lecturasCache.filter(x => x.id !== l.id);
+// Eliminar de memoria
+lecturasCache = lecturasCache.filter((x) => x.id !== l.id);
 
-  pintarLecturas();
+pintarLecturas();
 
 //// ---------------- TOGGLE TERMINADAS ----------------
 //btnToggleTerminadas.addEventListener("click", () => {
@@ -1168,8 +1178,6 @@ card.innerHTML = `
 //    : "Mostrar lecturas terminadas";
 //  pintarLecturas();
 //});
-
-
 
 btnToggleTerminadas.onclick = () => {
   const panel = document.getElementById("panelTerminadas");
@@ -1183,14 +1191,14 @@ btnToggleTerminadas.onclick = () => {
 function pintarTerminadas(panel) {
   panel.innerHTML = ""; // Limpiar contenido
 
-  const terminadas = lecturasCache.filter(l => !l.activa);
+  const terminadas = lecturasCache.filter((l) => !l.activa);
 
   if (terminadas.length === 0) {
     panel.innerHTML = "<p>No hay lecturas ni retos terminados aún</p>";
     return;
   }
 
-  terminadas.forEach(l => {
+  terminadas.forEach((l) => {
     const div = document.createElement("div");
     div.className = "lectura-card terminada";
 
@@ -1199,17 +1207,15 @@ function pintarTerminadas(panel) {
     // Fecha
     let fechaTexto = "";
     if (l.fechaFin) {
-      const fecha = l.fechaFin?.seconds
-        ? new Date(l.fechaFin.seconds * 1000)
-        : new Date(l.fechaFin);
+      const fecha = l.fechaFin?.seconds ? new Date(l.fechaFin.seconds * 1000) : new Date(l.fechaFin);
       fechaTexto = l.esReto
-        ? `📅 ${fecha.toLocaleDateString("es-ES", { month: 'long', year: 'numeric' })}`
+        ? `📅 ${fecha.toLocaleDateString("es-ES", { month: "long", year: "numeric" })}`
         : `📅 ${fecha.toLocaleDateString("es-ES")}`;
     }
 
     div.innerHTML = `
       <div class="lectura-info">
-        <img src="${l.portadaUrl || 'https://via.placeholder.com/60x90'}"
+        <img src="${l.portadaUrl || "https://via.placeholder.com/60x90"}"
              alt="Portada" style="width:60px; height:90px; float:left; margin-right:8px;">
         <strong>${l.titulo}</strong> ${l.esReto ? "🏆" : ""}<br>
         <small>${l.autor}</small><br>
@@ -1245,22 +1251,13 @@ function pintarTerminadas(panel) {
     div.querySelector(".btn-eliminar").onclick = async () => {
       if (!confirm("⚠️ ¿Eliminar esta lectura?")) return;
       await deleteDoc(doc(db, "users", usuarioActual.uid, "lecturas", l.id));
-      lecturasCache = lecturasCache.filter(x => x.id !== l.id);
+      lecturasCache = lecturasCache.filter((x) => x.id !== l.id);
       pintarTerminadas(panel);
     };
 
     panel.appendChild(div);
   });
 }
-
-
-
-
-
-
-
-
-
 
 // ---------------- BÚSQUEDA LIBROS ----------------
 async function buscarLibros(texto) {
@@ -1275,7 +1272,7 @@ async function buscarLibros(texto) {
   const data = await res.json();
   if (!data.items) return;
 
-  data.items.forEach(libro => {
+  data.items.forEach((libro) => {
     const info = libro.volumeInfo;
     const li = document.createElement("li");
     li.style.cursor = "pointer";
@@ -1283,13 +1280,14 @@ async function buscarLibros(texto) {
 
     li.textContent = `${info.title} — ${info.authors?.[0] || "Desconocido"}`;
 
-    li.onclick = () => seleccionarLibro({
-      titulo: info.title,
-      autor: info.authors?.[0],
-      paginas: info.pageCount || 0,
-      categoria: normalizarCategoria(info.categories?.[0] || ""),
-      portadaUrl: info.imageLinks?.thumbnail
-    });
+    li.onclick = () =>
+      seleccionarLibro({
+        titulo: info.title,
+        autor: info.authors?.[0],
+        paginas: info.pageCount || 0,
+        categoria: normalizarCategoria(info.categories?.[0] || ""),
+        portadaUrl: info.imageLinks?.thumbnail
+      });
 
     resultados.appendChild(li);
   });
@@ -1299,15 +1297,14 @@ async function buscarLibros(texto) {
   resultados.style.overflowY = "auto";
 }
 
-
 // ---------------- RECOMPENSAS ----------------
 function generarRecompensas(paginas) {
-  const monedas = Math.floor(Math.random() * (paginas * 1)) + 1;
+  const monedas = Math.floor(Math.random() * paginas) + 1;
   const rand = Math.random() * 100;
   let objeto = null;
 
- if (rand > 95) objeto = OBJETOS_LEGENDARIOS[Math.floor(Math.random() * OBJETOS_LEGENDARIOS.length)];
- else if (rand > 85) objeto = OBJETOS_RAROS[Math.floor(Math.random() * OBJETOS_RAROS.length)];
+  if (rand > 95) objeto = OBJETOS_LEGENDARIOS[Math.floor(Math.random() * OBJETOS_LEGENDARIOS.length)];
+  else if (rand > 85) objeto = OBJETOS_RAROS[Math.floor(Math.random() * OBJETOS_RAROS.length)];
 
   return { monedas, objeto };
 }
@@ -1358,30 +1355,27 @@ async function comprobarLogros(lectura) {
         }
       });
 
-        usuarioData.logros[logro.id] = {
-  fecha: new Date(),
-  titulo: logro.titulo,
-  efectos: logro.efectos
-};
+      usuarioData.logros[logro.id] = {
+        fecha: new Date(),
+        titulo: logro.titulo,
+        efectos: logro.efectos
+      };
 
       if (logro.efectos) {
         await aplicarEfectosLogro(logro.efectos);
       }
 
-             let mensaje = `🏆 ${logro.titulo}`;
-  if (logro.efectos?.xp) mensaje += `\n+${logro.efectos.xp} XP`;
-  if (logro.efectos?.monedas) mensaje += `\n+${logro.efectos.monedas} monedas`;
-  if (logro.efectos?.prestigio) mensaje += `\n+${logro.efectos.prestigio} prestigio`;
+      let mensaje = `🏆 ${logro.titulo}`;
+      if (logro.efectos?.xp) mensaje += `\n+${logro.efectos.xp} XP`;
+      if (logro.efectos?.monedas) mensaje += `\n+${logro.efectos.monedas} monedas`;
+      if (logro.efectos?.prestigio) mensaje += `\n+${logro.efectos.prestigio} prestigio`;
 
-  alert(mensaje);
+      alert(mensaje);
 
       mostrarNotificacionLogro(logro);
-
-
     }
   }
 }
-
 
 //pintar logros
 
@@ -1394,26 +1388,20 @@ function pintarLogros() {
     return;
   }
 
-const logros = Object.values(usuarioData.logros).sort(
-  (a, b) => {
-    const fa = a.fecha?.seconds
-      ? a.fecha.seconds * 1000
-      : new Date(a.fecha).getTime();
+  const logros = Object.values(usuarioData.logros).sort((a, b) => {
+    const fa = a.fecha?.seconds ? a.fecha.seconds * 1000 : new Date(a.fecha).getTime();
 
-    const fb = b.fecha?.seconds
-      ? b.fecha.seconds * 1000
-      : new Date(b.fecha).getTime();
+    const fb = b.fecha?.seconds ? b.fecha.seconds * 1000 : new Date(b.fecha).getTime();
 
     return fb - fa;
-  }
-);
+  });
 
   if (logros.length === 0) {
     cont.textContent = "Aún no has desbloqueado logros";
     return;
   }
 
-  logros.forEach(l => {
+  logros.forEach((l) => {
     const div = document.createElement("div");
     div.className = "logro";
 
@@ -1437,13 +1425,12 @@ function mostrarNotificacionLogro(logro) {
   alert(`🏆 Logro desbloqueado: ${logro.titulo}`);
 }
 
-
 async function cargarUsuarios() {
   const select = document.getElementById("selectAdmin");
   select.innerHTML = ""; // limpiar
 
   const snapshot = await getDocs(collection(db, "users")); // ¡users, no usuarios!
-  snapshot.forEach(doc => {
+  snapshot.forEach((doc) => {
     const data = doc.data();
 
     // No mostrarte a ti mismo
@@ -1460,10 +1447,7 @@ async function asignarAdmin() {
   if (!uidNuevoAdmin) return;
 
   // Quitar admin temporal anterior
-  const q = query(
-    collection(db, "users"),
-    where("tipoAdmin", "==", "crear")
-  );
+  const q = query(collection(db, "users"), where("tipoAdmin", "==", "crear"));
 
   const snap = await getDocs(q);
 
@@ -1489,13 +1473,10 @@ avatarInput.addEventListener("change", async () => {
   formData.append("file", file);
   formData.append("upload_preset", "avatar_users");
 
-  const res = await fetch(
-    "https://api.cloudinary.com/v1_1/dwuokewzr/image/upload",
-    {
-      method: "POST",
-      body: formData
-    }
-  );
+  const res = await fetch("https://api.cloudinary.com/v1_1/dwuokewzr/image/upload", {
+    method: "POST",
+    body: formData
+  });
 
   const data = await res.json();
 
@@ -1547,8 +1528,7 @@ function actualizarEstrellas() {
     s.classList.toggle("activa", i < valoracionActual * 2);
   });
 
-  document.getElementById("notaValoracion").textContent =
-    (valoracionActual * 2).toFixed(1);
+  document.getElementById("notaValoracion").textContent = (valoracionActual * 2).toFixed(1);
 }
 function iconoLogro(logro) {
   if (logro.tipo === "especial") return "⭐⭐⭐⭐½";
@@ -1566,11 +1546,7 @@ async function asignarRetosActivos(usuarioId) {
 
     // Revisar si ya está asignado
     const lecturaSnap = await getDocs(
-      query(
-        collection(db, "users", usuarioId, "lecturas"),
-        where("esReto", "==", true),
-        where("idReto", "==", idReto)
-      )
+      query(collection(db, "users", usuarioId, "lecturas"), where("esReto", "==", true), where("idReto", "==", idReto))
     );
 
     if (lecturaSnap.empty) {
@@ -1593,9 +1569,9 @@ async function asignarRetosActivos(usuarioId) {
 function normalizarClase(nombre) {
   return nombre
     .toLowerCase()
-    .normalize("NFD")                 // quita tildes
+    .normalize("NFD") // quita tildes
     .replace(/[\u0300-\u036f]/g, "")
-    .replace(/\/a|\/o/g, "")          // quita /a /o
+    .replace(/\/a|\/o/g, "") // quita /a /o
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
 }
@@ -1657,7 +1633,7 @@ const TEMAS_CLASES = {
     fondo: "#2e1065"
   },
 
-  "guardabibliotecas": {
+  guardabibliotecas: {
     primario: "#475569",
     secundario: "#cbd5e1",
     acento: "#38bdf8",
@@ -1742,7 +1718,6 @@ const TEMAS_CLASES = {
   }
 };
 
-
 function aplicarTemaPorClase(clase) {
   if (!clase) return;
 
@@ -1808,9 +1783,7 @@ async function subirPortada(file) {
   formData.append("file", file);
   formData.append("upload_preset", "portadas");
 
-
-
-  const res = await fetch( "https://api.cloudinary.com/v1_1/dwuokewzr/image/upload", {
+  const res = await fetch("https://api.cloudinary.com/v1_1/dwuokewzr/image/upload", {
     method: "POST",
     body: formData
   });
@@ -1849,7 +1822,7 @@ export function aplicarEfectos(effects, stats) {
   });
 }
 
-objetosEquipados.forEach(obj => aplicarEfectos(obj.efectos, stats));
+objetosEquipados.forEach((obj) => aplicarEfectos(obj.efectos, stats));
 
 async function otorgarObjeto(objeto) {
   if (!objeto?.id) return;
@@ -1905,24 +1878,18 @@ async function aplicarEfectosObjeto(efectos) {
   }
 }
 
-
 async function cargarHallOfFame() {
   const rankingDiv = document.getElementById("ranking");
   rankingDiv.innerHTML = "Cargando ranking...";
 
-  const q = query(
-    collection(db, "users"),
-    orderBy("prestigio", "desc"),
-    orderBy("nivel", "desc"),
-    limit(10)
-  );
+  const q = query(collection(db, "users"), orderBy("prestigio", "desc"), orderBy("nivel", "desc"), limit(10));
 
   const snap = await getDocs(q);
   rankingDiv.innerHTML = "";
 
   let posicion = 1;
 
-  snap.forEach(doc => {
+  snap.forEach((doc) => {
     const u = doc.data();
 
     const div = document.createElement("div");
@@ -1938,4 +1905,230 @@ async function cargarHallOfFame() {
     rankingDiv.appendChild(div);
     posicion++;
   });
+}
+
+btnMochila.onclick = () => {
+  panelMochila.classList.toggle("hidden");
+
+  if (!panelMochila.classList.contains("hidden")) {
+    cargarMochila();
+  }
+};
+
+function cargarMochila() {
+  pintarInventario();
+  pintarBiblioteca();
+}
+
+function pintarInventario() {
+  const grid = document.getElementById("inventarioGrid");
+  grid.innerHTML = "";
+
+  const objetosUsuario = usuarioData.objetos || {};
+
+  Object.keys(objetosUsuario).forEach((id) => {
+    const obj = OBJETOS_RAROS.find((o) => o.id === id) || OBJETOS_LEGENDARIOS.find((o) => o.id === id);
+
+    if (!obj) return;
+
+    const slot = document.createElement("div");
+    slot.className = `slot ${obj.rareza}`;
+
+    slot.innerHTML = `
+      ${obj.icono || "📦"}
+
+      <div class="tooltip">
+        <strong>${obj.titulo}</strong><br>
+        Rareza: ${obj.rareza}
+      </div>
+    `;
+
+    slot.onclick = () => equiparObjeto(obj);
+
+    grid.appendChild(slot);
+  });
+}
+
+function equiparObjeto(obj) {
+  if (objetosEquipados.find((o) => o.id === obj.id)) return;
+
+  if (objetosEquipados.length >= 3) {
+    alert("Solo puedes equipar 3 objetos");
+    return;
+  }
+
+  objetosEquipados.push(obj);
+
+  pintarEquipo();
+}
+
+function pintarEquipo() {
+  const cont = document.getElementById("equipoObjetos");
+  cont.innerHTML = "";
+
+  objetosEquipados.forEach((obj) => {
+    const div = document.createElement("div");
+    div.className = `slot ${obj.rareza}`;
+
+    div.innerHTML = obj.icono;
+
+    div.onclick = () => {
+      objetosEquipados = objetosEquipados.filter((o) => o.id !== obj.id);
+      pintarEquipo();
+    };
+
+    cont.appendChild(div);
+  });
+}
+
+function pintarBiblioteca() {
+  const cont = document.getElementById("bibliotecaGrid");
+  cont.innerHTML = "";
+
+  const libros = lecturasCache.filter((l) => !l.activa);
+
+  libros.forEach((l) => {
+    const card = document.createElement("div");
+    card.className = "libro-card";
+
+    card.innerHTML = `
+      <img src="${l.portadaUrl || "https://via.placeholder.com/60x90"}">
+
+      <div>
+        <strong>${l.titulo}</strong>
+        <br>
+        <small>${l.autor}</small>
+        ${renderizarEstrellas(l.valoracion)}
+      </div>
+    `;
+
+    cont.appendChild(card);
+  });
+}
+
+function mostrarObjetoEncontrado(obj) {
+  const popup = document.getElementById("popupObjeto");
+  const icono = document.getElementById("objetoAnimado");
+  const nombre = document.getElementById("nombreObjeto");
+  const rareza = document.getElementById("rarezaObjeto");
+
+  icono.textContent = obj.icono || "📦";
+  nombre.textContent = obj.titulo;
+  rareza.textContent = "Rareza: " + obj.rareza;
+
+  popup.classList.remove("hidden");
+}
+
+function cerrarPopupObjeto() {
+  document.getElementById("popupObjeto").classList.add("hidden");
+}
+//function idRetoMesActual() {
+//  const now = new Date();
+//  const year = now.getFullYear();
+//  const month = String(now.getMonth() + 1).padStart(2, "0"); // enero = 0
+//  return `${year}-${month}`;
+//}
+
+function idRetoMesActual() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+
+  return `${year}-${month}`;
+}
+
+//async function cargarRetoMensual() {
+//  const idReto = idRetoMesActual();
+//  const retoRef = doc(db, "retos", idReto);
+//  const snap = await getDoc(retoRef);
+//
+//  if (snap.exists()) {
+//    return snap.data(); // ya existe el reto del mes
+//  } else {
+//    // Crear reto automático del mes
+//    const retoAuto = {
+//      titulo: "Reto del mes",
+//      autor: "Autor desconocido",
+//      categoria: "Ficción",
+//      paginas: 100 + Math.floor(Math.random() * 200), // 100 a 300 páginas
+//      portadaUrl: "https://via.placeholder.com/120x180",
+//      fechaCreacion: new Date()
+//    };
+//
+//    await setDoc(retoRef, retoAuto);
+//    return retoAuto;
+//  }
+//}
+
+async function cargarRetoMensual() {
+
+  const id = idRetoMesActual();
+
+  const retoRef = doc(db, "retos", id);
+  const snap = await getDoc(retoRef);
+
+  if (!snap.exists()) {
+    return null;
+  }
+
+  return snap.data();
+}
+
+async function registrarRetoMensual() {
+  if (!lecturaPendiente) return;
+
+  // Verificar si ya existe un reto activo para este mes
+  const mesActual = idRetoMesActual();
+  const lecturasReto = lecturasCache.filter((l) => l.esReto && l.activa);
+
+  if (lecturasReto.length > 0) {
+    alert("⚠️ Ya tienes activo el reto de este mes");
+    return;
+  }
+
+  // Registrar lectura en Firestore
+  const ref = await addDoc(collection(db, "users", usuarioActual.uid, "lecturas"), {
+    titulo: lecturaPendiente.titulo,
+    autor: lecturaPendiente.autor,
+    paginas: lecturaPendiente.paginas,
+    categoria: lecturaPendiente.categoria,
+    portadaUrl: lecturaPendiente.portadaUrl,
+    activa: true,
+    progreso: 0,
+    esReto: true,
+    fechaInicio: new Date(),
+    mesId: mesActual // identificador del mes para histórico
+  });
+
+  lecturasCache.unshift({
+    id: ref.id,
+    ...lecturaPendiente,
+    activa: true,
+    progreso: 0,
+    esReto: true,
+    fechaInicio: new Date(),
+    mesId: mesActual
+  });
+
+  pintarLecturas();
+  alert("🏆 ¡Reto mensual registrado!");
+  btnRegistrar.textContent = "Registrar lectura";
+}
+
+async function crearRetoDelMes(libro) {
+
+  const id = idRetoMesActual();
+
+  await setDoc(doc(db, "retos", id), {
+    titulo: libro.titulo,
+    autor: libro.autor,
+    paginas: libro.paginas,
+    categoria: libro.categoria,
+    portadaUrl: libro.portadaUrl,
+    creadoPor: usuarioActual.uid,
+    fechaCreacion: serverTimestamp()
+  });
+
+  alert("🏆 Reto del mes creado");
+
 }
