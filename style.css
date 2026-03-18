@@ -585,6 +585,13 @@ justify-items: center;
 .top2 { color: silver; }
 .top3 { color: #cd7f32; } /* bronce */
 
+.comentario-card{
+  background:#1e1e1e;
+  border-radius:8px;
+  padding:12px;
+  margin:10px 0;
+  border-left:4px solid gold;
+}
 
 
 

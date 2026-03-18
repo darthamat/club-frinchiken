@@ -2079,7 +2079,9 @@ async function registrarRetoMensual() {
 
   // Verificar si ya existe un reto activo para este mes
   const mesActual = idRetoMesActual();
-  const lecturasReto = lecturasCache.filter((l) => l.esReto && l.activa);
+  const lecturasReto = lecturasCache.filter(
+  (l) => l.esReto && l.activa && l.mesId === mesActual
+);
 
   if (lecturasReto.length > 0) {
     alert("⚠️ Ya tienes activo el reto de este mes");
@@ -2132,3 +2134,62 @@ async function crearRetoDelMes(libro) {
   alert("🏆 Reto del mes creado");
 
 }
+
+async function cargarComentarios() {
+
+  const comentarios = [];
+
+  const usersSnap = await getDocs(collection(db, "users"));
+
+  for (const user of usersSnap.docs) {
+
+    const lecturasSnap = await getDocs(
+      collection(db, "users", user.id, "lecturas")
+    );
+
+    lecturasSnap.forEach((doc) => {
+
+      const data = doc.data();
+
+      if (data.comentario && data.valoracion) {
+        comentarios.push(data);
+      }
+
+    });
+  }
+
+  return comentarios;
+}
+
+function mezclarArray(array) {
+  return array.sort(() => Math.random() - 0.5);
+}
+
+async function mostrarComentarios() {
+
+  const comentarios = await cargarComentarios();
+
+  const aleatorios = mezclarArray(comentarios).slice(0,3);
+
+  const contenedor = document.getElementById("comentarios-home");
+  contenedor.innerHTML = "";
+
+  aleatorios.forEach(c => {
+
+    const div = document.createElement("div");
+
+    div.innerHTML = `
+      <div class="comentario-card">
+        <div>${renderizarEstrellas(c.valoracion)}</div>
+        <p>"${c.comentario}"</p>
+        <small>${c.titulo}</small>
+      </div>
+    `;
+
+    contenedor.appendChild(div);
+
+  });
+
+}
+
+
