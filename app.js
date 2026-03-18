@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, doc, getDoc, getDocs, collection, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, getDocs, collectionGroup, collection, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 // ---------------- CONFIG FIREBASE ----------------
@@ -207,6 +207,32 @@ function tiempoRelativo(fecha) {
   return "ayer";
 }
 
+function renderizarEstrellas(valoracion) {
+  if (!valoracion || valoracion <= 0) {
+    return `<span class="sin-valoracion">Sin valorar</span>`;
+  }
+
+  let html = `<div class="estrellas-card">`;
+  const estrellasCompletas = Math.floor(valoracion);
+  const media = valoracion % 1 >= 0.5;
+
+  for (let i = 0; i < estrellasCompletas; i++) {
+    html += `<span class="estrella activa">★</span>`;
+  }
+
+  if (media) {
+    html += `<span class="estrella media">★</span>`;
+  }
+
+  const restantes = 5 - estrellasCompletas - (media ? 1 : 0);
+  for (let i = 0; i < restantes; i++) {
+    html += `<span class="estrella">★</span>`;
+  }
+
+  html += `</div>`;
+  return html;
+}
+
 
 async function cargarHallOfFame() {
   const rankingDiv = document.getElementById("ranking");
@@ -242,5 +268,59 @@ async function cargarHallOfFame() {
     posicion++;
   });
 }
+
+async function cargarComentarios() {
+  const snap = await getDocs(
+    query(
+      collectionGroup(db, "lecturas"),
+      //orderBy("fechaFin", "desc"),
+      limit(30)
+    )
+  );
+
+  const comentarios = [];
+
+  snap.forEach(doc => {
+    const data = doc.data();
+
+    if (data.comentario?.trim()) {
+      comentarios.push(data);
+    }
+  });
+
+  return comentarios;
+}
+
+function mezclarArray(array) {
+  return array.sort(() => Math.random() - 0.5);
+}
+
+async function mostrarComentarios() {
+
+  const comentarios = await cargarComentarios();
+
+  const aleatorios = mezclarArray(comentarios).slice(0,3);
+
+  const contenedor = document.getElementById("comentarios-home");
+  contenedor.innerHTML = "";
+
+  aleatorios.forEach(c => {
+
+    const div = document.createElement("div");
+
+    div.innerHTML = `
+      <div class="comentario-card">
+        <div>${renderizarEstrellas(c.valoracion)}</div>
+        <p>"${c.comentario}"</p>
+        <small>${c.titulo}</small>
+      </div>
+    `;
+
+    contenedor.appendChild(div);
+
+  });
+}
+
 cargarHallOfFame();
+mostrarComentarios();
 

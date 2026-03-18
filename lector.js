@@ -812,6 +812,15 @@ document.getElementById("btnConfirmarValoracion").onclick = async () => {
   await finalizarLecturaConRecompensas(lecturaPendiente, valoracionActual, comentario);
 
   lecturaPendiente = null;
+
+  await addDoc(collection(db, "comentarios"), {
+  titulo: l.titulo,
+  comentario,
+  valoracion,
+  usuario: usuarioActual.uid,
+  fecha: serverTimestamp()
+});
+
 };
 
 async function finalizarLecturaConRecompensas(l, valoracion, comentario) {
@@ -2136,25 +2145,21 @@ async function crearRetoDelMes(libro) {
 }
 
 async function cargarComentarios() {
-
   const comentarios = [];
 
   const usersSnap = await getDocs(collection(db, "users"));
 
   for (const user of usersSnap.docs) {
-
     const lecturasSnap = await getDocs(
       collection(db, "users", user.id, "lecturas")
     );
 
     lecturasSnap.forEach((doc) => {
-
       const data = doc.data();
 
       if (data.comentario && data.valoracion) {
         comentarios.push(data);
       }
-
     });
   }
 
