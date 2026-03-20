@@ -1823,7 +1823,7 @@ async function agregarLectura(titulo, autor, filePortada) {
   lecturasCache.push({ ...nuevaLectura, id: docRef.id });
 }
 
-export function aplicarEfectos(effects, stats) {
+function aplicarEfectos(effects, stats) {
   if (!effects) return;
 
   Object.entries(effects).forEach(([key, value]) => {
