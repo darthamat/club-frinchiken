@@ -2018,6 +2018,9 @@ function pintarBiblioteca() {
 }
 
 function mostrarObjetoEncontrado(obj) {
+
+  if (!obj || !obj.titulo) return; // ⛔ evita popup vacío
+
   const popup = document.getElementById("popupObjeto");
   const icono = document.getElementById("objetoAnimado");
   const nombre = document.getElementById("nombreObjeto");
