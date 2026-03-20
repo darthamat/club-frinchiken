@@ -158,34 +158,36 @@ onAuthStateChanged(auth, async (user) => {
 
   const reto = await cargarRetoMensual();
 
+});
 
-export default {
-  data() {
-    return {
-      OBJETOS_RAROS,
-      OBJETOS_LEGENDARIOS,
-      usuarioData: {
-        nombrePersonaje: "Arwen",
-        clase: "Mago/a Sabe-lo-Todo",
-        nivel: 5,
-        // aquí guardamos los IDs de los objetos que el jugador ha encontrado
-        objetosEncontradosIds: ["pluma_fenix", "biblioteca_ancestral"]
-      }
-    };
-  },
-  computed: {
-    objetosEncontrados() {
-      // filtramos raros
-      const raros = this.OBJETOS_RAROS.filter((obj) => this.usuarioData.objetosEncontradosIds.includes(obj.id));
-      // filtramos legendarios (algunos legendarios en tu config son solo strings)
-      const legendarios = this.OBJETOS_LEGENDARIOS.map((obj) =>
-        typeof obj === "string" ? { id: obj, titulo: obj, rareza: "legendario", icono: "🌟" } : obj
-      ).filter((obj) => this.usuarioData.objetosEncontradosIds.includes(obj.id));
+//export default {
+//  data() {
+//    return {
+//      OBJETOS_RAROS,
+//      OBJETOS_LEGENDARIOS,
+//      usuarioData: {
+//        nombrePersonaje: "Arwen",
+//        clase: "Mago/a Sabe-lo-Todo",
+//        nivel: 5,
+//        // aquí guardamos los IDs de los objetos que el jugador ha encontrado
+//        objetosEncontradosIds: ["pluma_fenix", "biblioteca_ancestral"]
+//      }
+//    };
+//  },
+//  computed: {
+//    objetosEncontrados() {
+//      // filtramos raros
+//      const raros = this.OBJETOS_RAROS.filter((obj) => this.usuarioData.objetosEncontradosIds.includes(obj.id));
+//      // filtramos legendarios (algunos legendarios en tu config son solo strings)
+//      const legendarios = this.OBJETOS_LEGENDARIOS.map((obj) =>
+//        typeof obj === "string" ? { id: obj, titulo: obj, rareza: "legendario", icono: "🌟" } : obj
+//      ).filter((obj) => this.usuarioData.objetosEncontradosIds.includes(obj.id));
+//
+//      return [...raros, ...legendarios];
+//    }
+//  }
+//};
 
-      return [...raros, ...legendarios];
-    }
-  }
-};
 
 // ---------------- LOGOUT ----------------
 btnLogout.addEventListener("click", async () => {
