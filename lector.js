@@ -882,7 +882,9 @@ async function finalizarLecturaConRecompensas(l, valoracion, comentario) {
       await aplicarEfectosObjeto(recompensa.objeto.efectos);
     }
 
-    mostrarObjetoEncontrado(recompensa.objeto);
+  if (recompensa.objeto) {
+  mostrarObjetoEncontrado(recompensa.objeto);
+
   }
 
   pintarLecturas();
