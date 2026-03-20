@@ -639,12 +639,12 @@ button.gold {
   justify-content:center;
   align-items:center;
 
-  z-index:1000;
+  z-index: 99999;
 }
 
 .popup-card{
 
-  background:#020617;
+  background:hsla(216, 36%, 43%, 0.96);
   border-radius:16px;
   padding:30px;
   text-align:center;

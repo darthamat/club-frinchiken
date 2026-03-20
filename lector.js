@@ -752,10 +752,10 @@ async function finalizarLecturaConRecompensas(l, valoracion, comentario) {
       await aplicarEfectosObjeto(recompensa.objeto.efectos);
     }
 
-  if (recompensa.objeto) {
-  mostrarObjetoEncontrado(recompensa.objeto);
-
-  }
+  //if (recompensa.objeto) {
+  //mostrarObjetoEncontrado(recompensa.objeto);
+//
+  //}
   }
 
   pintarLecturas();
@@ -1744,25 +1744,23 @@ function pintarBiblioteca() {
   });
 }
 
-function mostrarObjetoEncontrado(obj) {
+//function mostrarObjetoEncontrado(obj) {
+//
+//  if (!obj || !obj.titulo) return; // ⛔ evita popup vacío
+//
+//  const popup = document.getElementById("popupObjeto");
+//  const icono = document.getElementById("objetoAnimado");
+//  const nombre = document.getElementById("nombreObjeto");
+//  const rareza = document.getElementById("rarezaObjeto");
+//
+//  icono.textContent = obj.icono || "📦";
+//  nombre.textContent = obj.titulo;
+//  rareza.textContent = "Rareza: " + obj.rareza;
+//
+//  popup.classList.remove("hidden");
+//}
 
-  if (!obj || !obj.titulo) return; // ⛔ evita popup vacío
 
-  const popup = document.getElementById("popupObjeto");
-  const icono = document.getElementById("objetoAnimado");
-  const nombre = document.getElementById("nombreObjeto");
-  const rareza = document.getElementById("rarezaObjeto");
-
-  icono.textContent = obj.icono || "📦";
-  nombre.textContent = obj.titulo;
-  rareza.textContent = "Rareza: " + obj.rareza;
-
-  popup.classList.remove("hidden");
-}
-
-function cerrarPopupObjeto() {
-  document.getElementById("popupObjeto").classList.add("hidden");
-}
 //function idRetoMesActual() {
 //  const now = new Date();
 //  const year = now.getFullYear();
@@ -1906,5 +1904,59 @@ async function mostrarComentarios() {
   });
 
 }
+function initPopupObjeto() {
+  const popup = document.getElementById("popupObjeto");
+  const btn = document.getElementById("btnCerrarObjeto");
 
-document.getElementById("btnCerrarObjeto").addEventListener("click", cerrarPopupObjeto);
+  if (!popup || !btn) {
+    console.log("❌ Popup no encontrado");
+    return;
+  }
+
+  btn.style.pointerEvents = "auto";
+popup.style.pointerEvents = "auto";
+
+  // BOTÓN
+  btn.onclick = () => {
+    console.log("✅ Click en continuar");
+    cerrarPopupObjeto();
+  };
+
+  //// CLICK FUERA
+  //popup.addEventListener("click", (e) => {
+  //  if (e.target === popup) {
+  //    console.log("✅ Click fuera");
+  //    cerrarPopupObjeto();
+  //  }
+  //});
+
+  popup.addEventListener("click", (e) => {
+  if (!e.target.closest(".popup-card")) {
+    cerrarPopupObjeto();
+  }
+});
+}
+
+function cerrarPopupObjeto() {
+  const popup = document.getElementById("popupObjeto");
+  popup.classList.add("hidden");
+}
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") cerrarPopupObjeto();
+});
+
+initPopupObjeto();
+
+/* --- PARCHE PARA CERRAR EL POPUP DE OBJETO --- */
+document.addEventListener('click', function(e) {
+    // Si el clic es en el botón de cerrar o en el fondo del popup
+    if (e.target && (e.target.id === 'btnCerrarObjeto' || e.target.id === 'popupObjeto')) {
+        const popup = document.getElementById('popupObjeto');
+        if (popup) {
+            popup.classList.add('hidden'); // Intenta con la clase CSS
+            popup.style.display = 'none';   // Fuerza el cierre por estilo directo
+            console.log("Hechizo de apertura roto: Popup cerrado.");
+        }
+    }
+});
