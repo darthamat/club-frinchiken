@@ -886,6 +886,7 @@ async function finalizarLecturaConRecompensas(l, valoracion, comentario) {
   mostrarObjetoEncontrado(recompensa.objeto);
 
   }
+  }
 
   pintarLecturas();
   await comprobarLogros(l);
@@ -1823,7 +1824,7 @@ async function agregarLectura(titulo, autor, filePortada) {
   lecturasCache.push({ ...nuevaLectura, id: docRef.id });
 }
 
-function aplicarEfectos(effects, stats) {
+ function aplicarEfectos(effects, stats) {
   if (!effects) return;
 
   Object.entries(effects).forEach(([key, value]) => {
