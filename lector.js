@@ -1905,8 +1905,4 @@ async function mostrarComentarios() {
 
 }
 
-document.getElementById("popupObjeto").addEventListener("click", (e) => {
-  if (e.target.id === "popupObjeto") {
-    cerrarPopupObjeto();
-  }
-});
+document.getElementById("btnCerrarObjeto").addEventListener("click", cerrarPopupObjeto);
