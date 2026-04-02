@@ -439,6 +439,64 @@ btnRegistrar.onclick = async () => {
   }
 }
 
+btnRegistrar.addEventListener("click", async () => {
+  const titulo = tituloInput.value.trim();
+  const autor = autorInput.value.trim();
+
+  if (!titulo || !autor) return alert("⚠️ Faltan datos del libro");
+
+  if (modoCrearReto) {
+    // Caso A: El admin está creando el reto global del mes
+    await crearRetoDesdeFormulario();
+  } else if (lecturaPendiente && lecturaPendiente.esReto) {
+    // Caso B: El usuario acepta el reto mensual para su lista personal
+    await registrarLecturaRetoPersonal();
+  } else {
+    // Caso C: Registro de un libro normal
+    await registrarLecturaNormal();
+  }
+
+  limpiarFormulario();
+});
+
+function limpiarFormulario() {
+  tituloInput.value = "";
+  autorInput.value = "";
+  paginasInput.value = "";
+  categoriaInput.value = "Ficción"; // o tu default
+  portadaLibro.src = "https://via.placeholder.com/120x180";
+  busquedaLibro.value = "";
+  resultados.innerHTML = "";
+  resultados.classList.add("hidden");
+  btnRegistrar.textContent = "Registrar lectura";
+}
+
+// Asegúrate de que el buscador de Google Books funcione bien con las categorías
+function normalizarCategoria(catOriginal) {
+  if (!catOriginal) return "Ficción";
+  // Busca en tu CATEGORIAS_MAP o devuelve la original
+  return CATEGORIAS_MAP[catOriginal] || catOriginal;
+}
+
+async function registrarLecturaRetoPersonal() {
+  const lectura = {
+    titulo: tituloInput.value,
+    autor: autorInput.value,
+    paginas: Number(paginasInput.value),
+    categoria: categoriaInput.value,
+    portadaUrl: portadaLibro.src,
+    activa: true,
+    progreso: 0,
+    esReto: true,
+    fechaInicio: serverTimestamp()
+  };
+
+  await addDoc(collection(db, "users", usuarioActual.uid, "lecturas"), lectura);
+  lecturaPendiente = null;
+  await cargarLecturas();
+  alert("🏆 Reto añadido a tu lista. ¡A leer!");
+}
+
 // ------------------ RELLENAR FORMULARIO ------------------
 function rellenarFormularioLectura(libro) {
   tituloInput.value = libro.titulo || "";
@@ -549,10 +607,10 @@ btnReto.addEventListener("click", async () => {
 
   const reto = await cargarRetoMensual();
 
-  if (!reto) {
-    alert("Aún no se ha creado el reto de este mes");
-    return;
-  }
+  //if (!reto) {
+  //  alert("Aún no se ha creado el reto de este mes");
+  //  return;
+  //}
 
   tituloInput.value = reto.titulo || "";
   autorInput.value = reto.autor || "";
@@ -590,19 +648,42 @@ document.querySelector(".registro-lectura").scrollIntoView({
   block: "center"
 });
 
-btnRegistrar.onclick = manejarRegistro;
+//btnRegistrar.onclick = manejarRegistro;
+//
+//async function manejarRegistro() {
+//  if (!tituloInput.value || !autorInput.value) {
+//    alert("Faltan datos");
+//    return;
+//  }
+//
+//  if (modoCrearReto) {
+//    await crearRetoDesdeFormulario();
+//  } else {
+//    await registrarLecturaNormal();
+//  }
+//}
 
-async function manejarRegistro() {
-  if (!tituloInput.value || !autorInput.value) {
-    alert("Faltan datos");
-    return;
-  }
+async function crearRetoDesdeFormulario() {
+  const nuevoReto = {
+    titulo: tituloInput.value,
+    autor: autorInput.value,
+    paginas: Number(paginasInput.value),
+    categoria: categoriaInput.value,
+    portadaUrl: portadaLibro.src,
+    creadoPor: usuarioActual.uid,
+    fecha: serverTimestamp()
+  };
 
-  if (modoCrearReto) {
-    await crearRetoDesdeFormulario();
-  } else {
-    await registrarLecturaNormal();
-  }
+  // 1. Actualizar el reto "actual" que todos ven
+  await setDoc(doc(db, "retos", "reto-actual"), nuevoReto);
+
+  // 2. Guardar en el histórico secuencial
+  const idHistorico = await generarIdRetoHistorico();
+  await setDoc(doc(db, "retos", idHistorico), nuevoReto);
+
+  modoCrearReto = false;
+  document.querySelector(".registro-lectura").classList.remove("modo-reto");
+  alert("👑 ¡Nuevo reto global publicado con éxito!");
 }
 
 
