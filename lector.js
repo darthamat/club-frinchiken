@@ -472,11 +472,11 @@ function limpiarFormulario() {
 }
 
 // Asegúrate de que el buscador de Google Books funcione bien con las categorías
-function normalizarCategoria(catOriginal) {
-  if (!catOriginal) return "Ficción";
-  // Busca en tu CATEGORIAS_MAP o devuelve la original
-  return CATEGORIAS_MAP[catOriginal] || catOriginal;
-}
+//function normalizarCategoria(catOriginal) {
+//  if (!catOriginal) return "Ficción";
+//  // Busca en tu CATEGORIAS_MAP o devuelve la original
+//  return CATEGORIAS_MAP[catOriginal] || catOriginal;
+//}
 
 async function registrarLecturaRetoPersonal() {
   const lectura = {
