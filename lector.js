@@ -491,10 +491,15 @@ async function registrarLecturaRetoPersonal() {
     fechaInicio: serverTimestamp()
   };
 
-  await addDoc(collection(db, "users", usuarioActual.uid, "lecturas"), lectura);
-  lecturaPendiente = null;
-  await cargarLecturas();
-  alert("🏆 Reto añadido a tu lista. ¡A leer!");
+  try {
+    await addDoc(collection(db, "users", usuarioActual.uid, "lecturas"), lectura);
+    lecturaPendiente = null; // Limpiamos el estado
+    await cargarLecturas();  // REFRESCAR LISTA
+    limpiarFormulario();
+    alert("🏆 Reto añadido a tu lista. ¡A leer!");
+  } catch (e) {
+    console.error("Error al añadir reto:", e);
+  }
 }
 
 // ------------------ RELLENAR FORMULARIO ------------------
@@ -604,27 +609,29 @@ async function cargarRetoActual() {
 
 
 btnReto.addEventListener("click", async () => {
+  const reto = await cargarRetoMensual(); // Usamos el nombre correcto
 
-  const reto = await cargarRetoMensual();
+  if (!reto) {
+    alert("Aún no se ha creado el reto de este mes");
+    return;
+  }
 
-  //if (!reto) {
-  //  alert("Aún no se ha creado el reto de este mes");
-  //  return;
-  //}
-
+  // 1. Precargar el formulario
   tituloInput.value = reto.titulo || "";
   autorInput.value = reto.autor || "";
   paginasInput.value = reto.paginas || 0;
   categoriaInput.value = reto.categoria || "";
   portadaLibro.src = reto.portadaUrl || "https://via.placeholder.com/120x180";
 
+  // 2. IMPORTANTE: Guardar en memoria que esto es un reto
   lecturaPendiente = {
     ...reto,
     esReto: true
   };
 
-  btnRegistrar.textContent = "Registrar reto";
-
+  // 3. Cambiar visualmente el botón para dar feedback al usuario
+  btnRegistrar.textContent = "Aceptar Reto Mensual";
+  btnRegistrar.classList.add("btn-highlight"); // Opcional: un estilo CSS diferente
 });
 
 
@@ -1859,17 +1866,12 @@ function idRetoMesActual() {
 
 
 async function cargarRetoMensual() {
-
-  const id = idRetoMesActual();
-
-  const retoRef = doc(db, "retos", id);
+  const retoRef = doc(db, "retos", "reto-actual");
   const snap = await getDoc(retoRef);
-
-  if (!snap.exists()) {
-    return null;
+  if (snap.exists()) {
+    return snap.data();
   }
-
-  return snap.data();
+  return null;
 }
 
 async function registrarRetoMensual() {
