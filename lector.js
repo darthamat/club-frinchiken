@@ -565,24 +565,57 @@ if (!usuarioActual.uid) return;
 }
 
 function actualizarXP(mostrarAlert = false) {
+  // 1. Definir la meta si no existe
   if (!usuarioData.experienciaNecesaria || usuarioData.experienciaNecesaria <= 0) {
     usuarioData.experienciaNecesaria = xpNecesariaParaNivel(usuarioData.nivel);
   }
 
-  while (usuarioData.experiencia >= usuarioData.experienciaNecesaria) {
-    usuarioData.experiencia -= usuarioData.experienciaNecesaria;
-    usuarioData.nivel++;
-    usuarioData.experienciaNecesaria = xpNecesariaParaNivel(usuarioData.nivel);
+  let subioDeNivel = false;
 
-    if (mostrarAlert) {
-      alert(`✨ ¡Has subido al nivel ${usuarioData.nivel}!`);
-    }
+  // 2. Bucle de subida (por si gana tanta XP que sube 2 niveles de golpe)
+  while (usuarioData.experiencia >= usuarioData.experienciaNecesaria) {
+    // Restamos lo que costaba este nivel para quedarnos con el "sobrante"
+    usuarioData.experiencia -= usuarioData.experienciaNecesaria;
+
+    usuarioData.nivel++;
+
+    // Calculamos la nueva meta para el nuevo nivel
+    usuarioData.experienciaNecesaria = xpNecesariaParaNivel(usuarioData.nivel);
+    subioDeNivel = true;
   }
 
+  // 3. Actualizar la interfaz
   nivelEl.textContent = usuarioData.nivel;
-  xpBarraEl.style.width = `${(usuarioData.experiencia / usuarioData.experienciaNecesaria) * 100}%`;
-  xpTextoEl.textContent = `${usuarioData.experiencia} / ${usuarioData.experienciaNecesaria} XP`;
+
+  // Calculamos el porcentaje real con la nueva meta
+  const porcentaje = (usuarioData.experiencia / usuarioData.experienciaNecesaria) * 100;
+  xpBarraEl.style.width = `${porcentaje}%`;
+  xpTextoEl.textContent = `${Math.floor(usuarioData.experiencia)} / ${usuarioData.experienciaNecesaria} XP`;
+
+  if (subioDeNivel && mostrarAlert) {
+    alert(`✨ ¡NIVEL ALCANZADO! Ahora eres nivel ${usuarioData.nivel} ✨`);
+  }
 }
+
+//function actualizarXP(mostrarAlert = false) {
+//  if (!usuarioData.experienciaNecesaria || usuarioData.experienciaNecesaria <= 0) {
+//    usuarioData.experienciaNecesaria = xpNecesariaParaNivel(usuarioData.nivel);
+//  }
+//
+//  while (usuarioData.experiencia >= usuarioData.experienciaNecesaria) {
+//    usuarioData.experiencia -= usuarioData.experienciaNecesaria;
+//    usuarioData.nivel++;
+//    usuarioData.experienciaNecesaria = xpNecesariaParaNivel(usuarioData.nivel);
+//
+//    if (mostrarAlert) {
+//      alert(`✨ ¡Has subido al nivel ${usuarioData.nivel}!`);
+//    }
+//  }
+//
+//  nivelEl.textContent = usuarioData.nivel;
+//  xpBarraEl.style.width = `${(usuarioData.experiencia / usuarioData.experienciaNecesaria) * 100}%`;
+//  xpTextoEl.textContent = `${usuarioData.experiencia} / ${usuarioData.experienciaNecesaria} XP`;
+//}
 
 // ---------------- RETO ----------------
 async function cargarReto() {
