@@ -74,6 +74,7 @@ btnRegister.addEventListener("click", async () => {
       fatiga: 0,
       mente: 0,
       corazon: 0,
+      suerte: 0,
       imagen_avatar: "",
       clase: claseAleatoria,
       experiencia: 0,
