@@ -758,6 +758,8 @@ async function terminarLectura(l) {
 document.getElementById("btnCancelarValoracion").onclick = () => {
   lecturaPendiente = null;
   document.getElementById("modalValoracion").classList.add("hidden");
+
+   pintarLecturas();
 };
 
 document.getElementById("btnConfirmarValoracion").onclick = async () => {
@@ -782,73 +784,135 @@ document.getElementById("btnConfirmarValoracion").onclick = async () => {
 };
 
 async function finalizarLecturaConRecompensas(l, valoracion, comentario) {
+  // --- Paso 1: Mostrar el dado ---
+  const modal = document.getElementById("modalDado");
+  const dadoVisual = document.getElementById("dadoVisual");
+  const resultadoTxt = document.getElementById("resultadoTirada");
+  const textoTirada = document.getElementById("textoTirada");
+
+  modal.classList.remove("hidden");
+  resultadoTxt.classList.add("hidden");
+  textoTirada.textContent = "¡Lanzando los dados de la fortuna!";
+
+  // --- Paso 2: Simular el tiempo de giro (2 segundos) ---
+  const tirada = Math.floor(Math.random() * 100) + 1;
+
+  await new Promise(resolve => setTimeout(resolve, 2000));
+
+  // Detener animación y mostrar resultado
+  dadoVisual.style.animation = "none";
+  textoTirada.textContent = "¡Resultado!";
+  resultadoTxt.textContent = tirada;
+  resultadoTxt.classList.remove("hidden");
+  resultadoTxt.className = "resultado-brillante";
+
+  // --- Paso 3: Lógica de recompensas ---
+  let objetoExtra = null;
+  let mensaje = "";
+
+  if (tirada <= 5) {
+    objetoExtra = OBJETOS_LEGENDARIOS[Math.floor(Math.random() * OBJETOS_LEGENDARIOS.length)];
+    mensaje = `🌟 ¡LEGENDARIO! Has obtenido: ${objetoExtra.titulo || objetoExtra}`;
+  } else if (tirada <= 20) {
+    objetoExtra = OBJETOS_RAROS[Math.floor(Math.random() * OBJETOS_RAROS.length)];
+    mensaje = `🔷 ¡RARO! Conseguiste: ${objetoExtra.nombre || objetoExtra.id}`;
+  } else {
+    mensaje = "No has encontrado objetos esta vez, ¡sigue leyendo!";
+  }
+
+  // Esperar un momento para que el usuario vea el número antes de cerrar
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  modal.classList.add("hidden");
+  dadoVisual.style.animation = ""; // Reset para la próxima vez
+
+  if (objetoExtra) {
+    alert(mensaje);
+    await otorgarObjeto(objetoExtra);
+  }
+
+  // --- Paso 4: Actualizar Firestore (XP, Prestigio, etc.) ---
   const userRef = doc(db, "users", usuarioActual.uid);
   const lecturaRef = doc(db, "users", usuarioActual.uid, "lecturas", l.id);
 
-  // Guardar valoración
-  await updateDoc(lecturaRef, {
-    activa: false,
-    fechaFin: serverTimestamp(),
-    valoracion,
-    comentario
+  await updateDoc(lecturaRef, { activa: false, fechaFin: serverTimestamp(), valoracion, comentario });
+
+  // Tu lógica de XP e Incrementos aquí...
+  await updateDoc(userRef, {
+    prestigio: increment(l.paginas),
+    monedas: increment(Math.floor(l.paginas / 5))
   });
 
-  l.activa = false;
-
-  // 🎮 RPG
-  if (l.esReto) {
-    usuarioData.experiencia += l.paginas;
-
-    actualizarXP(true);
-
-    await updateDoc(userRef, {
-      experiencia: usuarioData.experiencia,
-      nivel: usuarioData.nivel,
-      experienciaNecesaria: usuarioData.experienciaNecesaria
-    });
-
-    alert(`🏆 Reto completado +${l.paginas} XP`);
-  } else {
-    await updateDoc(userRef, {
-      prestigio: increment(l.paginas)
-    });
-
-    usuarioPrestigio.textContent = Number(usuarioPrestigio.textContent) + l.paginas;
-
-    alert(`📚 Lectura completada +${l.paginas} prestigio`);
-  }
-
-  // 💰 Recompensas
-  const recompensa = generarRecompensas(l.paginas);
-
-  if (recompensa.monedas) {
-    usuarioData.monedas += recompensa.monedas;
-
-    await updateDoc(userRef, {
-      monedas: increment(recompensa.monedas)
-    });
-
-    usuarioMonedas.textContent = usuarioData.monedas;
-
-    alert(`💰 +${recompensa.monedas} marcapáginas`);
-  }
-
-  if (recompensa.objeto && recompensa.objeto.id) {
-    await otorgarObjeto(recompensa.objeto);
-
-    if (recompensa.objeto.efectos) {
-      await aplicarEfectosObjeto(recompensa.objeto.efectos);
-    }
-
-  //if (recompensa.objeto) {
-  //mostrarObjetoEncontrado(recompensa.objeto);
-//
-  //}
-  }
-
   pintarLecturas();
-  await comprobarLogros(l);
 }
+
+//async function finalizarLecturaConRecompensas(l, valoracion, comentario) {
+//  const userRef = doc(db, "users", usuarioActual.uid);
+//  const lecturaRef = doc(db, "users", usuarioActual.uid, "lecturas", l.id);
+//
+//  // Guardar valoración
+//  await updateDoc(lecturaRef, {
+//    activa: false,
+//    fechaFin: serverTimestamp(),
+//    valoracion,
+//    comentario
+//  });
+//
+//  l.activa = false;
+//
+//  // 🎮 RPG
+//  if (l.esReto) {
+//    usuarioData.experiencia += l.paginas;
+//
+//    actualizarXP(true);
+//
+//    await updateDoc(userRef, {
+//      experiencia: usuarioData.experiencia,
+//      nivel: usuarioData.nivel,
+//      experienciaNecesaria: usuarioData.experienciaNecesaria
+//    });
+//
+//    alert(`🏆 Reto completado +${l.paginas} XP`);
+//  } else {
+//    await updateDoc(userRef, {
+//      prestigio: increment(l.paginas)
+//    });
+//
+//    usuarioPrestigio.textContent = Number(usuarioPrestigio.textContent) + l.paginas;
+//
+//    alert(`📚 Lectura completada +${l.paginas} prestigio`);
+//  }
+//
+//  // 💰 Recompensas
+//  const recompensa = generarRecompensas(l.paginas);
+//
+//  if (recompensa.monedas) {
+//    usuarioData.monedas += recompensa.monedas;
+//
+//    await updateDoc(userRef, {
+//      monedas: increment(recompensa.monedas)
+//    });
+//
+//    usuarioMonedas.textContent = usuarioData.monedas;
+//
+//    alert(`💰 +${recompensa.monedas} marcapáginas`);
+//  }
+//
+//  if (recompensa.objeto && recompensa.objeto.id) {
+//    await otorgarObjeto(recompensa.objeto);
+//
+//    if (recompensa.objeto.efectos) {
+//      await aplicarEfectosObjeto(recompensa.objeto.efectos);
+//    }
+//
+//  //if (recompensa.objeto) {
+//  //mostrarObjetoEncontrado(recompensa.objeto);
+////
+//  //}
+//  }
+//
+//  pintarLecturas();
+//  await comprobarLogros(l);
+//}
 
 function renderizarEstrellas(valoracion) {
   if (!valoracion || valoracion <= 0) {
