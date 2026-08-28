@@ -86,12 +86,21 @@ export const OBJETOS_RAROS = [
     titulo: "Mascota: Orangutan asesino",
     descripcion: "Ganas prestigio, eres famoso",
     rareza: "raro",
-    tipo: "pasivo",
+    tipo: "activo",
+    categoria: "seguidor",
     duracion: null,
     icono: "🦧",
+    
+    
+        frasesFinalLectura: [
+      "uh uh uhhhhh"
+        
+    ],
     efectos: {
       prestigio: 2500,
       fuerza: 3
+      
+      
 
     }
   },
@@ -101,9 +110,16 @@ export const OBJETOS_RAROS = [
     titulo: "Mascota: T-Rex simpatico",
     descripcion: "Ganas prestigio, eres famoso",
     rareza: "raro",
-    tipo: "pasivo",
+    tipo: "activo",
+    categoria: "seguidor",
     duracion: null,
     icono: "🦖",
+            frasesFinalLectura: [
+     "grrrrrrrrrrrrr",
+              "sniff",
+              "wooooooooooooo",
+              "burrrrrrrrrrrr"
+    ],
     efectos: {
       prestigio: 2500,
       fuerza: 3
@@ -115,9 +131,16 @@ export const OBJETOS_RAROS = [
     titulo: "Mascota: Rocket Raccoon",
     descripcion: "Ganas prestigio, esta muy chulo",
     rareza: "raro",
-    tipo: "pasivo",
+    tipo: "activo",
+    categoria: "seguidor",
     duracion: null,
-    icono: "🦙",
+    icono: "🦝",
+            frasesFinalLectura: [
+      "!Nosotros somos los malditos Guardianes de la Galaxia!",
+              "!NO SOY UN MAPACHE!",
+              "¡Necesito el ojo de ese tipo!",
+              
+    ],
     efectos: {
       prestigio: 1500,
       fuerza: 3
@@ -129,9 +152,17 @@ export const OBJETOS_RAROS = [
     titulo: "Mascota: Maximus Prime",
     descripcion: "Ganas prestigio, esta muy chulo",
     rareza: "raro",
-    tipo: "pasivo",
+    tipo: "activo",
+    categoria: "seguidor",
     duracion: null,
     icono: "🤖",
+            frasesFinalLectura: [
+      "soy maximus prime!",
+              "¡Ch-ch-ch-ch-ch-k-k-k!",
+              "Autobots, ¡avancen!",
+              "El destino rara vez nos llama en el momento que elegimos." ,
+              
+    ],
     efectos: {
       prestigio: 1500,
       fuerza: 3
@@ -143,9 +174,17 @@ export const OBJETOS_RAROS = [
     titulo: "Seguidor: Dracula",
     descripcion: "Ganas prestigio, esta muy chulo",
     rareza: "raro",
-    tipo: "pasivo",
+    tipo: "activo",
+    categoria: "seguidor",
     duracion: null,
     icono: "🧛",
+            frasesFinalLectura: [
+    "Interesante... aunque esperaba un poco más de sangre.",
+      "Otra lectura terminada. Brindo por ti... yo pongo la sangre, digo el vino...",
+      "Has sobrevivido a otro libro. Una habilidad admirable para un mortal.",
+      "Yo habría leído más rápido, pero los vampiros tenemos horarios complicados.",
+      "Excelente. Ahora apaga la luz y empecemos otro."
+    ],
     efectos: {
       prestigio: 1500,
       fuerza: 1,
@@ -158,9 +197,17 @@ export const OBJETOS_RAROS = [
     titulo: "Seguidor: Legolas",
     descripcion: "Ganas prestigio, esta muy chulo",
     rareza: "raro",
-    tipo: "pasivo",
+    tipo: "activo",
+    categoria: "seguidor",
     duracion: null,
     icono: "🧝",
+            frasesFinalLectura: [
+      "Una lectura digna de las canciones de los elfos.",
+      "He visto muchas cosas en mis largos años... pero este final me sorprendió.",
+      "Otro libro completado. Tus ojos son rápidos, humano.",
+      "Podría haber terminado este libro en menos tiempo... pero no presumiré.",
+      "Una historia termina. Otra aventura nos espera."
+    ],
     efectos: {
       prestigio: 1500,
       agilidad: 2
@@ -172,9 +219,17 @@ export const OBJETOS_RAROS = [
     titulo: "Seguidor: luis pitufo gruñon",
     descripcion: "Pierdes prestigio y cordura",
     rareza: "raro",
-    tipo: "pasivo",
+    tipo: "activo",
+    categoria: "seguidor",
     duracion: null,
     icono: "🤬",
+            frasesFinalLectura: [
+          "Pues a mí no me ha gustado.",
+      "¿Ya está? Menuda pérdida de tiempo.",
+      "He leído cosas peores. Pero pocas.",
+      "Otro libro terminado... fantástico. Qué emocionante.",
+      "Espero que el siguiente sea mejor. Aunque lo dudo."
+    ],
     efectos: {
       prestigio: -1500,
       mente: -1
@@ -216,7 +271,7 @@ export const OBJETOS_LEGENDARIOS = [
   "La dragonlance",
   "La segunda bola de dragon",
   "Sombrero de Terry Pratchett",
-  "Tercer libro de El titulo del Viento",
+  "Tercer libro de El nombre del Viento",
   "La granada de Antioquia",
   "Chapines de rubies",
   {
@@ -705,3 +760,16 @@ export const LOGROS = [
     efectos: { xp: 50, monedas: 25, prestigio: 100 }
   }
 ];
+
+export function obtenerFraseSeguidor(seguidor) {
+
+  if (!seguidor?.frasesFinalLectura?.length) {
+    return null;
+  }
+
+  const indice = Math.floor(
+    Math.random() * seguidor.frasesFinalLectura.length
+  );
+
+  return seguidor.frasesFinalLectura[indice];
+}
