@@ -20,7 +20,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-import { RECOMPENSAS, OBJETOS_RAROS, OBJETOS_LEGENDARIOS, LOGROS } from "./gameConfig.js";
+import { RECOMPENSAS, OBJETOS_RAROS, OBJETOS_LEGENDARIOS, LOGROS, obtenerFraseSeguidor } from "./gameConfig.js";
 
 // ---------------- FIREBASE ----------------
 const firebaseConfig = {
@@ -945,6 +945,7 @@ async function finalizarLecturaConRecompensas(l, valoracion, comentario) {
 
   pintarLecturas();
   await comprobarLogros(l);
+  await mostrarComentarioSeguidor();
 }
 
 function renderizarEstrellas(valoracion) {
